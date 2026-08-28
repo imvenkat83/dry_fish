@@ -214,6 +214,9 @@ export const reviews = sqliteTable("reviews", {
   rating: integer("rating").notNull().default(5),
   comment: text("comment").notNull(),
   designation: text("designation").default("Verified Buyer"),
+  imageUrl: text("image_url"),
+  buttonText: text("button_text").default("EXPLORE COLLECTION"),
+  buttonLink: text("button_link").default("/all"),
   createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
 });
 export const faqs = sqliteTable("faqs", {

@@ -45,4 +45,9 @@ playwright-report/
 test-results/
 
 # Database
-# sqlite.db
+sqlite.db
+*.db
+
+# Scratch and temporary env
+scratch/
+env*

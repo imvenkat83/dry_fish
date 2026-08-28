@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import ProductGrid from "@/components/ProductGrid";
+import ProductCard from "@/components/ProductCard";
+import { getFirstProductImageUrl, getProductImageUrls } from "@/utils/product";
 import { ChevronLeft, ChevronRight, Sun, Leaf, FlaskConical, Package, Star } from "lucide-react";
 
 type NavItem = {
@@ -54,6 +56,7 @@ export default function Home() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [faqs, setFaqs] = useState<any[]>([]);
   const [founderPromoList, setFounderPromoList] = useState<any[]>([]);
+  const [latestProducts, setLatestProducts] = useState<any[]>([]);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
 
@@ -94,6 +97,12 @@ export default function Home() {
         const dataReviews = await resReviews.json();
         if (dataReviews.success) {
           setReviews(dataReviews.data || []);
+        }
+
+        const resLatest = await fetch("/api/products/latest");
+        const dataLatest = await resLatest.json();
+        if (dataLatest.success) {
+          setLatestProducts(dataLatest.data || []);
         }
 
         const resCatCards = await fetch("/api/admin/homepage-categories");
@@ -166,9 +175,9 @@ export default function Home() {
 
       {/* 2. Dynamic Home Banner Carousel (supports image and video) */}
       {banners.length > 0 && (
-        <div className="w-full relative overflow-hidden border-b border-brand/10 group mt-0 bg-brand-light">
+        <div className="w-full h-[calc(100vh-4rem)] relative overflow-hidden border-b border-brand/10 group mt-0 bg-[#FAF6ED]">
           {banners.length === 1 ? (
-            <div className="w-full relative h-auto">
+            <div className="w-full h-full relative">
               {banners[0].link === "#featured-collections" ? (
                 <a
                   href="#featured-collections"
@@ -176,48 +185,48 @@ export default function Home() {
                     e.preventDefault();
                     document.getElementById("featured-collections")?.scrollIntoView({ behavior: "smooth" });
                   }}
-                  className="block w-full h-auto cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
+                  className="block w-full h-full cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
                 >
                   {isVideoUrl(banners[0].url) ? (
-                    <video src={banners[0].url} className="w-full h-auto" autoPlay muted loop playsInline />
+                    <video src={banners[0].url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
                   ) : (
                     <img
                       src={banners[0].url}
                       alt="Current Offers & Collections"
-                      className="w-full h-auto transition-transform duration-1000 ease-out group-hover:scale-[1.01]"
+                      className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.01]"
                     />
                   )}
                 </a>
               ) : banners[0].link ? (
                 <Link
                   href={banners[0].link}
-                  className="block w-full h-auto cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
+                  className="block w-full h-full cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
                 >
                   {isVideoUrl(banners[0].url) ? (
-                    <video src={banners[0].url} className="w-full h-auto" autoPlay muted loop playsInline />
+                    <video src={banners[0].url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
                   ) : (
                     <img
                       src={banners[0].url}
                       alt="Current Offers & Collections"
-                      className="w-full h-auto transition-transform duration-1000 ease-out group-hover:scale-[1.01]"
+                      className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.01]"
                     />
                   )}
                 </Link>
               ) : (
                 isVideoUrl(banners[0].url) ? (
-                  <video src={banners[0].url} className="w-full h-auto" autoPlay muted loop playsInline />
+                  <video src={banners[0].url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
                 ) : (
                   <img
                     src={banners[0].url}
                     alt="Current Offers & Collections"
-                    className="w-full h-auto transition-transform duration-1000 ease-out group-hover:scale-[1.01]"
+                    className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.01]"
                   />
                 )
               )}
               <div className="absolute inset-0 bg-black/[0.02] pointer-events-none"></div>
             </div>
           ) : (
-            <div className="relative w-full overflow-hidden aspect-[21/9] sm:aspect-[21/9] md:aspect-[3/1] lg:aspect-[21/9]">
+            <div className="relative w-full h-full overflow-hidden">
               <AnimatePresence initial={false} mode="wait">
                 <motion.div
                   key={currentBannerIndex}
@@ -356,6 +365,65 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
         <ProductGrid />
 
+        {/* 2.5 Brand Feature Banner (Banner 2) */}
+        <section className="w-full mx-auto my-10 rounded-3xl overflow-hidden shadow-sm border border-[#8c6239]/15 bg-[#FAF6ED] transition-all hover:shadow-md">
+          <div className="w-full relative">
+            <img
+              src="/images/brand_feature_banner.png"
+              alt="Brand Quality & Heritage Features"
+              className="w-full h-auto object-contain block"
+            />
+          </div>
+        </section>
+
+        {/* 2.6 Latest Arrivals Section */}
+        {latestProducts.length > 0 && (
+          <section className="w-full mx-auto my-12 pt-2">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="flex flex-col items-start mb-8 pb-2"
+            >
+              <h2 className="text-2xl md:text-3xl font-serif font-semibold text-[#3b2314]">
+                Latest Arrivals
+              </h2>
+            </motion.div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {latestProducts.slice(0, 8).map((product: any) => {
+                const parsedImages = getProductImageUrls(product.images, product.colors);
+                const firstImage = getFirstProductImageUrl(product.images, product.colors);
+
+                return (
+                  <ProductCard
+                    key={product.id}
+                    product={{
+                      id: product.id.toString(),
+                      name: product.name,
+                      description: product.description || "",
+                      price: product.salePrice || product.basePrice,
+                      basePrice: product.basePrice,
+                      salePrice: product.salePrice,
+                      imageUrl: firstImage,
+                      images: parsedImages,
+                      categorySlug: product.category || "all",
+                      isCustomizable: product.isCustomizable === true || product.isCustomizable === 1,
+                      style: product.style,
+                      neckStyle: product.neckStyle,
+                      keyWords: product.keyWords,
+                      avgRating: product.avgRating,
+                      numReviews: product.numReviews,
+                      totalStock: product.totalStock,
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         {/* Founder Promotion Section */}
         {founderPromoList.length > 0 && (
           <section className="w-full mx-auto my-8 border-t border-[#8c6239]/10 pt-8 animate-in fade-in duration-500">
@@ -396,49 +464,115 @@ export default function Home() {
 
 
 
-        {/* Dynamic Reviews Section */}
+        {/* 2.75. See What Our Customers Say About Us (Customer Reviews Section) */}
         {reviews.length > 0 && (
-          <section className="w-full mx-auto my-16">
+          <section className="w-full mx-auto my-12 pt-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="flex flex-col items-center text-center mb-12 border-b border-brand/10 pb-6"
+              className="flex flex-col items-center text-center mb-8"
             >
-              <h2 className="text-4xl font-playfair font-bold mb-3 text-black">Customer Testimonials</h2>
-              <p className="text-gray-600 italic">See what our customers love about our traditional delicacies.</p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-black text-[#3b2314] tracking-tight">
+                See What Our Customers Say About Us
+              </h2>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {reviews.map((review) => (
-                <div 
-                  key={review.id} 
-                  className="p-8 bg-white border border-brand/5 rounded-[2rem] shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    {/* Stars */}
-                    <div className="flex items-center gap-0.5 mb-4">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          size={14}
-                          className={i < review.rating ? "fill-[#C5A059] text-[#C5A059]" : "text-black/15"}
+            <div className="relative group px-1">
+              {reviews.length > 4 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const container = document.getElementById("reviews-scroll-container");
+                      if (container) container.scrollBy({ left: -340, behavior: "smooth" });
+                    }}
+                    className="absolute -left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-black shadow-xl flex items-center justify-center border border-black/10 z-20 transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+                    aria-label="Previous Reviews"
+                  >
+                    <ChevronLeft size={22} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const container = document.getElementById("reviews-scroll-container");
+                      if (container) container.scrollBy({ left: 340, behavior: "smooth" });
+                    }}
+                    className="absolute -right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-black shadow-xl flex items-center justify-center border border-black/10 z-20 transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+                    aria-label="Next Reviews"
+                  >
+                    <ChevronRight size={22} />
+                  </button>
+                </>
+              )}
+
+              <div
+                id="reviews-scroll-container"
+                className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar py-2 scroll-smooth"
+              >
+                {reviews.map((review) => (
+                  <div
+                    key={review.id}
+                    className="snap-start flex-shrink-0 w-[260px] sm:w-[280px] md:w-[300px] lg:w-[calc(25%-1.125rem)] bg-[#FAF6ED] border border-[#3b2314]/25 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between hover:shadow-md transition-all"
+                  >
+                    {/* Top Photo */}
+                    <div className="w-full aspect-[4/3] overflow-hidden bg-brand/5 border-b border-[#3b2314]/15">
+                      {review.imageUrl ? (
+                        <img
+                          src={review.imageUrl}
+                          alt={review.userName}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/images/placeholder.png";
+                          }}
                         />
-                      ))}
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-[#8c6239]/10 text-[#3b2314]">
+                          <span className="font-serif text-3xl font-bold uppercase">{review.userName.charAt(0)}</span>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-black/75 text-sm italic leading-relaxed mb-6">
-                      "{review.comment}"
-                    </p>
+
+                    {/* Card Content */}
+                    <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between text-center space-y-3">
+                      <div>
+                        {/* Rating Stars */}
+                        <div className="flex items-center justify-center gap-1 mb-3">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              size={15}
+                              className={i < (review.rating || 5) ? "fill-black text-black" : "text-black/15"}
+                            />
+                          ))}
+                        </div>
+
+                        {/* Review Comment */}
+                        <p className="text-xs sm:text-sm font-semibold text-black/90 leading-relaxed italic mb-4">
+                          "{review.comment}"
+                        </p>
+
+                        {/* Reviewer Name / Designation */}
+                        <p className="text-xs sm:text-sm font-black text-black uppercase tracking-wide">
+                          - {review.designation || review.userName}
+                        </p>
+                      </div>
+
+                      {/* Bottom Action Button */}
+                      <div className="pt-2">
+                        <Link
+                          href={review.buttonLink || "/all"}
+                          className="block w-full py-2.5 bg-[#eab308] hover:bg-[#d9a207] text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-xs active:scale-95"
+                        >
+                          {review.buttonText || "EXPLORE COLLECTION"}
+                        </Link>
+                      </div>
+                    </div>
                   </div>
-                  <div className="border-t border-brand/5 pt-4 flex items-center justify-between">
-                    <span className="text-xs font-bold text-black">{review.userName}</span>
-                    {review.designation && (
-                      <span className="text-[10px] font-black text-[#C5A059] uppercase tracking-wider">{review.designation}</span>
-                    )}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </section>
         )}

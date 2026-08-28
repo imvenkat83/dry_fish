@@ -120,6 +120,8 @@ export default function Navbar() {
     try {
       const res = await fetch("/api/auth/logout", { method: "POST" });
       if (res.ok) {
+        clearCart();
+        clearWishlist();
         setUser(null);
         setIsLogoutModalOpen(false);
         router.push("/");
@@ -161,7 +163,7 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-6 ml-4">
-              <Link href="/" className="text-[#3b2314] hover:text-[#8c6239] text-sm font-bold tracking-wide transition-colors">
+              <Link href="/" className="text-[#3b2314] hover:text-[#8c6239] text-sm font-medium tracking-wide transition-colors">
                 Home
               </Link>
               
@@ -169,7 +171,7 @@ export default function Navbar() {
                 <Link
                   key={cat.id}
                   href={cat.link || `/category/${cat.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
-                  className="text-[#3b2314] hover:text-[#8c6239] text-sm font-bold tracking-wide transition-colors capitalize"
+                  className="text-[#3b2314] hover:text-[#8c6239] text-sm font-medium tracking-wide transition-colors capitalize"
                 >
                   {cat.name}
                 </Link>
@@ -177,16 +179,16 @@ export default function Navbar() {
 
               <Link
                 href="/contact"
-                className={`hover:text-[#8c6239] text-sm font-bold tracking-wide transition-colors ${
+                className={`hover:text-[#8c6239] text-sm font-medium tracking-wide transition-colors ${
                   pathname === "/contact" ? "text-[#8c6239]" : "text-[#3b2314]"
                 }`}
               >
                 Contact
               </Link>
-              <Link href="/my-story" className="text-[#3b2314] hover:text-[#8c6239] text-sm font-bold tracking-wide transition-colors">
+              <Link href="/my-story" className="text-[#3b2314] hover:text-[#8c6239] text-sm font-medium tracking-wide transition-colors">
                 About us
               </Link>
-              <Link href="/blogs" className="text-[#3b2314] hover:text-[#8c6239] text-sm font-bold tracking-wide transition-colors">
+              <Link href="/blogs" className="text-[#3b2314] hover:text-[#8c6239] text-sm font-medium tracking-wide transition-colors">
                 Blog
               </Link>
             </nav>
@@ -208,7 +210,7 @@ export default function Navbar() {
               >
                 <Heart className="h-5 w-5" />
                 {user && wishlistItems.length > 0 && (
-                  <span className="absolute top-0 right-0 bg-[#8c6239] text-white text-[8px] font-black h-3.5 w-3.5 rounded-full flex items-center justify-center">
+                  <span className="absolute top-0 right-0 bg-[#8c6239] text-white text-[8px] font-medium h-3.5 w-3.5 rounded-full flex items-center justify-center">
                     {wishlistItems.length}
                   </span>
                 )}
@@ -216,7 +218,7 @@ export default function Navbar() {
 
               <Link href={user ? "/cart" : "/login"} aria-label="Cart" className="hover:text-[#8c6239] transition-colors relative p-2">
                 <ShoppingCart className="h-5 w-5" />
-                <span className="absolute top-0 right-0 bg-[#8c6239] text-white text-[8px] font-black h-3.5 w-3.5 rounded-full flex items-center justify-center">
+                <span className="absolute top-0 right-0 bg-[#8c6239] text-white text-[8px] font-medium h-3.5 w-3.5 rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               </Link>
@@ -249,7 +251,7 @@ export default function Navbar() {
               >
                 <Heart className="h-5 w-5" />
                 {user && wishlistItems.length > 0 && (
-                  <span className="absolute top-0 right-0 bg-[#eab308] text-black text-[9px] font-black h-4 w-4 rounded-full flex items-center justify-center border-2 border-black">
+                  <span className="absolute top-0 right-0 bg-[#eab308] text-black text-[9px] font-medium h-4 w-4 rounded-full flex items-center justify-center border-2 border-black">
                     {wishlistItems.length}
                   </span>
                 )}
@@ -257,7 +259,7 @@ export default function Navbar() {
 
               <Link href={user ? "/cart" : "/login"} aria-label="Cart" className="text-white hover:text-[#eab308] transition-colors relative p-1 sm:p-2">
                 <ShoppingCart className="h-5 w-5" />
-                <span className="absolute top-0 right-0 bg-[#eab308] text-black text-[9px] font-black h-4 w-4 rounded-full flex items-center justify-center border-2 border-black">
+                <span className="absolute top-0 right-0 bg-[#eab308] text-black text-[9px] font-medium h-4 w-4 rounded-full flex items-center justify-center border-2 border-black">
                   {cartCount}
                 </span>
               </Link>
@@ -285,31 +287,31 @@ export default function Navbar() {
                 <Link
                   href="/"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-white hover:text-[#eab308] text-sm font-black uppercase tracking-widest transition-colors py-2"
+                  className="block text-white hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-2"
                 >
                   Home
                 </Link>
                 <Link
                   href="/my-story"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-white hover:text-[#eab308] text-sm font-black uppercase tracking-widest transition-colors py-2"
+                  className="block text-white hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-2"
                 >
                   About Us
                 </Link>
                 <Link
                   href="/blogs"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-white hover:text-[#eab308] text-sm font-black uppercase tracking-widest transition-colors py-2"
+                  className="block text-white hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-2"
                 >
                   Blog
                 </Link>
 
                 {/* Products Section */}
                 <div className="space-y-2 py-2">
-                  <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-white opacity-80">Products</h3>
+                  <h3 className="text-[11px] font-medium uppercase tracking-[0.2em] text-white opacity-80">Products</h3>
                   <div className="flex flex-col space-y-1 pl-3 border-l border-white/20">
                     {categories.length === 0 ? (
-                      <span className="text-white/50 py-2 text-xs font-bold uppercase tracking-wider">
+                      <span className="text-white/50 py-2 text-xs font-medium uppercase tracking-wider">
                         No Categories Yet
                       </span>
                     ) : (
@@ -318,7 +320,7 @@ export default function Navbar() {
                           key={cat.id}
                           href={cat.link || `/category/${cat.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-white hover:text-[#eab308] transition-colors py-2 text-xs font-bold uppercase tracking-wider"
+                          className="text-white hover:text-[#eab308] transition-colors py-2 text-xs font-medium uppercase tracking-wider"
                         >
                           {cat.name}
                         </Link>
@@ -330,7 +332,7 @@ export default function Navbar() {
                 <Link
                   href="/contact"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block hover:text-[#eab308] text-sm font-black uppercase tracking-widest transition-colors py-2 ${
+                  className={`block hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-2 ${
                     pathname === "/contact" ? "text-[#eab308]" : "text-white"
                   }`}
                 >

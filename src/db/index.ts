@@ -13,7 +13,7 @@ const globalForDb = globalThis as unknown as {
   client: ReturnType<typeof createClient> | undefined;
 };
 
-const client = globalForDb.client ?? (
+export const client = globalForDb.client ?? (
   (url && url !== "file:sqlite.db") 
     ? createClient({ url, authToken })
     : createClient({ url: "file:sqlite.db" })

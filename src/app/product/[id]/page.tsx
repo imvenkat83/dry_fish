@@ -128,7 +128,14 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
 
   const handleWishlistClick = async () => {
-    if (!isAuthenticated) {
+    try {
+      const sessionRes = await fetch("/api/auth/session", { cache: "no-store" });
+      const sessionData = await sessionRes.json();
+      if (!sessionData.authenticated) {
+        window.location.href = `/login?redirect=${encodeURIComponent(pathname)}`;
+        return;
+      }
+    } catch (err) {
       window.location.href = `/login?redirect=${encodeURIComponent(pathname)}`;
       return;
     }
@@ -276,7 +283,19 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
+    try {
+      const sessionRes = await fetch("/api/auth/session", { cache: "no-store" });
+      const sessionData = await sessionRes.json();
+      if (!sessionData.authenticated) {
+        window.location.href = `/login?redirect=${encodeURIComponent(pathname)}`;
+        return;
+      }
+    } catch (err) {
+      window.location.href = `/login?redirect=${encodeURIComponent(pathname)}`;
+      return;
+    }
+
     if (!selectedColor) {
       setToast("Please select a color first");
       return;
