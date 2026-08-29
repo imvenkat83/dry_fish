@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, ShoppingCart, User, Menu, X, LogOut, AlertCircle, BookOpen, Heart, Trash2, Calendar, Package, MapPin } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, LogOut, AlertCircle, BookOpen, Heart, Trash2, Calendar, Package, MapPin, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfileDropdown from "./ProfileDropdown";
 import SearchModal from "./SearchModal";
