@@ -23,4 +23,7 @@ if (process.env.NODE_ENV !== "production") {
   globalForDb.client = client;
 }
 
+// Auto-ensure email column exists in users table
+client.execute("ALTER TABLE users ADD COLUMN email TEXT;").catch(() => {});
+
 export const db = drizzle(client, { schema });

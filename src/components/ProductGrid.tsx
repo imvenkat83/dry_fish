@@ -72,6 +72,7 @@ export default function ProductGrid() {
     async function fetchFeatured() {
       try {
         const res = await fetch("/api/products/featured");
+        if (!res.ok) return;
         const data = await res.json();
         if (data.success) {
           setProducts(data.data);

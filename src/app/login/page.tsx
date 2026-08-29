@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck, User, Phone } from "lucide-react";
+import { ArrowLeft, ShieldCheck, User, Phone, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { auth } from "@/db/firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
@@ -13,6 +13,7 @@ export default function Login() {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [timer, setTimer] = useState(0);
@@ -92,7 +93,7 @@ export default function Login() {
       const res = await fetch("/api/auth/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, fullName }),
+        body: JSON.stringify({ phone, fullName, email }),
       });
       const data = await res.json();
       
@@ -137,7 +138,7 @@ export default function Login() {
           <p className="text-black/60 text-sm leading-relaxed px-4">
             {step === "phone" && "Enter your 10-digit mobile number to access your account."}
             {step === "otp" && `We've sent a 6-digit verification code to +91 ${phone}`}
-            {step === "profile" && "One last step! Tell us your name to personalize your experience."}
+            {step === "profile" && "One last step! Tell us your name and email address to personalize your experience."}
           </p>
         </div>
 
@@ -226,7 +227,7 @@ export default function Login() {
 
         {/* STEP 3: Profile Setup */}
         {step === "profile" && (
-          <form onSubmit={handleSaveProfile} className="space-y-6">
+          <form onSubmit={handleSaveProfile} className="space-y-5">
             <div>
               <label className="block text-[10px] font-black text-black/40 uppercase mb-2 tracking-[0.2em] ml-1">Full Name</label>
               <div className="relative">
@@ -241,9 +242,23 @@ export default function Login() {
                 />
               </div>
             </div>
+            <div>
+              <label className="block text-[10px] font-black text-black/40 uppercase mb-2 tracking-[0.2em] ml-1">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-black-accent" size={18} />
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="e.g. arjun@example.com" 
+                  className="w-full bg-brand/5 border-2 border-transparent focus:border-brand-accent/30 focus:bg-white rounded-xl py-4 px-12 text-black font-bold transition-all outline-none"
+                  required
+                />
+              </div>
+            </div>
             <button 
               type="submit" 
-              disabled={loading || !fullName.trim()} 
+              disabled={loading || !fullName.trim() || !email.trim()} 
               className="w-full bg-brand text-white font-bold py-4 rounded-xl shadow-lg hover:bg-brand-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex justify-center items-center space-x-2"
             >
               {loading ? (

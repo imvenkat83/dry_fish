@@ -343,25 +343,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           <span>Back to Collections</span>
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          {/* Left: Image Gallery (5 cols - reduced from 6) */}
-          <div className="lg:col-span-5 flex flex-col-reverse md:flex-row gap-5">
-            {/* Thumbnails */}
-            <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto max-h-[600px] no-scrollbar">
-              {colorImages.map((img: string, idx: number) => (
-                <button
-                  key={idx}
-                  onClick={() => setMainImage(img)}
-                  className={`relative flex-shrink-0 w-20 h-24 md:w-24 md:h-32 rounded-lg overflow-hidden border-2 transition-all ${mainImage === img ? "border-brand-accent shadow-md scale-105" : "border-transparent hover:border-brand/20"
-                    }`}
-                >
-                  <img src={img} alt={`${product.name} ${idx}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          {/* Left: Image Gallery (occupies 50% screen width on desktop, sticky while scrolling details) */}
+          <div className="lg:col-span-6 lg:sticky lg:top-24 self-start flex flex-col gap-4">
             {/* Main Image */}
-            <div className="flex-1 aspect-square relative rounded-2xl overflow-hidden bg-white shadow-xl group">
+            <div className="w-full aspect-square relative rounded-2xl overflow-hidden bg-white shadow-xl group border border-[#8c6239]/10">
               <img
                 src={mainImage}
                 alt={product.name}
@@ -373,10 +359,27 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 </div>
               </div>
             </div>
+
+            {/* Small Thumbnails below Main Image */}
+            {colorImages.length > 0 && (
+              <div className="flex flex-row gap-3 overflow-x-auto no-scrollbar py-1">
+                {colorImages.map((img: string, idx: number) => (
+                  <button
+                    key={idx}
+                    onClick={() => setMainImage(img)}
+                    className={`relative flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
+                      mainImage === img ? "border-[#8c6239] shadow-md scale-105" : "border-transparent hover:border-[#8c6239]/30"
+                    }`}
+                  >
+                    <img src={img} alt={`${product.name} thumbnail ${idx}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Right: Product Details (7 cols) */}
-          <div className="lg:col-span-7 flex flex-col bg-[#FAF6ED] border border-[#8c6239]/15 rounded-3xl p-6 md:p-8 shadow-sm">
+          {/* Right: Product Details (occupies 50% screen width on desktop) */}
+          <div className="lg:col-span-6 flex flex-col bg-[#FAF6ED] border border-[#8c6239]/15 rounded-3xl p-6 md:p-8 shadow-sm">
             {/* 1. Product Name */}
             <h1 className="text-2xl md:text-3xl font-serif font-black leading-tight text-[#3b2314] mb-3">
               {product.name}

@@ -38,6 +38,7 @@ export default function AnnouncementBar() {
     async function fetchOffers() {
       try {
         const res = await fetch("/api/admin/offers");
+        if (!res.ok) return;
         const data = await res.json();
         if (data.success) {
           setOffers(data.data || []);

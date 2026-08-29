@@ -16,40 +16,40 @@ export default function Footer() {
   };
 
   return (
-    <div className="w-full flex flex-col font-sans select-none">
-      <footer id="contact-us" className="w-full bg-[#8c6239] pt-14 pb-12 px-6 md:px-12 text-[#FFFDF6]/90">
+    <div className="w-full flex flex-col font-serif select-none">
+      <footer id="contact-us" className="w-full bg-[#8c6239] pt-14 pb-12 px-6 md:px-12 text-[#FFFDF6]/90 font-serif">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
           
           {/* Column 1: Info and Address */}
           <div className="md:col-span-2 flex flex-col pr-0 md:pr-10">
-            <h3 className="text-xl font-serif font-black text-[#fcd34d] mb-4 tracking-wide">
-              Dry Fish Basket
+            <h3 className="text-2xl font-serif font-bold text-[#fcd34d] mb-4 tracking-wide">
+              Godavari Dry fish
             </h3>
-            <p className="text-xs text-[#FFFDF6]/80 leading-relaxed mb-3">
-              Traditional taste from the coastal belt. FSSAI licensed & hygienic processing.
+            <p className="text-sm text-[#FFFDF6]/85 leading-relaxed mb-3 font-serif">
+              Traditional taste from the Godavari coastal belt. FSSAI licensed &amp; hygienic processing.
             </p>
-            <p className="text-xs text-[#FFFDF6]/80 italic leading-relaxed mb-5">
+            <p className="text-sm text-[#FFFDF6]/85 italic leading-relaxed mb-5 font-serif">
               Now delivering to Hyderabad, Bangalore, Chennai, Mumbai, Pune, Delhi &amp; across India.
             </p>
-            <div className="text-xs text-[#FFFDF6]/85 space-y-1">
+            <div className="text-sm text-[#FFFDF6]/90 space-y-1 font-serif">
               <p className="font-bold text-[#fcd34d] tracking-wide mb-1">Address:</p>
               <p>Bhimavaram</p>
               <p>ANDHRAPRADESH - 534204</p>
               <p className="pt-3">
-                call: <a href="tel:+919848357279" className="hover:text-[#fcd34d] hover:underline transition-colors">+91 98483 57279</a>
+                call : <a href="tel:+919676344465" className="hover:text-[#fcd34d] hover:underline transition-colors">+91-9676344465</a>
               </p>
               <p>
-                <a href="mailto:info@vkdryfishbasket.com" className="hover:text-[#fcd34d] hover:underline transition-colors">info@vkdryfishbasket.com</a>
+                <a href="mailto:godavaridryfish@gmail.com" className="hover:text-[#fcd34d] hover:underline transition-colors">godavaridryfish@gmail.com</a>
               </p>
             </div>
           </div>
 
           {/* Column 2: Quick Links */}
           <div className="flex flex-col">
-            <h3 className="text-sm font-serif font-black text-[#fcd34d] mb-4 tracking-wide uppercase">
-              QUICK LINKS
+            <h3 className="text-lg font-serif font-bold text-[#fcd34d] mb-4 tracking-wide">
+              Quick links
             </h3>
-            <ul className="space-y-2 text-xs font-medium text-[#FFFDF6]/80">
+            <ul className="space-y-2.5 text-sm font-normal text-[#FFFDF6]/85 font-serif">
               <li>
                 <Link href="/search" className="hover:text-[#fcd34d] hover:underline transition-colors">
                   Search
@@ -80,10 +80,10 @@ export default function Footer() {
 
           {/* Column 3: Delivery Locations */}
           <div className="flex flex-col">
-            <h3 className="text-sm font-serif font-black text-[#fcd34d] mb-4 tracking-wide uppercase">
-              OUR DRY FISH DELIVERY LOCATIONS
+            <h3 className="text-lg font-serif font-bold text-[#fcd34d] mb-4 tracking-wide">
+              Our Dry Fish Delivery Locations
             </h3>
-            <ul className="space-y-2 text-xs font-medium text-[#FFFDF6]/80">
+            <ul className="space-y-2.5 text-sm font-normal text-[#FFFDF6]/85 font-serif">
               <li>
                 <Link href="/location/mumbai" className="hover:text-[#fcd34d] hover:underline transition-colors">
                   Dry Fish in Mumbai

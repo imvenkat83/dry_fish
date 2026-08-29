@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { fullName } = body;
+    const { fullName, email } = body;
 
     if (!fullName) {
       return NextResponse.json({ success: false, error: "Name is required" }, { status: 400 });
@@ -21,7 +21,10 @@ export async function POST(request: Request) {
 
     // Update user profile in DB
     await db.update(users)
-      .set({ fullName })
+      .set({ 
+        fullName,
+        ...(email ? { email } : {})
+      })
       .where(eq(users.phoneNumber, phone));
 
     return NextResponse.json({ success: true, message: "Profile updated successfully" });

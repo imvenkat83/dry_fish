@@ -4,6 +4,7 @@ export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   phoneNumber: text("phone_number").notNull().unique(),
   fullName: text("full_name"),
+  email: text("email"),
   role: text("role").default("user"), // user, admin
   address: text("address"), // Default shipping address
   createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),

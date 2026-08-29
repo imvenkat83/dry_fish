@@ -55,12 +55,18 @@ export default function SettingsPage() {
   const [error, setError] = useState("");
 
   const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0);
+  const [previewDevice, setPreviewDevice] = useState<"laptop" | "mobile">("laptop");
 
-  const [bannersList, setBannersList] = useState<{ url: string; link: string | null }[]>([]);
+  const [bannersList, setBannersList] = useState<{ url: string; mobileUrl: string; link: string | null }[]>([]);
   const [navItems, setNavItems] = useState<any[]>([]);
   const [homepageCategoriesList, setHomepageCategoriesList] = useState<any[]>([]);
   const [selectedBannerLink, setSelectedBannerLink] = useState("");
   const [customLinkText, setCustomLinkText] = useState("");
+
+  const [tempDesktopUrl, setTempDesktopUrl] = useState("");
+  const [tempMobileUrl, setTempMobileUrl] = useState("");
+  const [isUploadingDesktop, setIsUploadingDesktop] = useState(false);
+  const [isUploadingMobile, setIsUploadingMobile] = useState(false);
 
   const premadeLinks = useMemo(() => {
     const list: { label: string; value: string }[] = [];
@@ -93,11 +99,14 @@ export default function SettingsPage() {
   const [newOfferSubtext, setNewOfferSubtext] = useState("");
   const [newOfferLink, setNewOfferLink] = useState("");
 
-  const [tempBannerUrl, setTempBannerUrl] = useState("");
+  const handleAddBannerSlide = () => {
+    const desktopTrimmed = tempDesktopUrl.trim();
+    const mobileTrimmed = tempMobileUrl.trim();
 
-  const handleAddBannerUrl = () => {
-    const trimmed = tempBannerUrl.trim();
-    if (!trimmed) return;
+    if (!desktopTrimmed && !mobileTrimmed) {
+      setError("Please provide at least a Laptop View or Mobile View image URL.");
+      return;
+    }
 
     let finalLink: string | null = null;
     if (selectedBannerLink === "__custom__") {
@@ -106,19 +115,70 @@ export default function SettingsPage() {
       finalLink = selectedBannerLink;
     }
 
-    setBannersList((prev) => {
-      const exists = prev.some((b) => b.url === trimmed);
-      if (exists) {
-        setError("This banner URL is already added.");
-        return prev;
-      }
-      return [...prev, { url: trimmed, link: finalLink }];
-    });
+    setBannersList((prev) => [
+      ...prev,
+      {
+        url: desktopTrimmed || mobileTrimmed,
+        mobileUrl: mobileTrimmed || desktopTrimmed,
+        link: finalLink,
+      },
+    ]);
 
-    setTempBannerUrl("");
+    setTempDesktopUrl("");
+    setTempMobileUrl("");
     setSelectedBannerLink("");
     setCustomLinkText("");
-    setSuccess("Banner URL added successfully!");
+    setSuccess("New banner slide added successfully!");
+  };
+
+  const handleSingleFileUpload = async (file: File, target: "newDesktop" | "newMobile" | { slideIndex: number; field: "url" | "mobileUrl" }) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    if (typeof target === "object") {
+      // Editing existing slide image
+      try {
+        const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+        const data = await res.json();
+        if (data.success) {
+          setBannersList((prev) => {
+            const copy = [...prev];
+            copy[target.slideIndex] = {
+              ...copy[target.slideIndex],
+              [target.field]: data.url,
+            };
+            return copy;
+          });
+          setSuccess("Image updated successfully!");
+        } else {
+          setError(data.error || "Failed to upload file.");
+        }
+      } catch {
+        setError("Error uploading file.");
+      }
+      return;
+    }
+
+    if (target === "newDesktop") setIsUploadingDesktop(true);
+    if (target === "newMobile") setIsUploadingMobile(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.success) {
+        if (target === "newDesktop") setTempDesktopUrl(data.url);
+        if (target === "newMobile") setTempMobileUrl(data.url);
+        setSuccess("Image uploaded successfully!");
+      } else {
+        setError(data.error || "Failed to upload image.");
+      }
+    } catch {
+      setError("An error occurred during file upload.");
+    } finally {
+      setIsUploadingDesktop(false);
+      setIsUploadingMobile(false);
+    }
   };
 
   const fetchData = async () => {
@@ -132,16 +192,27 @@ export default function SettingsPage() {
         try {
           const parsed = JSON.parse(val);
           if (Array.isArray(parsed)) {
-            setBannersList(parsed.map((item: any) => {
-              if (typeof item === "string") return { url: item, link: null };
-              return { url: item.url || "", link: item.link || null };
-            }));
+            setBannersList(
+              parsed.map((item: any) => {
+                if (typeof item === "string") return { url: item, mobileUrl: "", link: null };
+                return {
+                  url: item.url || item.desktopUrl || "",
+                  mobileUrl: item.mobileUrl || "",
+                  link: item.link || null,
+                };
+              })
+            );
           } else {
             setBannersList([]);
           }
         } catch {
           // Legacy format
-          setBannersList(val.split(",").map((url: string) => ({ url: url.trim(), link: null })).filter((b: any) => b.url));
+          setBannersList(
+            val
+              .split(",")
+              .map((url: string) => ({ url: url.trim(), mobileUrl: "", link: null }))
+              .filter((b: any) => b.url)
+          );
         }
       }
 
@@ -192,71 +263,6 @@ export default function SettingsPage() {
     fetchData();
   }, [router]);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    setIsUploading(true);
-    setError("");
-    setSuccess("");
-
-    const uploadedUrls: string[] = [];
-    let uploadErrors = 0;
-
-    try {
-      const uploadPromises = Array.from(files).map(async (file) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        try {
-          const res = await fetch("/api/admin/upload", {
-            method: "POST",
-            body: formData,
-          });
-          const data = await res.json();
-          if (data.success) {
-            uploadedUrls.push(data.url);
-          } else {
-            uploadErrors++;
-          }
-        } catch (err) {
-          uploadErrors++;
-        }
-      });
-
-      await Promise.all(uploadPromises);
-
-      if (uploadedUrls.length > 0) {
-        let finalLink: string | null = null;
-        if (selectedBannerLink === "__custom__") {
-          finalLink = customLinkText.trim() || null;
-        } else if (selectedBannerLink !== "") {
-          finalLink = selectedBannerLink;
-        }
-
-        setBannersList((prev) => {
-          const newBanners = uploadedUrls.map((url) => ({ url, link: finalLink }));
-          return [...prev, ...newBanners];
-        });
-        
-        setSelectedBannerLink("");
-        setCustomLinkText("");
-        
-        if (uploadErrors > 0) {
-          setSuccess(`Uploaded ${uploadedUrls.length} image(s), but ${uploadErrors} failed.`);
-        } else {
-          setSuccess(`Successfully uploaded ${uploadedUrls.length} image(s)!`);
-        }
-      } else if (uploadErrors > 0) {
-        setError("Failed to upload selected image(s).");
-      }
-    } catch (err) {
-      setError("An error occurred during file upload.");
-    } finally {
-      setIsUploading(false);
-      e.target.value = "";
-    }
-  };
-
   const handleSaveBanner = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -274,7 +280,7 @@ export default function SettingsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setSuccess("Banner setting saved successfully!");
+        setSuccess("Homepage banner settings saved successfully!");
         router.refresh();
       } else {
         setError(data.error || "Failed to save settings.");
@@ -390,24 +396,24 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="p-10">
+    <div className="p-10 font-serif">
       <div className="mb-10 text-center flex flex-col items-center">
-        <h1 className="text-4xl font-playfair font-bold text-black">Site Settings</h1>
-        <p className="mt-2 text-black/60 font-medium tracking-tight flex items-center justify-center">
+        <h1 className="text-4xl font-serif font-bold text-black">Site Settings</h1>
+        <p className="mt-2 text-black/60 font-medium tracking-tight flex items-center justify-center font-sans">
           <Sparkles size={16} className="text-[#C5A059] mr-2" />
-          Customize the aesthetic and layout options of your storefront.
+          Customize the layout, banners, and options for laptop and mobile view.
         </p>
       </div>
 
       {/* Alerts */}
       {success && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-100 rounded-xl flex items-center space-x-3 text-green-600 animate-in fade-in">
+        <div className="mb-6 p-4 bg-green-50 border border-green-100 rounded-xl flex items-center space-x-3 text-green-600 animate-in fade-in font-sans">
           <Check size={20} />
           <span className="text-sm font-bold uppercase tracking-wider">{success}</span>
         </div>
       )}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center space-x-3 text-red-500 animate-in fade-in">
+        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center space-x-3 text-red-500 animate-in fade-in font-sans">
           <AlertCircle size={20} />
           <span className="text-sm font-bold uppercase tracking-wider">{error}</span>
         </div>
@@ -417,47 +423,87 @@ export default function SettingsPage() {
         {/* Settings Form Column */}
         <div className="space-y-10">
           
-          {/* Banner Setting Form */}
+          {/* Banner Setting Form (Separate Laptop and Mobile Views) */}
           <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-brand/5">
-            <h2 className="text-xl font-playfair font-bold text-black mb-6 border-b border-brand/5 pb-4">Homepage Hero Banner</h2>
-            
-            <form onSubmit={handleSaveBanner} className="space-y-6">
-              <div className="flex gap-3 items-end">
-                <div className="flex-grow">
-                  <label className="block text-[10px] font-black text-black/40 uppercase tracking-[0.2em] mb-3 ml-1">Banner Image URL</label>
-                  <input
-                    type="text"
-                    value={tempBannerUrl}
-                    onChange={(e) => setTempBannerUrl(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleAddBannerUrl();
-                      }
-                    }}
-                    placeholder="Paste banner image URL here"
-                    className="w-full bg-brand/5 border border-transparent focus:border-[#C5A059]/50 rounded-2xl px-5 py-4 text-sm font-semibold text-black outline-none transition-all placeholder:text-black/20"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleAddBannerUrl}
-                  className="flex items-center gap-1.5 bg-[#8c6239] hover:bg-[#734f2d] text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-md h-fit mb-[1px]"
-                >
-                  <Plus size={14} />
-                  <span>Add</span>
-                </button>
-              </div>
+            <h2 className="text-xl font-serif font-bold text-black mb-2 border-b border-brand/5 pb-3">
+              Homepage Hero Banner Carousel
+            </h2>
+            <p className="text-xs text-black/50 mb-6 font-sans">
+              Add multiple banner slides to scroll as a carousel. Specify separate images for 💻 <strong>Laptop View</strong> and 📱 <strong>Mobile View</strong>.
+            </p>
 
-              {/* Single dropdown for banner click navigation link */}
-              <div className="space-y-4 bg-brand/5 p-5 rounded-2xl border border-brand/10">
-                <label className="block text-[10px] font-black text-black/40 uppercase tracking-[0.2em] ml-1">Banner Click Navigation Link (Optional)</label>
-                
-                <div>
+            <form onSubmit={handleSaveBanner} className="space-y-6">
+              {/* Add New Slide Form Card */}
+              <div className="bg-brand/5 p-6 rounded-2xl border border-brand/10 space-y-5">
+                <h3 className="text-sm font-bold text-[#8c6239] uppercase tracking-wider font-serif">
+                  + Add New Banner Carousel Slide
+                </h3>
+
+                {/* Section A: Laptop View Image */}
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-black/60 uppercase tracking-[0.2em] ml-1 font-sans">
+                    💻 Laptop View Image / Video URL
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={tempDesktopUrl}
+                      onChange={(e) => setTempDesktopUrl(e.target.value)}
+                      placeholder="Paste Laptop view image URL here"
+                      className="w-full bg-white border border-brand/20 focus:border-[#C5A059]/50 rounded-xl px-4 py-3 text-xs font-semibold text-black outline-none transition-all placeholder:text-black/30 font-sans"
+                    />
+                    <label className="bg-white border border-brand/20 hover:border-[#8c6239] rounded-xl px-4 py-3 text-xs font-bold text-black cursor-pointer select-none flex items-center justify-center shrink-0 shadow-xs font-sans">
+                      {isUploadingDesktop ? <Loader2 size={14} className="animate-spin text-[#8c6239]" /> : "Upload"}
+                      <input
+                        type="file"
+                        accept="image/*,video/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleSingleFileUpload(file, "newDesktop");
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Section B: Mobile View Image */}
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-black text-black/60 uppercase tracking-[0.2em] ml-1 font-sans">
+                    📱 Mobile View Image / Video URL
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={tempMobileUrl}
+                      onChange={(e) => setTempMobileUrl(e.target.value)}
+                      placeholder="Paste Mobile view image URL here (optional, falls back to Laptop image if empty)"
+                      className="w-full bg-white border border-brand/20 focus:border-[#C5A059]/50 rounded-xl px-4 py-3 text-xs font-semibold text-black outline-none transition-all placeholder:text-black/30 font-sans"
+                    />
+                    <label className="bg-white border border-brand/20 hover:border-[#8c6239] rounded-xl px-4 py-3 text-xs font-bold text-black cursor-pointer select-none flex items-center justify-center shrink-0 shadow-xs font-sans">
+                      {isUploadingMobile ? <Loader2 size={14} className="animate-spin text-[#8c6239]" /> : "Upload"}
+                      <input
+                        type="file"
+                        accept="image/*,video/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleSingleFileUpload(file, "newMobile");
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                {/* Section C: Navigation Link */}
+                <div className="space-y-2 font-sans">
+                  <label className="block text-[10px] font-black text-black/60 uppercase tracking-[0.2em] ml-1">
+                    Banner Click Link (Optional)
+                  </label>
                   <select
                     value={selectedBannerLink}
                     onChange={(e) => setSelectedBannerLink(e.target.value)}
-                    className="w-full bg-white border border-brand/20 rounded-xl px-4 py-3.5 text-xs font-semibold text-black outline-none focus:border-[#C5A059]/50 transition-all cursor-pointer"
+                    className="w-full bg-white border border-brand/20 rounded-xl px-4 py-3 text-xs font-semibold text-black outline-none focus:border-[#C5A059]/50 transition-all cursor-pointer"
                   >
                     <option value="">No Navigation Link (Optional)</option>
                     {premadeLinks.map((option) => (
@@ -467,48 +513,156 @@ export default function SettingsPage() {
                     ))}
                     <option value="__custom__">+ Add custom link</option>
                   </select>
-                </div>
 
-                {selectedBannerLink === "__custom__" && (
-                  <div className="animate-in fade-in slide-in-from-top-1 duration-300">
-                    <label className="block text-[9px] font-bold text-[#C5A059] uppercase tracking-wider mb-2 ml-1">Custom Destination Link URL</label>
+                  {selectedBannerLink === "__custom__" && (
                     <input
                       type="text"
                       value={customLinkText}
                       onChange={(e) => setCustomLinkText(e.target.value)}
-                      placeholder="e.g. /my-story or /product/12"
-                      className="w-full bg-white border border-brand/20 focus:border-[#C5A059]/50 rounded-xl px-4 py-3.5 text-xs font-semibold text-black outline-none transition-all placeholder:text-black/20"
+                      placeholder="e.g. /my-story or /category/dry-fish"
+                      className="w-full bg-white border border-brand/20 focus:border-[#C5A059]/50 rounded-xl px-4 py-3 text-xs font-semibold text-black outline-none transition-all mt-2 placeholder:text-black/30"
                     />
-                  </div>
-                )}
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddBannerSlide}
+                  className="w-full flex items-center justify-center gap-2 bg-[#8c6239] hover:bg-[#734f2d] text-white py-3.5 rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-md font-sans cursor-pointer"
+                >
+                  <Plus size={14} />
+                  <span>Add Banner Carousel Slide</span>
+                </button>
               </div>
 
+              {/* Configured Banner Slides List */}
               {bannersList.length > 0 && (
-                <div className="space-y-3">
-                  <label className="block text-[10px] font-black text-black/40 uppercase tracking-[0.2em] ml-1">Configured Banner Images ({bannersList.length})</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="space-y-4 font-sans">
+                  <label className="block text-[10px] font-black text-black/40 uppercase tracking-[0.2em] ml-1">
+                    Configured Carousel Slides ({bannersList.length})
+                  </label>
+
+                  <div className="space-y-4">
                     {bannersList.map((banner, idx) => (
-                      <div key={idx} className="relative group rounded-xl border border-brand/10 overflow-hidden bg-brand/5 aspect-[16/9] flex items-center justify-center">
-                        {isVideoUrl(banner.url) ? (
-                          <video src={banner.url} className="w-full h-full object-cover" muted playsInline />
-                        ) : (
-                          <img src={banner.url} alt={`Banner thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setBannersList(prev => prev.filter((_, i) => i !== idx));
-                          }}
-                          className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md opacity-90 hover:opacity-100 transition-opacity z-10"
-                        >
-                          <X size={14} />
-                        </button>
-                        <div className="absolute bottom-1 left-1 bg-brand/80 text-white text-[9px] px-1.5 py-0.5 rounded font-black z-10">
-                          #{idx + 1}
+                      <div key={idx} className="bg-brand/5 border border-brand/10 rounded-2xl p-4 space-y-3 relative group">
+                        <div className="flex items-center justify-between border-b border-brand/10 pb-2">
+                          <span className="font-bold text-xs text-[#8c6239] uppercase tracking-wider">
+                            Slide #{idx + 1}
+                          </span>
+                          <div className="flex items-center space-x-1">
+                            {idx > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setBannersList((prev) => {
+                                    const copy = [...prev];
+                                    const temp = copy[idx];
+                                    copy[idx] = copy[idx - 1];
+                                    copy[idx - 1] = temp;
+                                    return copy;
+                                  });
+                                }}
+                                className="p-1 bg-white hover:bg-brand/10 border border-brand/10 rounded text-black text-xs cursor-pointer"
+                                title="Move Up"
+                              >
+                                ↑
+                              </button>
+                            )}
+                            {idx < bannersList.length - 1 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setBannersList((prev) => {
+                                    const copy = [...prev];
+                                    const temp = copy[idx];
+                                    copy[idx] = copy[idx + 1];
+                                    copy[idx + 1] = temp;
+                                    return copy;
+                                  });
+                                }}
+                                className="p-1 bg-white hover:bg-brand/10 border border-brand/10 rounded text-black text-xs cursor-pointer"
+                                title="Move Down"
+                              >
+                                ↓
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => setBannersList((prev) => prev.filter((_, i) => i !== idx))}
+                              className="p-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs transition-colors cursor-pointer"
+                              title="Delete Slide"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </div>
+
+                        {/* Laptop vs Mobile Images Inputs & Previews */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {/* Laptop View */}
+                          <div className="space-y-1.5">
+                            <span className="text-[10px] font-bold text-black/60 uppercase">💻 Laptop View Image</span>
+                            <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-white border border-brand/10 flex items-center justify-center">
+                              {banner.url ? (
+                                isVideoUrl(banner.url) ? (
+                                  <video src={banner.url} className="w-full h-full object-cover" muted playsInline />
+                                ) : (
+                                  <img src={banner.url} alt={`Laptop banner ${idx + 1}`} className="w-full h-full object-cover" />
+                                )
+                              ) : (
+                                <span className="text-[10px] text-black/30 font-bold">No Laptop Image</span>
+                              )}
+                            </div>
+                            <input
+                              type="text"
+                              value={banner.url}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setBannersList((prev) => {
+                                  const copy = [...prev];
+                                  copy[idx] = { ...copy[idx], url: val };
+                                  return copy;
+                                });
+                              }}
+                              placeholder="Laptop Image URL"
+                              className="w-full bg-white border border-brand/15 rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-black outline-none"
+                            />
+                          </div>
+
+                          {/* Mobile View */}
+                          <div className="space-y-1.5">
+                            <span className="text-[10px] font-bold text-black/60 uppercase">📱 Mobile View Image</span>
+                            <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-white border border-brand/10 flex items-center justify-center">
+                              {(banner.mobileUrl || banner.url) ? (
+                                isVideoUrl(banner.mobileUrl || banner.url) ? (
+                                  <video src={banner.mobileUrl || banner.url} className="w-full h-full object-cover" muted playsInline />
+                                ) : (
+                                  <img src={banner.mobileUrl || banner.url} alt={`Mobile banner ${idx + 1}`} className="w-full h-full object-cover" />
+                                )
+                              ) : (
+                                <span className="text-[10px] text-black/30 font-bold">No Mobile Image</span>
+                              )}
+                            </div>
+                            <input
+                              type="text"
+                              value={banner.mobileUrl}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setBannersList((prev) => {
+                                  const copy = [...prev];
+                                  copy[idx] = { ...copy[idx], mobileUrl: val };
+                                  return copy;
+                                });
+                              }}
+                              placeholder="Mobile Image URL (optional)"
+                              className="w-full bg-white border border-brand/15 rounded-lg px-2.5 py-1.5 text-[11px] font-medium text-black outline-none"
+                            />
+                          </div>
+                        </div>
+
                         {banner.link && (
-                          <div className="absolute bottom-1 right-1 max-w-[60%] bg-black/70 text-white text-[8px] px-1 py-0.5 rounded truncate select-none z-10 font-bold animate-in fade-in" title={banner.link}>
-                            {banner.link}
+                          <div className="text-[10px] text-[#C5A059] font-bold truncate pt-1">
+                            Link target: {banner.link}
                           </div>
                         )}
                       </div>
@@ -517,50 +671,26 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              <div className="relative border-2 border-dashed border-brand/10 hover:border-[#C5A059]/30 rounded-2xl p-8 text-center transition-all bg-brand/5">
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  onChange={handleUpload}
-                  disabled={isUploading}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-                <div className="flex flex-col items-center justify-center space-y-3">
-                  <div className="p-4 bg-white rounded-2xl shadow-sm text-black">
-                    {isUploading ? (
-                      <Loader2 className="w-6 h-6 animate-spin text-[#C5A059]" />
-                    ) : (
-                      <Upload className="w-6 h-6" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-black">Click to Upload Banner Image</p>
-                    <p className="text-xs text-black/40 mt-1">PNG, JPG, JPEG or WEBP up to 5MB</p>
-                  </div>
-                </div>
-              </div>
-
               <button
                 type="submit"
-                disabled={isSubmitting || isUploading}
-                className="w-full flex items-center justify-center space-x-2 bg-[#8c6239] text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#734f2d] transition-all shadow-lg disabled:opacity-50"
+                disabled={isSubmitting}
+                className="w-full flex items-center justify-center space-x-2 bg-[#8c6239] text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#734f2d] transition-all shadow-lg disabled:opacity-50 font-sans cursor-pointer"
               >
                 {isSubmitting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <Save size={16} />
                 )}
-                <span>Save Banner Setting</span>
+                <span>Save All Banner Carousel Settings</span>
               </button>
             </form>
           </div>
 
           {/* Offer Ticker Settings Form */}
           <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-brand/5">
-            <h2 className="text-xl font-playfair font-bold text-black mb-6 border-b border-brand/5 pb-4">Offer Announcement Carousel</h2>
+            <h2 className="text-xl font-serif font-bold text-black mb-6 border-b border-brand/5 pb-4">Offer Announcement Carousel</h2>
             
-            <form onSubmit={handleAddOffer} className="space-y-4 mb-8">
+            <form onSubmit={handleAddOffer} className="space-y-4 mb-8 font-sans">
               <div>
                 <label className="block text-[10px] font-black text-black/40 uppercase tracking-[0.2em] mb-2 ml-1">Add Offer Banner Text</label>
                 <input
@@ -590,7 +720,7 @@ export default function SettingsPage() {
                   type="text"
                   value={newOfferLink}
                   onChange={(e) => setNewOfferLink(e.target.value)}
-                  placeholder="e.g. /category/mens"
+                  placeholder="e.g. /category/dry-fish"
                   className="w-full bg-brand/5 border border-transparent focus:border-[#C5A059]/50 rounded-2xl px-5 py-3.5 text-xs font-semibold text-black outline-none transition-all placeholder:text-black/20"
                 />
               </div>
@@ -598,7 +728,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center space-x-2 bg-[#C5A059] text-white py-3.5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-[#b39150] transition-all shadow-md disabled:opacity-50"
+                className="w-full flex items-center justify-center space-x-2 bg-[#C5A059] text-white py-3.5 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-[#b39150] transition-all shadow-md disabled:opacity-50 cursor-pointer"
               >
                 {isSubmitting ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -610,7 +740,7 @@ export default function SettingsPage() {
             </form>
 
             {/* List of current offers */}
-            <div>
+            <div className="font-sans">
               <p className="text-[10px] font-black text-black/40 uppercase tracking-[0.25em] mb-4 border-b border-brand/5 pb-2">Active Slides ({offers.length})</p>
               
               {offers.length === 0 ? (
@@ -643,7 +773,7 @@ export default function SettingsPage() {
                       <button
                         onClick={() => handleDeleteOffer(offer.id)}
                         disabled={isSubmitting}
-                        className="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 hover:text-red-600 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100"
+                        className="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-100 hover:text-red-600 transition-all cursor-pointer"
                       >
                         <Trash2 size={12} />
                       </button>
@@ -656,12 +786,12 @@ export default function SettingsPage() {
 
           {/* Founder Promotion Section (3 Cards) */}
           <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-brand/5">
-            <h2 className="text-xl font-playfair font-bold text-black mb-6 border-b border-brand/5 pb-4">Founder Promotion Section (3 Cards)</h2>
+            <h2 className="text-xl font-serif font-bold text-black mb-6 border-b border-brand/5 pb-4">Founder Promotion Section (3 Cards)</h2>
             
-            <form onSubmit={handleSaveFounderPromo} className="space-y-8">
+            <form onSubmit={handleSaveFounderPromo} className="space-y-8 font-sans">
               {founderCards.map((card, idx) => (
                 <div key={idx} className="bg-brand/5 p-5 rounded-2xl border border-brand/10 space-y-4">
-                  <h3 className="text-sm font-bold text-[#8c6239] uppercase tracking-wider">Card #{idx + 1}</h3>
+                  <h3 className="text-sm font-bold text-[#8c6239] uppercase tracking-wider font-serif">Card #{idx + 1}</h3>
                   
                   {/* Image URL Input */}
                   <div>
@@ -712,7 +842,7 @@ export default function SettingsPage() {
                     </div>
                   </div>
 
-                  {/* Text Description TextArea with toolbar helper */}
+                  {/* Text Description TextArea */}
                   <div>
                     <div className="flex justify-between items-center mb-2 ml-1">
                       <label className="block text-[10px] font-black text-black/40 uppercase tracking-[0.2em]">Card Text (HTML / Bold allowed)</label>
@@ -747,7 +877,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 bg-[#8c6239] hover:bg-[#734f2d] text-[#FAF6ED] py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-md cursor-pointer disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 bg-[#8c6239] hover:bg-[#734f2d] text-[#FAF6ED] py-4 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-md cursor-pointer disabled:opacity-50 font-sans"
               >
                 {isSubmitting ? (
                   <Loader2 className="w-4 h-4 animate-spin text-[#FAF6ED]" />
@@ -762,130 +892,147 @@ export default function SettingsPage() {
 
         {/* Live Preview Column */}
         <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-brand/5 flex flex-col h-fit">
-          <h2 className="text-xl font-playfair font-bold text-black mb-6 border-b border-brand/5 pb-4">Aesthetic Offer & Banner Preview</h2>
+          <div className="flex items-center justify-between mb-6 border-b border-brand/5 pb-4">
+            <h2 className="text-xl font-serif font-bold text-black">Banner Preview</h2>
+            {/* View Switcher: Laptop vs Mobile */}
+            <div className="flex bg-brand/5 p-1 rounded-xl border border-brand/10 font-sans">
+              <button
+                type="button"
+                onClick={() => setPreviewDevice("laptop")}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  previewDevice === "laptop" ? "bg-[#8c6239] text-white shadow-xs" : "text-black/60 hover:text-black"
+                }`}
+              >
+                💻 Laptop View
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewDevice("mobile")}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  previewDevice === "mobile" ? "bg-[#8c6239] text-white shadow-xs" : "text-black/60 hover:text-black"
+                }`}
+              >
+                📱 Mobile View
+              </button>
+            </div>
+          </div>
           
           <div className="rounded-2xl border border-brand/10 overflow-hidden relative flex flex-col p-0 bg-brand/5">
 
-            {/* 2. Offer Carousel Banner Mockup */}
-            <div className="h-24 bg-[#F5EBE0] text-[#064e3b] flex items-center justify-center px-4 relative z-10 shadow-sm border-b border-[#064e3b]/10">
+            {/* Offer Carousel Banner Mockup */}
+            <div className="h-20 bg-[#F5EBE0] text-[#064e3b] flex items-center justify-center px-4 relative z-10 shadow-sm border-b border-[#064e3b]/10 font-sans">
               {offers.length > 0 ? (
                 (() => {
                   const { title, subtitle } = parseOfferText(offers[0].text);
                   return (
-                    <div className={`relative flex items-center h-16 bg-[#eab308] text-[#064e3b] px-10 rounded-l-2xl rounded-r-md shadow-md overflow-hidden font-inter ${!subtitle ? "justify-center" : ""}`}>
-                      {/* Left Title */}
-                      <span className={`font-extrabold text-lg md:text-xl uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap ${subtitle ? "pr-4" : ""}`}>
+                    <div className={`relative flex items-center h-14 bg-[#eab308] text-[#064e3b] px-8 rounded-l-2xl rounded-r-md shadow-md overflow-hidden font-inter ${!subtitle ? "justify-center" : ""}`}>
+                      <span className={`font-extrabold text-sm uppercase tracking-wider flex items-center gap-1.5 whitespace-nowrap ${subtitle ? "pr-3" : ""}`}>
                         {title}
                       </span>
                       
                       {subtitle && (
                         <>
-                          {/* Dashed Divider with top/bottom circular cutouts */}
                           <div className="relative h-full flex items-center px-1">
-                            <div className="absolute -top-[10px] left-1/2 -translate-x-1/2 w-5 h-5 bg-[#F5EBE0] rounded-full"></div>
+                            <div className="absolute -top-[10px] left-1/2 -translate-x-1/2 w-4 h-4 bg-[#F5EBE0] rounded-full"></div>
                             <div className="h-3/5 border-l border-dashed border-white/50"></div>
-                            <div className="absolute -bottom-[10px] left-1/2 -translate-x-1/2 w-5 h-5 bg-[#F5EBE0] rounded-full"></div>
+                            <div className="absolute -bottom-[10px] left-1/2 -translate-x-1/2 w-4 h-4 bg-[#F5EBE0] rounded-full"></div>
                           </div>
-                          
-                          {/* Right Subtitle */}
-                          <span className="text-sm md:text-base font-black uppercase tracking-widest pl-4 pr-2 opacity-95 whitespace-nowrap">
+                          <span className="text-xs font-black uppercase tracking-widest pl-3 pr-2 opacity-95 whitespace-nowrap">
                             {subtitle}
                           </span>
                         </>
                       )}
-
-                      {/* Jagged right edge (torn coupon effect) */}
-                      <div className="absolute right-0 top-0 bottom-0 w-1 flex flex-col justify-between py-1">
-                        {Array.from({ length: 8 }).map((_, i) => (
-                          <div key={i} className="w-1 h-1.5 bg-[#F5EBE0] rounded-l-full"></div>
-                        ))}
-                      </div>
                     </div>
                   );
                 })()
               ) : (
-                <p className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.25em] text-white/40">
-                  Carousel Slide Offers Area (1 - 2 CM Height)
+                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-black/40">
+                  Offer Banner Announcements
                 </p>
               )}
             </div>
 
-            {/* 3. Promo Banner Preview Section */}
+            {/* Dynamic Banner Preview Section (Laptop vs Mobile aspect ratio) */}
             {bannersList.length > 0 ? (
-              <div className="relative w-full overflow-hidden bg-white aspect-[21/9] flex items-center justify-center">
-                {bannersList.length === 1 ? (
-                  isVideoUrl(bannersList[0].url) ? (
-                    <video src={bannersList[0].url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
-                  ) : (
-                    <img
-                      src={bannersList[0].url}
-                      alt="Banner Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  )
-                ) : (
-                  <div className="relative w-full h-full">
-                    {isVideoUrl(bannersList[currentPreviewIndex]?.url) ? (
-                      <video
-                        key={currentPreviewIndex}
-                        src={bannersList[currentPreviewIndex]?.url}
-                        className="w-full h-full object-cover transition-all duration-500"
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                      />
-                    ) : (
-                      <img
-                        src={bannersList[currentPreviewIndex]?.url}
-                        alt={`Banner Preview ${currentPreviewIndex + 1}`}
-                        className="w-full h-full object-cover transition-all duration-500"
-                      />
-                    )}
-                    {/* Navigation Arrows */}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setCurrentPreviewIndex(
-                          (prev) => (prev - 1 + bannersList.length) % bannersList.length
-                        )
-                      }
-                      className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/80 hover:bg-white text-black shadow-sm flex items-center justify-center z-10"
-                    >
-                      <ChevronLeft size={14} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setCurrentPreviewIndex(
-                          (prev) => (prev + 1) % bannersList.length
-                        )
-                      }
-                      className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white/80 hover:bg-white text-black shadow-sm flex items-center justify-center z-10"
-                    >
-                      <ChevronRight size={14} />
-                    </button>
-                    {/* Pagination Indicator */}
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 z-10">
-                      {bannersList.map((_, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => setCurrentPreviewIndex(idx)}
-                          className={`w-1.5 h-1.5 rounded-full transition-all ${
-                            idx === currentPreviewIndex ? "bg-[#C5A059] w-3" : "bg-white/60"
-                          }`}
+              <div
+                className={`relative w-full overflow-hidden bg-black flex items-center justify-center transition-all duration-500 mx-auto ${
+                  previewDevice === "mobile"
+                    ? "max-w-[280px] aspect-[9/16] my-4 rounded-3xl border-4 border-black shadow-xl"
+                    : "aspect-[21/9] rounded-b-2xl"
+                }`}
+              >
+                {(() => {
+                  const currentSlide = bannersList[currentPreviewIndex];
+                  const currentUrl = previewDevice === "mobile" ? (currentSlide?.mobileUrl || currentSlide?.url) : currentSlide?.url;
+
+                  return (
+                    <div className="relative w-full h-full">
+                      {isVideoUrl(currentUrl) ? (
+                        <video
+                          key={`${currentPreviewIndex}-${previewDevice}`}
+                          src={currentUrl}
+                          className="w-full h-full object-cover transition-all duration-500"
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
                         />
-                      ))}
+                      ) : (
+                        <img
+                          key={`${currentPreviewIndex}-${previewDevice}`}
+                          src={currentUrl}
+                          alt={`Banner Preview ${currentPreviewIndex + 1}`}
+                          className="w-full h-full object-cover transition-all duration-500"
+                        />
+                      )}
+
+                      {/* Controls overlay */}
+                      {bannersList.length > 1 && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setCurrentPreviewIndex(
+                                (prev) => (prev - 1 + bannersList.length) % bannersList.length
+                              )
+                            }
+                            className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/80 hover:bg-white text-black shadow-sm flex items-center justify-center z-10 cursor-pointer"
+                          >
+                            <ChevronLeft size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setCurrentPreviewIndex(
+                                (prev) => (prev + 1) % bannersList.length
+                              )
+                            }
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/80 hover:bg-white text-black shadow-sm flex items-center justify-center z-10 cursor-pointer"
+                          >
+                            <ChevronRight size={14} />
+                          </button>
+                          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 z-10">
+                            {bannersList.map((_, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => setCurrentPreviewIndex(idx)}
+                                className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                                  idx === currentPreviewIndex ? "bg-[#C5A059] w-4" : "bg-white/60 w-1.5"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
                     </div>
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-black/5 pointer-events-none"></div>
+                  );
+                })()}
               </div>
             ) : (
-              <div className="h-32 flex flex-col items-center justify-center text-black/30 border-dashed bg-white space-y-1">
-                <ImageIcon size={20} />
-                <p className="text-[9px] font-bold uppercase tracking-widest">No Promo Banner Selected</p>
+              <div className="h-40 flex flex-col items-center justify-center text-black/30 border-dashed bg-white space-y-1 font-sans">
+                <ImageIcon size={24} />
+                <p className="text-[10px] font-bold uppercase tracking-widest">No Banner Carousel Selected</p>
               </div>
             )}
           </div>

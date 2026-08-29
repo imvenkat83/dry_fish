@@ -74,27 +74,33 @@ export default function Navbar() {
       try {
         // Fetch Nav Items
         const navRes = await fetch("/api/admin/nav");
-        const navData = await navRes.json();
-        if (navData.success) {
-          setNavItems(navData.data);
+        if (navRes.ok) {
+          const navData = await navRes.json();
+          if (navData.success) {
+            setNavItems(navData.data);
+          }
         }
 
         // Fetch Categories
         const catRes = await fetch("/api/admin/homepage-categories");
-        const catData = await catRes.json();
-        if (catData.success) {
-          setCategories(catData.data);
+        if (catRes.ok) {
+          const catData = await catRes.json();
+          if (catData.success) {
+            setCategories(catData.data);
+          }
         }
 
         // Fetch Session
         const sessionRes = await fetch("/api/auth/session", { cache: "no-store" });
-        const sessionData = await sessionRes.json();
-        if (sessionData.authenticated) {
-          setUser(sessionData.user);
-          // Fetch wishlist
-          fetchWishlist();
-        } else {
-          setUser(null);
+        if (sessionRes.ok) {
+          const sessionData = await sessionRes.json();
+          if (sessionData.authenticated) {
+            setUser(sessionData.user);
+            // Fetch wishlist
+            fetchWishlist();
+          } else {
+            setUser(null);
+          }
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -141,37 +147,37 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-[#FAF6ED] border-b border-[#8c6239]/10 shadow-sm font-inter">
+      <header className="sticky top-0 z-50 w-full bg-[#FAF6ED] border-b border-[#8c6239]/10 shadow-sm font-serif">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
 
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center mr-2 sm:mr-4 md:mr-8">
               <Link href="/" className="flex items-center gap-2 group">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden flex items-center justify-center bg-white border border-[#8c6239]/15 shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg overflow-hidden flex items-center justify-center bg-white border border-[#8c6239]/15 shadow-sm group-hover:scale-105 transition-transform duration-300">
                   <img
                     src="/logo.jpeg"
                     alt="Dry Fish Basket Logo"
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <span className="font-gabriola text-xl sm:text-2xl md:text-3xl font-bold text-[#3b2314] tracking-wide hover:text-[#8c6239] transition-colors translate-y-[0.5px]">
+                <span className="font-serif text-xl sm:text-2xl md:text-3xl font-bold text-[#3b2314] tracking-wide hover:text-[#8c6239] transition-colors translate-y-[0.5px]">
                   Dry Fish Basket
                 </span>
               </Link>
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-6 ml-4">
-              <Link href="/" className="text-[#3b2314] hover:text-[#8c6239] text-sm font-medium tracking-wide transition-colors">
+            <nav className="hidden lg:flex items-center space-x-6 ml-4 font-serif">
+              <Link href="/" className="text-[#3b2314] hover:text-[#8c6239] text-base font-medium tracking-wide transition-colors">
                 Home
               </Link>
               
-              {categories.map((cat) => (
+              {categories.slice(0, 2).map((cat) => (
                 <Link
                   key={cat.id}
                   href={cat.link || `/category/${cat.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
-                  className="text-[#3b2314] hover:text-[#8c6239] text-sm font-medium tracking-wide transition-colors capitalize"
+                  className="text-[#3b2314] hover:text-[#8c6239] text-base font-medium tracking-wide transition-colors capitalize"
                 >
                   {cat.name}
                 </Link>
@@ -179,16 +185,16 @@ export default function Navbar() {
 
               <Link
                 href="/contact"
-                className={`hover:text-[#8c6239] text-sm font-medium tracking-wide transition-colors ${
+                className={`hover:text-[#8c6239] text-base font-medium tracking-wide transition-colors ${
                   pathname === "/contact" ? "text-[#8c6239]" : "text-[#3b2314]"
                 }`}
               >
                 Contact
               </Link>
-              <Link href="/my-story" className="text-[#3b2314] hover:text-[#8c6239] text-sm font-medium tracking-wide transition-colors">
+              <Link href="/my-story" className="text-[#3b2314] hover:text-[#8c6239] text-base font-medium tracking-wide transition-colors">
                 About us
               </Link>
-              <Link href="/blogs" className="text-[#3b2314] hover:text-[#8c6239] text-sm font-medium tracking-wide transition-colors">
+              <Link href="/blogs" className="text-[#3b2314] hover:text-[#8c6239] text-base font-medium tracking-wide transition-colors">
                 Blog
               </Link>
             </nav>
@@ -210,7 +216,7 @@ export default function Navbar() {
               >
                 <Heart className="h-5 w-5" />
                 {user && wishlistItems.length > 0 && (
-                  <span className="absolute top-0 right-0 bg-[#8c6239] text-white text-[8px] font-medium h-3.5 w-3.5 rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#8c6239] text-white text-[11px] font-sans font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shadow-sm">
                     {wishlistItems.length}
                   </span>
                 )}
@@ -218,9 +224,11 @@ export default function Navbar() {
 
               <Link href={user ? "/cart" : "/login"} aria-label="Cart" className="hover:text-[#8c6239] transition-colors relative p-2">
                 <ShoppingCart className="h-5 w-5" />
-                <span className="absolute top-0 right-0 bg-[#8c6239] text-white text-[8px] font-medium h-3.5 w-3.5 rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#8c6239] text-white text-[11px] font-sans font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shadow-sm">
+                    {cartCount}
+                  </span>
+                )}
               </Link>
 
               {user ? (
@@ -279,8 +287,8 @@ export default function Navbar() {
 
         {/* Mobile Menu Panel */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-black border-t border-white/10 animate-in slide-in-from-top duration-300">
-            <div className="px-6 pt-8 pb-12 space-y-6">
+          <div className="md:hidden bg-black border-t border-white/10 animate-in slide-in-from-top duration-300 font-serif">
+            <div className="px-6 pt-8 pb-12 space-y-6 font-serif">
 
               {/* Navigation Links */}
               <div className="space-y-4">
@@ -315,7 +323,7 @@ export default function Navbar() {
                         No Categories Yet
                       </span>
                     ) : (
-                      categories.map((cat) => (
+                      categories.slice(0, 2).map((cat) => (
                         <Link
                           key={cat.id}
                           href={cat.link || `/category/${cat.name.toLowerCase().trim().replace(/\s+/g, "-")}`}

@@ -38,11 +38,12 @@ export default function ProfileDropdown({ user, onLogout }: ProfileDropdownProps
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center bg-white/5 w-10 h-10 rounded-full hover:bg-white/10 transition-all border border-white/5 group"
+        className="flex items-center justify-center w-9 h-9 rounded-full bg-[#8c6239] text-white hover:bg-[#734f2d] transition-all shadow-sm border border-[#8c6239]/20 group cursor-pointer"
+        aria-label="User account menu"
       >
-        <div className="w-7 h-7 rounded-full bg-[#FFFDF6] flex items-center justify-center text-[10px] text-[#064e3b] font-bold shadow-sm">
+        <span className="text-sm font-sans font-bold tracking-tight text-white uppercase">
           {initials}
-        </div>
+        </span>
       </button>
 
       {/* Dropdown Menu */}

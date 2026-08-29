@@ -6,8 +6,11 @@ import { isAdminPhone } from "@/utils/admin-helper";
 export async function POST(request: Request) {
   try {
     // Dynamically import database and firebase-admin modules to catch initialization errors
-    const { db } = await import("@/db");
+    const { db, client } = await import("@/db");
     const { users } = await import("@/db/schema");
+
+    // Ensure email column exists in users table on Turso cloud database
+    await client.execute("ALTER TABLE users ADD COLUMN email TEXT;").catch(() => {});
 
     const body = await request.json();
     const { phone: rawPhone, idToken } = body;

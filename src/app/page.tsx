@@ -65,6 +65,7 @@ export default function Home() {
     const fetchNavItems = async () => {
       try {
         const res = await fetch("/api/admin/nav");
+        if (!res.ok) return;
         const data = await res.json();
         if (data.success) {
           setNavItems(data.data);
@@ -82,50 +83,64 @@ export default function Home() {
     async function fetchData() {
       try {
         const resBanner = await fetch("/api/admin/settings?key=homepage_banner");
-        const dataBanner = await resBanner.json();
-        if (dataBanner.success && dataBanner.data) {
-          setBannerUrl(dataBanner.data.value);
+        if (resBanner.ok) {
+          const dataBanner = await resBanner.json();
+          if (dataBanner.success && dataBanner.data) {
+            setBannerUrl(dataBanner.data.value);
+          }
         }
 
         const resOffers = await fetch("/api/admin/offers");
-        const dataOffers = await resOffers.json();
-        if (dataOffers.success) {
-          setOffers(dataOffers.data);
+        if (resOffers.ok) {
+          const dataOffers = await resOffers.json();
+          if (dataOffers.success) {
+            setOffers(dataOffers.data);
+          }
         }
 
         const resReviews = await fetch("/api/admin/reviews");
-        const dataReviews = await resReviews.json();
-        if (dataReviews.success) {
-          setReviews(dataReviews.data || []);
+        if (resReviews.ok) {
+          const dataReviews = await resReviews.json();
+          if (dataReviews.success) {
+            setReviews(dataReviews.data || []);
+          }
         }
 
         const resLatest = await fetch("/api/products/latest");
-        const dataLatest = await resLatest.json();
-        if (dataLatest.success) {
-          setLatestProducts(dataLatest.data || []);
+        if (resLatest.ok) {
+          const dataLatest = await resLatest.json();
+          if (dataLatest.success) {
+            setLatestProducts(dataLatest.data || []);
+          }
         }
 
         const resCatCards = await fetch("/api/admin/homepage-categories");
-        const dataCatCards = await resCatCards.json();
-        if (dataCatCards.success) {
-          setHomepageCatCards(dataCatCards.data);
+        if (resCatCards.ok) {
+          const dataCatCards = await resCatCards.json();
+          if (dataCatCards.success) {
+            setHomepageCatCards(dataCatCards.data);
+          }
         }
 
         const resFaqs = await fetch("/api/admin/faqs");
-        const dataFaqs = await resFaqs.json();
-        if (dataFaqs.success) {
-          setFaqs(dataFaqs.data || []);
+        if (resFaqs.ok) {
+          const dataFaqs = await resFaqs.json();
+          if (dataFaqs.success) {
+            setFaqs(dataFaqs.data || []);
+          }
         }
 
         const resFounder = await fetch("/api/admin/settings?key=founder_promo");
-        const dataFounder = await resFounder.json();
-        if (dataFounder.success && dataFounder.data) {
-          try {
-            const parsed = JSON.parse(dataFounder.data.value);
-            if (Array.isArray(parsed)) {
-              setFounderPromoList(parsed);
-            }
-          } catch {}
+        if (resFounder.ok) {
+          const dataFounder = await resFounder.json();
+          if (dataFounder.success && dataFounder.data) {
+            try {
+              const parsed = JSON.parse(dataFounder.data.value);
+              if (Array.isArray(parsed)) {
+                setFounderPromoList(parsed);
+              }
+            } catch {}
+          }
         }
       } catch (err) {
         console.error("Failed to fetch settings/offers/categories/reviews/faqs/founder_promo", err);
@@ -140,14 +155,18 @@ export default function Home() {
       const parsed = JSON.parse(bannerUrl);
       if (Array.isArray(parsed)) {
         return parsed.map((item: any) => {
-          if (typeof item === "string") return { url: item, link: null };
-          return { url: item.url || "", link: item.link || null };
+          if (typeof item === "string") return { url: item, mobileUrl: "", link: null };
+          return {
+            url: item.url || item.desktopUrl || "",
+            mobileUrl: item.mobileUrl || "",
+            link: item.link || null,
+          };
         });
       }
     } catch (e) {
       // Fallback to legacy
     }
-    return bannerUrl.split(",").map((url) => ({ url: url.trim(), link: null })).filter(b => b.url);
+    return bannerUrl.split(",").map((url) => ({ url: url.trim(), mobileUrl: "", link: null })).filter(b => b.url);
   }, [bannerUrl]);
 
   useEffect(() => {
@@ -158,205 +177,210 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [banners.length]);
 
-  const marqueeItems = useMemo(() => {
-    if (offers.length === 0) return [];
-    const repeats = offers.length === 1 ? 12 : offers.length === 2 ? 6 : 4;
+  const categoryMarqueeItems = useMemo(() => {
+    if (homepageCatCards.length === 0) return [];
+    const repeats = homepageCatCards.length <= 3 ? 6 : 3;
     const list = [];
     for (let i = 0; i < repeats; i++) {
-      list.push(...offers);
+      list.push(...homepageCatCards);
     }
     return list;
-  }, [offers]);
+  }, [homepageCatCards]);
 
   return (
     <div className="min-h-screen bg-brand-light text-black font-sans selection:bg-brand-accent/30">
 
-
-
-      {/* 2. Dynamic Home Banner Carousel (supports image and video) */}
+      {/* Dynamic Home Banner Carousel (Separate Laptop and Mobile Views) */}
       {banners.length > 0 && (
-        <div className="w-full h-[calc(100vh-4rem)] relative overflow-hidden border-b border-brand/10 group mt-0 bg-[#FAF6ED]">
-          {banners.length === 1 ? (
-            <div className="w-full h-full relative">
-              {banners[0].link === "#featured-collections" ? (
-                <a
-                  href="#featured-collections"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById("featured-collections")?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  className="block w-full h-full cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
-                >
-                  {isVideoUrl(banners[0].url) ? (
-                    <video src={banners[0].url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
-                  ) : (
-                    <img
-                      src={banners[0].url}
-                      alt="Current Offers & Collections"
-                      className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.01]"
-                    />
-                  )}
-                </a>
-              ) : banners[0].link ? (
-                <Link
-                  href={banners[0].link}
-                  className="block w-full h-full cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
-                >
-                  {isVideoUrl(banners[0].url) ? (
-                    <video src={banners[0].url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
-                  ) : (
-                    <img
-                      src={banners[0].url}
-                      alt="Current Offers & Collections"
-                      className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.01]"
-                    />
-                  )}
-                </Link>
-              ) : (
-                isVideoUrl(banners[0].url) ? (
-                  <video src={banners[0].url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
-                ) : (
-                  <img
-                    src={banners[0].url}
-                    alt="Current Offers & Collections"
-                    className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.01]"
-                  />
-                )
-              )}
-              <div className="absolute inset-0 bg-black/[0.02] pointer-events-none"></div>
-            </div>
-          ) : (
-            <div className="relative w-full h-full overflow-hidden">
-              <AnimatePresence initial={false} mode="wait">
-                <motion.div
-                  key={currentBannerIndex}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
-                  className="absolute inset-0 w-full h-full"
-                >
-                  {banners[currentBannerIndex]?.link === "#featured-collections" ? (
-                    <a
-                      href="#featured-collections"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        document.getElementById("featured-collections")?.scrollIntoView({ behavior: "smooth" });
-                      }}
-                      className="block w-full h-full cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
-                    >
-                      {isVideoUrl(banners[currentBannerIndex]?.url) ? (
-                        <video src={banners[currentBannerIndex]?.url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
-                      ) : (
-                        <img
-                          src={banners[currentBannerIndex]?.url}
-                          alt={`Promo Banner ${currentBannerIndex + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </a>
-                  ) : banners[currentBannerIndex]?.link ? (
-                    <Link
-                      href={banners[currentBannerIndex].link}
-                      className="block w-full h-full cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
-                    >
-                      {isVideoUrl(banners[currentBannerIndex]?.url) ? (
-                        <video src={banners[currentBannerIndex]?.url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
-                      ) : (
-                        <img
-                          src={banners[currentBannerIndex]?.url}
-                          alt={`Promo Banner ${currentBannerIndex + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </Link>
-                  ) : (
-                    isVideoUrl(banners[currentBannerIndex]?.url) ? (
-                      <video src={banners[currentBannerIndex]?.url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
-                    ) : (
+        <div className="w-full relative overflow-hidden border-b border-brand/10 group mt-0 bg-[#FAF6ED]">
+          <div className="relative w-full h-[55vh] sm:h-[65vh] md:h-[calc(100vh-4rem)] overflow-hidden">
+            <AnimatePresence initial={false} mode="wait">
+              <motion.div
+                key={currentBannerIndex}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+                className="absolute inset-0 w-full h-full"
+              >
+                {(() => {
+                  const currentBanner = banners[currentBannerIndex];
+                  if (!currentBanner) return null;
+
+                  const desktopUrl = currentBanner.url;
+                  const mobileUrl = currentBanner.mobileUrl || currentBanner.url;
+                  const link = currentBanner.link;
+
+                  const renderMedia = (src: string, className: string) => {
+                    if (isVideoUrl(src)) {
+                      return <video src={src} className={className} autoPlay muted loop playsInline />;
+                    }
+                    return (
                       <img
-                        src={banners[currentBannerIndex]?.url}
+                        src={src}
                         alt={`Promo Banner ${currentBannerIndex + 1}`}
-                        className="w-full h-full object-cover"
+                        className={className}
                       />
+                    );
+                  };
+
+                  const content = (
+                    <div className="w-full h-full relative">
+                      {/* Laptop / Desktop View Image (visible on md screens and up) */}
+                      <div className="hidden md:block w-full h-full">
+                        {renderMedia(desktopUrl, "w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.01]")}
+                      </div>
+
+                      {/* Mobile View Image (visible on mobile screens below md) */}
+                      <div className="block md:hidden w-full h-full">
+                        {renderMedia(mobileUrl, "w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.01]")}
+                      </div>
+                    </div>
+                  );
+
+                  if (link === "#featured-collections") {
+                    return (
+                      <a
+                        href="#featured-collections"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          document.getElementById("featured-collections")?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        className="block w-full h-full cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
+                      >
+                        {content}
+                      </a>
+                    );
+                  }
+                  if (link) {
+                    return (
+                      <Link
+                        href={link}
+                        className="block w-full h-full cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
+                      >
+                        {content}
+                      </Link>
+                    );
+                  }
+                  return content;
+                })()}
+              </motion.div>
+            </AnimatePresence>
+            <div className="absolute inset-0 bg-black/[0.02] pointer-events-none"></div>
+
+            {/* Navigation Arrows */}
+            {banners.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentBannerIndex(
+                      (prev) => (prev - 1 + banners.length) % banners.length
                     )
-                  )}
-                </motion.div>
-              </AnimatePresence>
-              <div className="absolute inset-0 bg-black/[0.02] pointer-events-none"></div>
+                  }
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-black shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 cursor-pointer"
+                  aria-label="Previous Banner"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCurrentBannerIndex((prev) => (prev + 1) % banners.length)
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-black shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 cursor-pointer"
+                  aria-label="Next Banner"
+                >
+                  <ChevronRight size={20} />
+                </button>
 
-              {/* Navigation Arrows */}
-              <button
-                type="button"
-                onClick={() =>
-                  setCurrentBannerIndex(
-                    (prev) => (prev - 1 + banners.length) % banners.length
-                  )
-                }
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-black shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setCurrentBannerIndex((prev) => (prev + 1) % banners.length)
-                }
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-black shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-              >
-                <ChevronRight size={20} />
-              </button>
-
-              {/* Pagination Dots */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-                {banners.map((_, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setCurrentBannerIndex(idx)}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === currentBannerIndex
-                        ? "bg-[#C5A059] w-6"
-                        : "bg-white/60 hover:bg-white"
-                      }`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+                {/* Pagination Dots */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+                  {banners.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setCurrentBannerIndex(idx)}
+                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${idx === currentBannerIndex
+                          ? "bg-[#C5A059] w-6"
+                          : "bg-white/60 hover:bg-white w-2"
+                        }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
       )}
 
-      {/* 2.5. Categories Grid Section */}
-      {!isLoading && homepageCatCards.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
-            {homepageCatCards.map((item, index) => {
-              const cardImage = item.imageUrl && item.imageUrl.includes(",") 
-                ? item.imageUrl.split(",")[0] 
-                : (item.imageUrl || "/images/placeholder.png");
-              return (
-                <Link
-                  key={`${item.id}-${index}`}
-                  href={item.link || `/category/${item.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
-                  className="group flex flex-col items-center animate-in fade-in duration-300"
-                >
-                  <div className="w-full max-h-[220px] md:max-h-[250px] aspect-[4/3] rounded-2xl overflow-hidden border border-brand/5 shadow-sm transition-transform duration-500 group-hover:scale-[1.01] relative">
-                    <img
-                      src={cardImage}
-                      alt={item.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      onError={e => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = "/images/placeholder.png";
-                      }}
-                    />
-                  </div>
-                  <h3 className="mt-3 text-center font-serif text-black font-semibold text-sm md:text-base tracking-tight group-hover:text-brand-accent transition-colors leading-tight">
-                    {item.name}
-                  </h3>
-                </Link>
-              );
-            })}
+      {/* 2.5. Categories Marquee Section (Continuously autoscrolls to the left) */}
+      {!isLoading && categoryMarqueeItems.length > 0 && (
+        <section className="w-full py-6 md:py-8 overflow-hidden bg-[#FAF6ED] border-b border-brand/10 relative">
+          <div className="w-full flex items-center overflow-hidden relative">
+            <div
+              className="flex animate-marquee hover:[animation-play-state:paused] whitespace-nowrap"
+              style={{ animationDuration: "35s" }}
+            >
+              <div className="flex shrink-0 gap-6 md:gap-8 items-center px-4">
+                {categoryMarqueeItems.map((item, index) => {
+                  const cardImage = item.imageUrl && item.imageUrl.includes(",") 
+                    ? item.imageUrl.split(",")[0] 
+                    : (item.imageUrl || "/images/placeholder.png");
+                  return (
+                    <Link
+                      key={`${item.id}-${index}`}
+                      href={item.link || `/category/${item.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
+                      className="group flex flex-col items-center shrink-0 w-[180px] sm:w-[220px] md:w-[260px] transition-transform duration-300"
+                    >
+                      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-brand/10 shadow-sm transition-transform duration-500 group-hover:scale-[1.03] relative bg-white">
+                        <img
+                          src={cardImage}
+                          alt={item.name}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          onError={e => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/images/placeholder.png";
+                          }}
+                        />
+                      </div>
+                      <h3 className="mt-3 text-center font-serif text-[#3b2314] font-bold text-sm md:text-base tracking-tight group-hover:text-[#8c6239] transition-colors leading-tight">
+                        {item.name}
+                      </h3>
+                    </Link>
+                  );
+                })}
+              </div>
+              <div className="flex shrink-0 gap-6 md:gap-8 items-center px-4" aria-hidden="true">
+                {categoryMarqueeItems.map((item, index) => {
+                  const cardImage = item.imageUrl && item.imageUrl.includes(",") 
+                    ? item.imageUrl.split(",")[0] 
+                    : (item.imageUrl || "/images/placeholder.png");
+                  return (
+                    <Link
+                      key={`dup-${item.id}-${index}`}
+                      href={item.link || `/category/${item.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
+                      className="group flex flex-col items-center shrink-0 w-[180px] sm:w-[220px] md:w-[260px] transition-transform duration-300"
+                    >
+                      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-brand/10 shadow-sm transition-transform duration-500 group-hover:scale-[1.03] relative bg-white">
+                        <img
+                          src={cardImage}
+                          alt={item.name}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          onError={e => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/images/placeholder.png";
+                          }}
+                        />
+                      </div>
+                      <h3 className="mt-3 text-center font-serif text-[#3b2314] font-bold text-sm md:text-base tracking-tight group-hover:text-[#8c6239] transition-colors leading-tight">
+                        {item.name}
+                      </h3>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </section>
       )}
@@ -369,7 +393,7 @@ export default function Home() {
         <section className="w-full mx-auto my-10 rounded-3xl overflow-hidden shadow-sm border border-[#8c6239]/15 bg-[#FAF6ED] transition-all hover:shadow-md">
           <div className="w-full relative">
             <img
-              src="/images/brand_feature_banner.png"
+              src="/images/banner_2.png"
               alt="Brand Quality & Heritage Features"
               className="w-full h-auto object-contain block"
             />

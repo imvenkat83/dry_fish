@@ -48,9 +48,15 @@ function verifySession(token: string | undefined): { phone: string } | null {
 }
 
 export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Always bypass API routes from page redirects
+  if (pathname.startsWith("/api")) {
+    return NextResponse.next();
+  }
+
   const sessionCookie = request.cookies.get("auth_session")?.value;
   const adminSessionCookie = request.cookies.get("admin_session")?.value;
-  const { pathname } = request.nextUrl;
 
   const userSession = verifySession(sessionCookie);
   const adminSession = verifySession(adminSessionCookie);
@@ -84,8 +90,8 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // 3. Protect Product and Cart Routes 
-  if ((pathname.startsWith("/product/") || pathname.startsWith("/cart")) && !userSession) {
+  // 3. Protect Cart Route 
+  if (pathname.startsWith("/cart") && !userSession) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -93,5 +99,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/admin/:path*", "/product/:path*", "/cart/:path*"],
+  matcher: ["/login", "/admin/:path*", "/cart/:path*"],
 };
