@@ -159,7 +159,7 @@ export default function Home() {
       {/* Dynamic Home Banner Carousel (Separate Laptop and Mobile Views) */}
       {banners.length > 0 && (
         <div className="w-full relative overflow-hidden border-b border-brand/10 group mt-0 bg-[#FAF6ED]">
-          <div className="relative w-full h-[42vh] min-h-[260px] sm:h-[55vh] md:h-[calc(100vh-4rem)] overflow-hidden bg-[#FAF6ED]">
+          <div className="relative w-full h-[62vh] min-h-[420px] sm:h-[72vh] md:h-[calc(100vh-4rem)] overflow-hidden bg-[#FAF6ED]">
             <AnimatePresence initial={false} mode="wait">
               <motion.div
                 key={currentBannerIndex}

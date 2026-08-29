@@ -173,15 +173,42 @@ export default function Navbar() {
                 Home
               </Link>
               
-              {categories.slice(0, 2).map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={cat.link || `/category/${cat.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
-                  className="text-[#3b2314] hover:text-[#8c6239] text-base font-medium tracking-wide transition-colors capitalize"
+              {/* Collections Dropdown */}
+              <div className="relative group">
+                <button
+                  type="button"
+                  className="flex items-center gap-1 text-[#3b2314] hover:text-[#8c6239] text-base font-medium tracking-wide transition-colors py-2 cursor-pointer"
                 >
-                  {cat.name}
-                </Link>
-              ))}
+                  <span>Collections</span>
+                  <ChevronDown size={15} className="transition-transform duration-200 group-hover:rotate-180 text-[#8c6239]" />
+                </button>
+
+                {/* Dropdown Menu Popup */}
+                <div className="absolute top-full left-0 w-60 bg-[#FAF6ED] border border-[#8c6239]/20 shadow-xl rounded-2xl p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform origin-top-left scale-95 group-hover:scale-100">
+                  <div className="py-1">
+                    {categories.length === 0 ? (
+                      <div className="px-4 py-2.5 text-xs text-black/50 italic">No Collections Available</div>
+                    ) : (
+                      categories.map((cat) => (
+                        <Link
+                          key={cat.id}
+                          href={cat.link || `/category/${cat.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
+                          className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[#3b2314] hover:text-[#8c6239] hover:bg-[#8c6239]/10 text-sm font-medium transition-all group/item"
+                        >
+                          {cat.imageUrl && (
+                            <img
+                              src={cat.imageUrl.split(",")[0]}
+                              alt={cat.name}
+                              className="w-7 h-7 rounded-lg object-cover border border-[#8c6239]/15 shadow-sm group-hover/item:scale-105 transition-transform"
+                            />
+                          )}
+                          <span className="capitalize">{cat.name}</span>
+                        </Link>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
 
               <Link
                 href="/contact"
@@ -314,23 +341,23 @@ export default function Navbar() {
                   Blog
                 </Link>
 
-                {/* Products Section */}
+                {/* Collections Section */}
                 <div className="space-y-2 py-2">
-                  <h3 className="text-[11px] font-medium uppercase tracking-[0.2em] text-white opacity-80">Products</h3>
+                  <h3 className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#C5A059]">Collections</h3>
                   <div className="flex flex-col space-y-1 pl-3 border-l border-white/20">
                     {categories.length === 0 ? (
                       <span className="text-white/50 py-2 text-xs font-medium uppercase tracking-wider">
-                        No Categories Yet
+                        No Collections Available
                       </span>
                     ) : (
-                      categories.slice(0, 2).map((cat) => (
+                      categories.map((cat) => (
                         <Link
                           key={cat.id}
                           href={cat.link || `/category/${cat.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-white hover:text-[#eab308] transition-colors py-2 text-xs font-medium uppercase tracking-wider"
+                          className="text-white hover:text-[#C5A059] transition-colors py-2 text-xs font-medium uppercase tracking-wider flex items-center gap-2"
                         >
-                          {cat.name}
+                          <span className="capitalize">{cat.name}</span>
                         </Link>
                       ))
                     )}
