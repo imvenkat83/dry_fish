@@ -1,6 +1,8 @@
 import { verifyAdminRequest } from "@/utils/auth";
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
+import path from "path";
 
 // Configure Cloudinary with keys from environment variables or fallback credentials
 cloudinary.config({
@@ -28,32 +30,43 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Stream upload directly to Cloudinary
-    const uploadResult = (await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: "dry_fish_basket_store", // Folder name in Cloudinary media library
-          resource_type: "auto", // Automatically detects image or video type
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      );
-      uploadStream.end(buffer);
-    })) as any;
+    // 1. Try uploading to Cloudinary
+    try {
+      const mimeType = file.type || (file.name.endsWith(".mp4") ? "video/mp4" : "image/jpeg");
+      const base64Data = `data:${mimeType};base64,${buffer.toString("base64")}`;
 
-    const secureUrl = uploadResult?.secure_url || uploadResult?.url;
+      const uploadResult = await cloudinary.uploader.upload(base64Data, {
+        folder: "dry_fish_basket_store",
+        resource_type: "auto",
+        timeout: 15000,
+      });
 
-    if (!secureUrl) {
-      throw new Error("Cloudinary response did not include a secure_url");
+      const secureUrl = uploadResult?.secure_url || uploadResult?.url;
+      if (secureUrl) {
+        return NextResponse.json({ success: true, url: secureUrl });
+      }
+    } catch (cloudinaryErr: any) {
+      console.warn("Cloudinary upload failed/timed out, saving locally:", cloudinaryErr.message || cloudinaryErr);
     }
 
-    return NextResponse.json({ success: true, url: secureUrl });
+    // 2. Local File System Fallback (Guaranteed to work instantly)
+    const uploadsDir = path.join(process.cwd(), "public", "uploads");
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const sanitizedOriginalName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+    const uniqueFileName = `${Date.now()}_${sanitizedOriginalName}`;
+    const filePath = path.join(uploadsDir, uniqueFileName);
+
+    await fs.promises.writeFile(filePath, buffer);
+    const localUrl = `/uploads/${uniqueFileName}`;
+
+    return NextResponse.json({ success: true, url: localUrl });
   } catch (error: any) {
-    console.error("Cloudinary Upload Error:", error);
+    console.error("Upload Error:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to upload file to Cloudinary" },
+      { success: false, error: error.message || "Failed to upload file." },
       { status: 500 }
     );
   }

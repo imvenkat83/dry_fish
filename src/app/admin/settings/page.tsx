@@ -132,6 +132,8 @@ export default function SettingsPage() {
   };
 
   const handleSingleFileUpload = async (file: File, target: "newDesktop" | "newMobile" | { slideIndex: number; field: "url" | "mobileUrl" }) => {
+    setError("");
+    setSuccess("Uploading banner media to Cloudinary, please wait...");
     const formData = new FormData();
     formData.append("file", file);
 
@@ -151,17 +153,18 @@ export default function SettingsPage() {
           });
           setSuccess("Image updated successfully!");
         } else {
+          setSuccess("");
           setError(data.error || "Failed to upload file.");
         }
       } catch {
-        setError("Error uploading file.");
+        setSuccess("");
+        setError("Error uploading file. Please check file size or paste URL directly.");
       }
       return;
     }
 
     if (target === "newDesktop") setIsUploadingDesktop(true);
     if (target === "newMobile") setIsUploadingMobile(true);
-    setError("");
 
     try {
       const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
@@ -171,10 +174,12 @@ export default function SettingsPage() {
         if (target === "newMobile") setTempMobileUrl(data.url);
         setSuccess("Image uploaded successfully!");
       } else {
+        setSuccess("");
         setError(data.error || "Failed to upload image.");
       }
     } catch {
-      setError("An error occurred during file upload.");
+      setSuccess("");
+      setError("An error occurred during file upload. Try using a smaller file or paste image URL.");
     } finally {
       setIsUploadingDesktop(false);
       setIsUploadingMobile(false);
