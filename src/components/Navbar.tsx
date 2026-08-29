@@ -249,31 +249,31 @@ export default function Navbar() {
 
             {/* Mobile menu button */}
             <div className="flex md:hidden items-center space-x-1 sm:space-x-2">
-              <Link href="/search" aria-label="Search" className="text-white p-1 sm:p-2">
+              <Link href="/search" aria-label="Search" className="text-[#3b2314] hover:text-[#8c6239] p-1.5 sm:p-2 transition-colors">
                 <Search className="h-5 w-5" />
               </Link>
               <Link
                 href={user ? "/wishlist" : `/login?redirect=${encodeURIComponent(pathname)}`}
                 aria-label="Wishlist"
-                className="text-white hover:text-[#eab308] transition-colors relative p-1 sm:p-2 cursor-pointer"
+                className="text-[#3b2314] hover:text-[#8c6239] transition-colors relative p-1.5 sm:p-2 cursor-pointer"
               >
                 <Heart className="h-5 w-5" />
                 {user && wishlistItems.length > 0 && (
-                  <span className="absolute top-0 right-0 bg-[#eab308] text-black text-[9px] font-medium h-4 w-4 rounded-full flex items-center justify-center border-2 border-black">
+                  <span className="absolute -top-0.5 -right-0.5 bg-[#8c6239] text-white text-[10px] font-sans font-bold min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center shadow-sm">
                     {wishlistItems.length}
                   </span>
                 )}
               </Link>
 
-              <Link href={user ? "/cart" : "/login"} aria-label="Cart" className="text-white hover:text-[#eab308] transition-colors relative p-1 sm:p-2">
+              <Link href={user ? "/cart" : "/login"} aria-label="Cart" className="text-[#3b2314] hover:text-[#8c6239] transition-colors relative p-1.5 sm:p-2">
                 <ShoppingCart className="h-5 w-5" />
-                <span className="absolute top-0 right-0 bg-[#eab308] text-black text-[9px] font-medium h-4 w-4 rounded-full flex items-center justify-center border-2 border-black">
+                <span className="absolute -top-0.5 -right-0.5 bg-[#8c6239] text-white text-[10px] font-sans font-bold min-w-[16px] h-[16px] px-1 rounded-full flex items-center justify-center shadow-sm">
                   {cartCount}
                 </span>
               </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="text-white hover:text-[#eab308] focus:outline-none p-1 sm:p-2"
+                className="text-[#3b2314] hover:text-[#8c6239] focus:outline-none p-1.5 sm:p-2 transition-colors cursor-pointer"
               >
                 {isMobileMenuOpen ? (
                   <X className="h-6 w-6" />
