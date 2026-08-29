@@ -159,7 +159,7 @@ export default function Home() {
       {/* Dynamic Home Banner Carousel (Separate Laptop and Mobile Views) */}
       {banners.length > 0 && (
         <div className="w-full relative overflow-hidden border-b border-brand/10 group mt-0 bg-[#FAF6ED]">
-          <div className="relative w-full overflow-hidden flex items-center justify-center bg-[#FAF6ED] min-h-[220px] sm:min-h-[350px] md:h-[calc(100vh-4rem)]">
+          <div className="relative w-full h-auto overflow-hidden md:h-[calc(100vh-4rem)] bg-[#FAF6ED]">
             <AnimatePresence initial={false} mode="wait">
               <motion.div
                 key={currentBannerIndex}
@@ -167,7 +167,7 @@ export default function Home() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="w-full h-full flex items-center justify-center"
+                className="w-full h-auto md:h-full md:absolute md:inset-0"
               >
                 {(() => {
                   const currentBanner = banners[currentBannerIndex];
@@ -191,7 +191,7 @@ export default function Home() {
                   };
 
                   const content = (
-                    <div className="w-full h-full relative flex items-center justify-center">
+                    <div className="w-full h-auto md:h-full relative">
                       {/* Laptop / Desktop View Image (visible on md screens and up) */}
                       <div className="hidden md:block w-full h-full">
                         {renderMedia(desktopUrl, "w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.01]")}
@@ -199,7 +199,7 @@ export default function Home() {
 
                       {/* Mobile View Image (visible on mobile screens below md) */}
                       <div className="block md:hidden w-full h-auto">
-                        {renderMedia(mobileUrl, "w-full h-auto max-h-[75vh] object-contain transition-transform duration-1000 ease-out group-hover:scale-[1.01]")}
+                        {renderMedia(mobileUrl, "w-full h-auto block transition-transform duration-1000 ease-out group-hover:scale-[1.01]")}
                       </div>
                     </div>
                   );
