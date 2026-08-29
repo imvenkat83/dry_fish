@@ -238,3 +238,16 @@ export const blogs = sqliteTable("blogs", {
   publishedAt: text("published_at").$defaultFn(() => new Date().toISOString()),
   author: text("author").default("Admin"),
 });
+
+export const reels = sqliteTable("reels", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  videoUrl: text("video_url").notNull(),
+  thumbnailUrl: text("thumbnail_url"),
+  productId: integer("product_id").references(() => products.id, { onDelete: "set null" }),
+  badgeText: text("badge_text").default("NEW"),
+  viewsCount: text("views_count").default("2.5M"),
+  displayOrder: integer("display_order").notNull().default(0),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
+});

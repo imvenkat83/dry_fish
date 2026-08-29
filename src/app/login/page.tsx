@@ -125,11 +125,11 @@ export default function Login() {
 
       <div className="w-full max-w-md bg-white border border-brand/10 rounded-2xl p-10 shadow-2xl border-t-8 border-t-brand-accent transform transition-all">
         <div className="text-center mb-10">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full overflow-hidden flex items-center justify-center bg-white border border-[#8c6239]/15 shadow-lg hover:scale-105 transition-transform duration-300">
+          <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-transparent hover:scale-105 transition-transform duration-300">
             <img
-              src="/logo.jpeg"
+              src="/logo_fin.png"
               alt="Dry Fish Basket Logo"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </div>
           <h2 className="text-3xl font-playfair font-bold text-black mb-3">

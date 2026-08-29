@@ -32,6 +32,7 @@ export async function GET() {
       user: {
         phoneNumber: user.phoneNumber,
         fullName: user.fullName,
+        email: user.email || "",
       } 
     });
   } catch (error) {

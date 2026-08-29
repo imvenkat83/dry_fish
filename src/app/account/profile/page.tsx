@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User, Phone, Save, ArrowLeft, Loader2 } from "lucide-react";
+import { User, Phone, Mail, Save, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 export default function ProfilePage() {
@@ -10,6 +10,7 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -21,6 +22,7 @@ export default function ProfilePage() {
         const data = await res.json();
         if (data.authenticated) {
           setFullName(data.user.fullName || "");
+          setEmail(data.user.email || "");
           setPhoneNumber(data.user.phoneNumber || "");
         } else {
           router.push("/login");
@@ -44,7 +46,7 @@ export default function ProfilePage() {
       const res = await fetch("/api/auth/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName }),
+        body: JSON.stringify({ fullName, email }),
       });
       const data = await res.json();
       if (data.success) {
@@ -100,8 +102,25 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Phone (Read Only) */}
+            {/* Email Address Input */}
             <div className="space-y-2">
+              <label className="text-xs font-bold text-black/60 uppercase tracking-widest ml-1">Email Address</label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-black/40">
+                  <Mail size={18} />
+                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-brand-light border border-brand/10 rounded-2xl py-4 pl-12 pr-4 text-black font-medium focus:outline-none focus:border-[#C5A059] focus:ring-1 focus:ring-[#C5A059] transition-all"
+                  placeholder="name@example.com"
+                />
+              </div>
+            </div>
+
+            {/* Phone (Read Only) */}
+            <div className="space-y-2 md:col-span-2">
               <label className="text-xs font-bold text-black/60 uppercase tracking-widest ml-1">Phone Number</label>
               <div className="relative opacity-60">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-black/40">

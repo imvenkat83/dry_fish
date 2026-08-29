@@ -23,7 +23,8 @@ import {
   Menu,
   MessageSquare,
   HelpCircle,
-  FileText
+  FileText,
+  Video
 } from "lucide-react";
 
 const sidebarLinks = [
@@ -36,6 +37,7 @@ const sidebarLinks = [
   { name: "Category Settings", href: "/admin/categories", icon: LayoutGrid },
   { name: "Customers", href: "/admin/customers", icon: Users },
   { name: "Reviews", href: "/admin/reviews", icon: MessageSquare },
+  { name: "Reels Settings", href: "/admin/reels", icon: Video },
   { name: "FAQs Settings", href: "/admin/faqs", icon: HelpCircle },
   { name: "Coupons", href: "/admin/coupons", icon: Ticket },
   { name: "Blogs", href: "/admin/blogs", icon: FileText },
@@ -79,8 +81,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       }`}>
         <div className="p-6 border-b border-white/5 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3 group" onClick={() => setIsMobileSidebarOpen(false)}>
-            <div className="w-8 h-8 bg-black rounded-full p-0.5 flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform">
-              <img src="/logo.jpeg" alt="Dry Fish Basket Logo" className="w-full h-full rounded-full object-cover" />
+            <div className="w-9 h-9 flex items-center justify-center bg-transparent group-hover:scale-105 transition-transform">
+              <img src="/logo_fin.png" alt="Dry Fish Basket Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="font-gabriola font-bold text-xl tracking-wide leading-none">Dry Fish Basket</h1>
@@ -146,8 +148,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <div className="relative w-8 h-8 group">
               {/* Dry Fish Basket Logo Icon */}
-              <div className="absolute inset-0 bg-black rounded-full p-0.5 flex items-center justify-center shadow-md group-hover:scale-0 opacity-100 group-hover:opacity-0 transition-all duration-200">
-                <img src="/logo.jpeg" alt="Dry Fish Basket Logo" className="w-full h-full rounded-full object-cover" />
+              <div className="absolute inset-0 bg-transparent flex items-center justify-center group-hover:scale-0 opacity-100 group-hover:opacity-0 transition-all duration-200">
+                <img src="/logo_fin.png" alt="Dry Fish Basket Logo" className="w-full h-full object-contain" />
               </div>
               {/* Dashboard Icon on hover */}
               <div className="absolute inset-0 scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 flex items-center justify-center bg-[#8c6239] text-white rounded-full transition-all duration-200">

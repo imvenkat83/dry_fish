@@ -22,8 +22,13 @@ export const metadata: Metadata = {
   title: "Dry Fish Basket - Premium Dry Fish & Coastal Delicacies",
   description: "Hygienically Prepared. Authentic Coastal Taste.",
   icons: {
-    icon: "/favicon.jpeg",
-    apple: "/favicon.jpeg",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png" },
+      { url: "/fav_icon_fin.jpeg", type: "image/jpeg" },
+    ],
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
 };
 

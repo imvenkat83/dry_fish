@@ -4,8 +4,9 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import ProductGrid from "@/components/ProductGrid";
 import ProductCard from "@/components/ProductCard";
+import ReelsCarouselSection from "@/components/ReelsCarouselSection";
 import { getFirstProductImageUrl, getProductImageUrls } from "@/utils/product";
-import { ChevronLeft, ChevronRight, Sun, Leaf, FlaskConical, Package, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sun, Leaf, FlaskConical, Package, Star, Sparkles } from "lucide-react";
 
 type NavItem = {
   id: number;
@@ -59,94 +60,33 @@ export default function Home() {
   const [latestProducts, setLatestProducts] = useState<any[]>([]);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
-
-
   useEffect(() => {
-    const fetchNavItems = async () => {
+    async function loadAllPageData() {
       try {
-        const res = await fetch("/api/admin/nav");
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.success) {
-          setNavItems(data.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch nav items:", error);
+        await Promise.allSettled([
+          fetch("/api/admin/nav").then(res => res.json()).then(data => { if (data.success) setNavItems(data.data); }),
+          fetch("/api/admin/settings?key=homepage_banner").then(res => res.json()).then(data => { if (data.success && data.data) setBannerUrl(data.data.value); }),
+          fetch("/api/admin/offers").then(res => res.json()).then(data => { if (data.success) setOffers(data.data); }),
+          fetch("/api/admin/reviews").then(res => res.json()).then(data => { if (data.success) setReviews(data.data || []); }),
+          fetch("/api/products/latest").then(res => res.json()).then(data => { if (data.success) setLatestProducts(data.data || []); }),
+          fetch("/api/admin/homepage-categories").then(res => res.json()).then(data => { if (data.success) setHomepageCatCards(data.data); }),
+          fetch("/api/admin/faqs").then(res => res.json()).then(data => { if (data.success) setFaqs(data.data || []); }),
+          fetch("/api/admin/settings?key=founder_promo").then(res => res.json()).then(data => {
+            if (data.success && data.data) {
+              try {
+                const parsed = JSON.parse(data.data.value);
+                if (Array.isArray(parsed)) setFounderPromoList(parsed);
+              } catch {}
+            }
+          }),
+        ]);
+      } catch (err) {
+        console.error("Failed to load initial page data:", err);
       } finally {
         setIsLoading(false);
       }
-    };
-    fetchNavItems();
-  }, []);
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const resBanner = await fetch("/api/admin/settings?key=homepage_banner");
-        if (resBanner.ok) {
-          const dataBanner = await resBanner.json();
-          if (dataBanner.success && dataBanner.data) {
-            setBannerUrl(dataBanner.data.value);
-          }
-        }
-
-        const resOffers = await fetch("/api/admin/offers");
-        if (resOffers.ok) {
-          const dataOffers = await resOffers.json();
-          if (dataOffers.success) {
-            setOffers(dataOffers.data);
-          }
-        }
-
-        const resReviews = await fetch("/api/admin/reviews");
-        if (resReviews.ok) {
-          const dataReviews = await resReviews.json();
-          if (dataReviews.success) {
-            setReviews(dataReviews.data || []);
-          }
-        }
-
-        const resLatest = await fetch("/api/products/latest");
-        if (resLatest.ok) {
-          const dataLatest = await resLatest.json();
-          if (dataLatest.success) {
-            setLatestProducts(dataLatest.data || []);
-          }
-        }
-
-        const resCatCards = await fetch("/api/admin/homepage-categories");
-        if (resCatCards.ok) {
-          const dataCatCards = await resCatCards.json();
-          if (dataCatCards.success) {
-            setHomepageCatCards(dataCatCards.data);
-          }
-        }
-
-        const resFaqs = await fetch("/api/admin/faqs");
-        if (resFaqs.ok) {
-          const dataFaqs = await resFaqs.json();
-          if (dataFaqs.success) {
-            setFaqs(dataFaqs.data || []);
-          }
-        }
-
-        const resFounder = await fetch("/api/admin/settings?key=founder_promo");
-        if (resFounder.ok) {
-          const dataFounder = await resFounder.json();
-          if (dataFounder.success && dataFounder.data) {
-            try {
-              const parsed = JSON.parse(dataFounder.data.value);
-              if (Array.isArray(parsed)) {
-                setFounderPromoList(parsed);
-              }
-            } catch {}
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch settings/offers/categories/reviews/faqs/founder_promo", err);
-      }
     }
-    fetchData();
+    loadAllPageData();
   }, []);
 
   const banners = useMemo(() => {
@@ -157,7 +97,7 @@ export default function Home() {
         return parsed.map((item: any) => {
           if (typeof item === "string") return { url: item, mobileUrl: "", link: null };
           return {
-            url: item.url || item.desktopUrl || "",
+            url: item.url || "",
             mobileUrl: item.mobileUrl || "",
             link: item.link || null,
           };
@@ -186,6 +126,32 @@ export default function Home() {
     }
     return list;
   }, [homepageCatCards]);
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-[100] bg-[#FAF6ED] flex flex-col items-center justify-center p-6 text-center select-none font-serif">
+        <div className="relative mb-6">
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center bg-white border border-[#8c6239]/20 shadow-xl p-2 animate-pulse">
+            <img src="/logo_fin.png" alt="Dry Fish Basket Logo" className="w-full h-full object-contain" />
+          </div>
+          <div className="absolute -bottom-2 -right-2 p-2 bg-[#8c6239] text-[#fcd34d] rounded-full shadow-lg animate-spin">
+            <Sparkles size={16} />
+          </div>
+        </div>
+
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#3b2314] tracking-wide mb-1 font-serif">
+          Dry Fish Basket
+        </h2>
+        <p className="text-xs uppercase tracking-[0.25em] text-[#8c6239] font-black font-sans mb-8">
+          Loading Store...
+        </p>
+
+        <div className="w-48 h-1.5 bg-[#8c6239]/15 rounded-full overflow-hidden relative">
+          <div className="absolute inset-y-0 bg-[#8c6239] w-1/2 rounded-full animate-marquee" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-brand-light text-black font-sans selection:bg-brand-accent/30">
@@ -600,6 +566,9 @@ export default function Home() {
             </div>
           </section>
         )}
+
+        {/* 2.8. Shoppable Video Reels Section (Below Customer Reviews) */}
+        <ReelsCarouselSection />
 
         {/* 5. FAQs Section */}
         {faqs.length > 0 && (

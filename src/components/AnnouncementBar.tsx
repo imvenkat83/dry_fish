@@ -30,11 +30,11 @@ export default function AnnouncementBar() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  if (pathname?.startsWith("/admin")) {
-    return null;
-  }
-
   useEffect(() => {
+    if (pathname?.startsWith("/admin")) {
+      setIsLoading(false);
+      return;
+    }
     async function fetchOffers() {
       try {
         const res = await fetch("/api/admin/offers");
@@ -50,7 +50,7 @@ export default function AnnouncementBar() {
       }
     }
     fetchOffers();
-  }, []);
+  }, [pathname]);
 
   const marqueeItems = useMemo(() => {
     if (offers.length === 0) return [];
@@ -62,6 +62,10 @@ export default function AnnouncementBar() {
     }
     return list;
   }, [offers]);
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   if (isLoading || offers.length === 0) {
     return null;

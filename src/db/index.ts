@@ -23,7 +23,21 @@ if (process.env.NODE_ENV !== "production") {
   globalForDb.client = client;
 }
 
-// Auto-ensure email column exists in users table
+// Auto-ensure required tables & columns exist
 client.execute("ALTER TABLE users ADD COLUMN email TEXT;").catch(() => {});
+client.execute(`
+  CREATE TABLE IF NOT EXISTS reels (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    video_url TEXT NOT NULL,
+    thumbnail_url TEXT,
+    product_id INTEGER REFERENCES products(id) ON DELETE SET NULL,
+    badge_text TEXT DEFAULT 'NEW',
+    views_count TEXT DEFAULT '2.5M',
+    display_order INTEGER NOT NULL DEFAULT 0,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT
+  );
+`).catch(() => {});
 
 export const db = drizzle(client, { schema });
