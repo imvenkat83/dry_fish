@@ -131,11 +131,11 @@ export default function Home() {
     return (
       <div className="fixed inset-0 z-[100] bg-[#FAF6ED] flex flex-col items-center justify-center p-6 text-center select-none font-serif">
         <div className="relative mb-6">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center bg-transparent p-1 animate-pulse">
+          <div className="w-52 h-52 sm:w-64 sm:h-64 flex items-center justify-center bg-transparent p-1 animate-pulse">
             <img src="/images/vk_logo_transparent.png" alt="Dry Fish Basket Logo" className="w-full h-full object-contain" />
           </div>
-          <div className="absolute -bottom-2 -right-2 p-2 bg-[#8c6239] text-[#fcd34d] rounded-full shadow-lg animate-spin">
-            <Sparkles size={18} />
+          <div className="absolute bottom-2 right-2 p-3 bg-[#8c6239] text-[#fcd34d] rounded-full shadow-lg animate-spin">
+            <Sparkles size={24} />
           </div>
         </div>
 
