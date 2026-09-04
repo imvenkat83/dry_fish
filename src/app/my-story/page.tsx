@@ -60,23 +60,49 @@ export default function MyStory() {
           </div>
 
           {/* Right Column: Why Choose Dry Fish Basket text */}
-          <div className="bg-[#FAF6ED] border border-[#8c6239]/15 rounded-[2rem] p-8 flex flex-col justify-center space-y-4 shadow-sm text-left">
-            <h2 className="text-lg md:text-xl font-serif font-black text-[#8c6239] flex items-center gap-2">
-              🔥 Why Choose Dry Fish Basket?
-            </h2>
-            <span className="text-[10px] font-black text-black/40 uppercase tracking-widest block">
-              December 9, 2025
-            </span>
-            <p className="text-xs md:text-sm text-black/75 font-medium leading-relaxed">
-              Why Choose Dry Fish Basket? At Dry Fish Basket, we don't just sell seafood; we deliver a piece of our coastal heritage. Here is why thousands of seafood lovers across India trust us:...
-            </p>
-            <div className="pt-2">
+          <div className="bg-[#FAF6ED] border border-[#8c6239]/15 rounded-[2rem] p-7 md:p-8 flex flex-col justify-between space-y-4 shadow-sm text-left">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h2 className="text-lg md:text-xl font-serif font-black text-[#8c6239] flex items-center gap-2">
+                  🔥 Why Choose Dry Fish Basket?
+                </h2>
+                <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">
+                  December 9, 2025
+                </span>
+              </div>
+
+              <p className="text-xs md:text-sm text-black/75 font-medium leading-relaxed">
+                At Dry Fish Basket, we don't just sell seafood; we deliver a piece of our coastal heritage. Here is why thousands of seafood lovers across India trust us:
+              </p>
+
+              <ul className="space-y-2.5 text-xs text-black/80 font-medium pt-1">
+                <li className="flex items-start gap-2">
+                  <span className="text-base shrink-0">🐟</span>
+                  <span><strong>Authentic Taste:</strong> Sourced directly from Andhra coastlines for legendary coastal flavors like Nethallu, Endu Royyalu, and more.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-base shrink-0">💎</span>
+                  <span><strong>100% Chemical-Free:</strong> Naturally sun-dried with zero urea, no added colors, and zero artificial preservatives.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-base shrink-0">💰</span>
+                  <span><strong>Direct from Source:</strong> Direct from Bhimavaram coastal fishermen for export quality at wholesale prices.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-base shrink-0">🚚</span>
+                  <span><strong>Odor-Proof Delivery:</strong> Specialized vacuum-sealed packaging delivered fresh to your doorstep across India.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-3 border-t border-[#8c6239]/10">
               <button 
                 type="button"
                 onClick={() => setIsWhyChooseModalOpen(true)}
-                className="text-xs font-black uppercase tracking-wider text-[#8c6239] hover:underline cursor-pointer focus:outline-none"
+                className="text-xs font-black uppercase tracking-wider text-[#8c6239] hover:underline cursor-pointer focus:outline-none inline-flex items-center gap-1 group"
               >
-                Read more...
+                <span>Read more...</span>
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
               </button>
             </div>
           </div>
