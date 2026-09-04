@@ -25,17 +25,22 @@ export default function MyStory() {
       <section className="max-w-5xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-stretch">
           
-          {/* Left Column: Traditional Sun-drying Process Image */}
-          <div className="relative rounded-[2rem] overflow-hidden border border-[#8c6239]/15 shadow-md aspect-[4/3] md:aspect-auto min-h-[350px] bg-brand/5">
+          {/* Left Column: Authentic Dry Fish & Prawns Varieties */}
+          <div className="relative rounded-[2rem] overflow-hidden border border-[#8c6239]/15 shadow-md min-h-[380px] md:min-h-[440px] bg-brand/5 group">
             <img
-              src="https://images.unsplash.com/photo-1534482421-64566f976cfa?auto=format&fit=crop&w=800&q=80"
-              alt="Traditional sun-drying process of Dry Fish Basket"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = "https://placehold.co/800x600/FAF6ED/8c6239?text=Traditional+Sun-Drying+Process";
-              }}
+              src="/images/about_dry_fish_varieties.jpg"
+              alt="Authentic Dry Fish and Dry Prawns varieties at Dry Fish Basket"
+              className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
+            <div className="absolute bottom-5 left-5 right-5 text-white space-y-1">
+              <span className="text-[10px] font-black uppercase tracking-wider bg-[#8c6239] px-3 py-1 rounded-full text-[#FAF6ED] shadow-sm inline-block">
+                Authentic Coastal Heritage
+              </span>
+              <p className="text-xs font-semibold text-white/95 drop-shadow-md">
+                Traditionally sun-dried prawns, fish, and authentic Andhra seafood varieties.
+              </p>
+            </div>
           </div>
 
           {/* Right Column: Why Choose Dry Fish Basket text */}
@@ -145,6 +150,21 @@ export default function MyStory() {
               >
                 <X size={20} />
               </button>
+            </div>
+
+            {/* Modal Image Banner */}
+            <div className="w-full h-44 overflow-hidden relative border-b border-[#8c6239]/10 shrink-0">
+              <img
+                src="/images/about_dry_fish_varieties.jpg"
+                alt="Dry Fish Basket Varieties"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-3 left-5 text-white">
+                <span className="text-[10px] font-black uppercase tracking-wider bg-[#8c6239] px-3 py-1 rounded-full text-[#FAF6ED] shadow-sm">
+                  100% Sun-Dried &bull; Zero Chemicals
+                </span>
+              </div>
             </div>
 
             {/* Content (Scrollable) */}
