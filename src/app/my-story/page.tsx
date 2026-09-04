@@ -11,14 +11,30 @@ export default function MyStory() {
     <main className="min-h-screen bg-[#FAF6ED] text-[#3b2314] font-sans selection:bg-[#8c6239]/20 pb-20">
       
       {/* 1. Header & Main Intro Section */}
-      <section className="max-w-4xl mx-auto px-6 pt-12 pb-10 text-center space-y-6">
-        <h1 className="text-3xl md:text-5xl font-serif font-black text-[#8c6239] leading-tight">
-          About Us – Dry Fish Basket
-        </h1>
-        <div className="w-24 h-1 bg-[#8c6239]/20 mx-auto rounded-full"></div>
-        <p className="text-xs md:text-sm text-black/75 font-medium leading-relaxed max-w-3xl mx-auto text-justify md:text-center">
-          At Dry Fish Basket, we bring you authentic coastal flavours of Andhra Pradesh using traditional, time-honoured methods from the coastal region. Based in Bhimavaram, we work with trusted fishermen who follow sustainable practices to deliver premium, hygienically processed dry fish across India. Every batch is naturally sun-dried, carefully cleaned, and packed in food-grade, moisture-free packaging to preserve purity, freshness, and nutrition.
-        </p>
+      <section className="max-w-5xl mx-auto px-6 pt-12 pb-10">
+        <div className="flex flex-col sm:flex-row items-center gap-8 md:gap-12">
+          {/* Website Logo to the left */}
+          <div className="shrink-0 flex items-center justify-center">
+            <div className="w-28 h-28 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full p-2 bg-white/70 border border-[#8c6239]/20 shadow-md flex items-center justify-center group hover:scale-105 transition-transform duration-300">
+              <img
+                src="/logo_fin.png"
+                alt="Dry Fish Basket Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+          </div>
+
+          {/* Intro Text moved to the right */}
+          <div className="flex-1 text-center sm:text-left space-y-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif font-black text-[#8c6239] leading-tight">
+              About Us – Dry Fish Basket
+            </h1>
+            <div className="w-20 h-1 bg-[#8c6239]/25 rounded-full mx-auto sm:mx-0"></div>
+            <p className="text-xs md:text-sm text-black/75 font-medium leading-relaxed text-justify sm:text-left">
+              At Dry Fish Basket, we bring you authentic coastal flavours of Andhra Pradesh using traditional, time-honoured methods from the coastal region. Based in Bhimavaram, we work with trusted fishermen who follow sustainable practices to deliver premium, hygienically processed dry fish across India. Every batch is naturally sun-dried, carefully cleaned, and packed in food-grade, moisture-free packaging to preserve purity, freshness, and nutrition.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* 2. Split Process / Why Choose Us Section */}
