@@ -27,7 +27,7 @@ export default function MyStory() {
           {/* Intro Text moved to the right */}
           <div className="flex-1 text-center sm:text-left space-y-4">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif font-black text-[#8c6239] leading-tight">
-              About Us – Dry Fish Basket
+              About Us – VK Dry Fish Basket
             </h1>
             <div className="w-20 h-1 bg-[#8c6239]/25 rounded-full mx-auto sm:mx-0"></div>
             <p className="text-xs md:text-sm text-black/75 font-medium leading-relaxed text-justify sm:text-left">
@@ -64,7 +64,7 @@ export default function MyStory() {
             <div className="space-y-2.5">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <h2 className="text-lg md:text-xl font-serif font-black text-[#8c6239] flex items-center gap-2">
-                  🔥 Why Choose Dry Fish Basket?
+                  🔥 Why Choose VK Dry Fish Basket?
                 </h2>
                 <span className="text-[10px] font-black text-black/40 uppercase tracking-widest">
                   December 9, 2025
@@ -110,66 +110,65 @@ export default function MyStory() {
         </div>
       </section>
 
-      {/* 2.5. Official FSSAI License & Registration Section */}
+      {/* 2.5. Official FSSAI Certification Section */}
       <section className="max-w-5xl mx-auto px-6 py-8">
-        <div className="bg-white border border-[#8c6239]/15 rounded-[2.5rem] p-8 md:p-12 shadow-sm space-y-8">
-          <div className="text-center space-y-3">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8c6239] bg-[#8c6239]/10 px-4 py-1.5 rounded-full inline-block">
-              Government Food Safety Certification
-            </span>
-            <h2 className="text-2xl md:text-3xl font-serif font-black text-[#8c6239]">
-              FSSAI Registered &amp; Licensed Store
-            </h2>
-            <p className="text-xs md:text-sm text-black/70 max-w-2xl mx-auto">
-              Dry Fish Basket is officially registered under the <strong>Food Safety and Standards Authority of India (FSSAI)</strong>, ensuring 100% hygienic, safe, and quality-tested processing.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Registration Card Image */}
-            <div className="lg:col-span-6 flex justify-center">
-              <div className="relative rounded-2xl overflow-hidden border border-[#8c6239]/20 shadow-lg bg-white max-w-md w-full p-2 group hover:scale-[1.01] transition-transform duration-300">
-                <img
-                  src="/images/fssai_registration_card.png"
-                  alt="FSSAI Registration ID Card - VK-DRY FISH BASKET"
-                  className="w-full h-auto object-contain rounded-xl"
-                />
+        <div className="bg-[#FAF6ED] border border-[#8c6239]/20 rounded-[2.5rem] p-6 sm:p-10 md:p-12 shadow-sm">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+            
+            {/* Left Column: Official FSSAI Logo directly on outer card */}
+            <div className="w-full md:w-5/12 flex flex-col items-center justify-center text-center space-y-4">
+              <img
+                src="/images/fssai_logo.svg"
+                alt="FSSAI Official Food Safety Logo"
+                className="w-56 sm:w-64 md:w-72 h-auto object-contain"
+              />
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-green-100/70 border border-green-300/80 text-green-800 text-xs font-bold">
+                <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse"></span>
+                <span>Government Certified &bull; Active License</span>
               </div>
             </div>
 
-            {/* Registration Details Grid */}
-            <div className="lg:col-span-6 space-y-4 text-xs md:text-sm">
-              <div className="bg-[#FAF6ED] p-5 rounded-2xl border border-[#8c6239]/10 space-y-3">
-                <div className="flex items-center justify-between border-b border-[#8c6239]/10 pb-2">
-                  <span className="text-black/60 font-medium">Registration ID:</span>
-                  <span className="font-bold text-[#8c6239] font-mono text-sm">23626009000082</span>
+            {/* Right Column: Highlighted FSSAI ID & Trust Details */}
+            <div className="w-full md:w-7/12 space-y-5 text-left">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#8c6239] bg-[#8c6239]/10 px-3 py-1 rounded-full inline-block mb-2">
+                  Food Safety &amp; Standards Authority of India
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-serif font-black text-[#8c6239]">
+                  FSSAI Registered Store
+                </h2>
+                <p className="text-xs sm:text-sm text-black/70 mt-1 leading-relaxed">
+                  Dry Fish Basket operates with complete adherence to national food safety guidelines, ensuring 100% clean, unadulterated, and hygienically processed seafood.
+                </p>
+              </div>
+
+              {/* Highlighted FSSAI ID Box */}
+              <div className="bg-white rounded-2xl p-5 sm:p-6 border-2 border-[#8c6239]/30 shadow-sm space-y-2">
+                <div className="text-[11px] font-black uppercase tracking-widest text-black/50">
+                  FSSAI Registration ID
                 </div>
-                <div className="flex items-center justify-between border-b border-[#8c6239]/10 pb-2">
-                  <span className="text-black/60 font-medium">Registered Name:</span>
+                <div className="text-2xl sm:text-3xl font-black font-mono tracking-wider text-[#8c6239] select-all">
+                  23626009000082
+                </div>
+                <div className="text-xs text-black/60 font-medium flex items-center gap-2 pt-2 border-t border-black/5">
+                  <span className="font-semibold text-black/80">Registered Entity:</span>
                   <span className="font-bold text-black">VK-DRY FISH BASKET</span>
                 </div>
-                <div className="flex items-center justify-between border-b border-[#8c6239]/10 pb-2">
-                  <span className="text-black/60 font-medium">Fee Paid Upto:</span>
-                  <span className="font-bold text-green-700">01-09-2027</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-[#8c6239]/10 pb-2">
-                  <span className="text-black/60 font-medium">Issued On:</span>
-                  <span className="font-semibold text-black">02-09-2026</span>
-                </div>
-                <div className="flex items-center justify-between border-b border-[#8c6239]/10 pb-2">
-                  <span className="text-black/60 font-medium">Issuing Authority:</span>
-                  <span className="font-semibold text-black">Malkaigiri Municipal Corp.</span>
-                </div>
-                <div className="flex items-start justify-between pt-1">
-                  <span className="text-black/60 font-medium shrink-0">Business Scope (KOB):</span>
-                  <span className="font-semibold text-[#8c6239] text-right">Wholesaler, Retailer, General Manufacturing</span>
-                </div>
               </div>
 
-              <p className="text-[11px] text-black/50 italic leading-relaxed">
-                * This Registration ID card is issued under the provisions laid down under the Food Safety and Standards Act, 2006.
-              </p>
+              {/* Verified Features */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div className="bg-white/80 rounded-xl p-3.5 border border-[#8c6239]/10 text-xs">
+                  <div className="font-bold text-[#8c6239]">✓ 100% Chemical-Free</div>
+                  <div className="text-[11px] text-black/60 mt-0.5 leading-snug">Naturally sun-dried with zero urea, colors, or artificial preservatives</div>
+                </div>
+                <div className="bg-white/80 rounded-xl p-3.5 border border-[#8c6239]/10 text-xs">
+                  <div className="font-bold text-[#8c6239]">✓ Hygienic Processing</div>
+                  <div className="text-[11px] text-black/60 mt-0.5 leading-snug">Carefully cleaned, sand-free, and sealed in odor-proof packaging</div>
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -183,7 +182,7 @@ export default function MyStory() {
             {/* Header */}
             <div className="p-6 border-b border-[#8c6239]/10 flex items-center justify-between bg-brand/5">
               <h2 className="text-base md:text-lg font-serif font-black text-[#8c6239] flex items-center gap-2">
-                🔥 Why Choose Dry Fish Basket?
+                🔥 Why Choose VK Dry Fish Basket?
               </h2>
               <button
                 onClick={() => setIsWhyChooseModalOpen(false)}

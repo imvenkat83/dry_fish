@@ -317,13 +317,13 @@ export default function Home() {
             </motion.div>
 
             <div className="relative group px-1">
-              {reviews.length > 4 && (
+              {reviews.length > 5 && (
                 <>
                   <button
                     type="button"
                     onClick={() => {
                       const container = document.getElementById("reviews-scroll-container");
-                      if (container) container.scrollBy({ left: -340, behavior: "smooth" });
+                      if (container) container.scrollBy({ left: -280, behavior: "smooth" });
                     }}
                     className="absolute -left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-black shadow-xl flex items-center justify-center border border-black/10 z-20 transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
                     aria-label="Previous Reviews"
@@ -334,7 +334,7 @@ export default function Home() {
                     type="button"
                     onClick={() => {
                       const container = document.getElementById("reviews-scroll-container");
-                      if (container) container.scrollBy({ left: 340, behavior: "smooth" });
+                      if (container) container.scrollBy({ left: 280, behavior: "smooth" });
                     }}
                     className="absolute -right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-black shadow-xl flex items-center justify-center border border-black/10 z-20 transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
                     aria-label="Next Reviews"
@@ -346,66 +346,65 @@ export default function Home() {
 
               <div
                 id="reviews-scroll-container"
-                className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar py-2 scroll-smooth"
+                className="flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar py-2 scroll-smooth"
               >
                 {reviews.map((review) => (
                   <div
                     key={review.id}
-                    className="snap-start flex-shrink-0 w-[260px] sm:w-[280px] md:w-[300px] lg:w-[calc(25%-1.125rem)] bg-[#FAF6ED] border border-[#3b2314]/25 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between hover:shadow-md transition-all"
+                    className="snap-start flex-shrink-0 w-[200px] sm:w-[220px] md:w-[calc(33.333%-0.75rem)] lg:w-[calc(20%-0.8rem)] bg-[#FAF6ED] border border-[#3b2314]/25 rounded-2xl p-4 sm:p-4.5 shadow-sm flex flex-col justify-between hover:shadow-md transition-all text-center min-h-[340px] sm:min-h-[350px]"
                   >
-                    {/* Top Photo */}
-                    <div className="w-full aspect-[4/3] overflow-hidden bg-brand/5 border-b border-[#3b2314]/15">
-                      {review.imageUrl ? (
-                        <img
-                          src={review.imageUrl}
-                          alt={review.userName}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = "/images/placeholder.png";
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-[#8c6239]/10 text-[#3b2314]">
-                          <span className="font-serif text-3xl font-bold uppercase">{review.userName.charAt(0)}</span>
-                        </div>
-                      )}
-                    </div>
+                    <div className="flex flex-col items-center flex-1">
+                      {/* Circular Customer Avatar - Increased Size */}
+                      <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-[#8c6239]/25 shadow-md bg-white shrink-0 mb-3 p-0.5">
+                        {review.imageUrl ? (
+                          <img
+                            src={review.imageUrl}
+                            alt={review.userName}
+                            className="w-full h-full object-cover rounded-full"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = "/images/placeholder.png";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-[#8c6239]/10 text-[#3b2314] rounded-full">
+                            <span className="font-serif text-2xl font-bold uppercase">{review.userName.charAt(0)}</span>
+                          </div>
+                        )}
+                      </div>
 
-                    {/* Card Content */}
-                    <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between text-center space-y-3">
-                      <div>
-                        {/* Rating Stars */}
-                        <div className="flex items-center justify-center gap-1 mb-3">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              size={15}
-                              className={i < (review.rating || 5) ? "fill-black text-black" : "text-black/15"}
-                            />
-                          ))}
-                        </div>
+                      {/* Rating Stars */}
+                      <div className="flex items-center justify-center gap-1 mb-2.5">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            size={14}
+                            className={i < (review.rating || 5) ? "fill-black text-black" : "text-black/15"}
+                          />
+                        ))}
+                      </div>
 
-                        {/* Review Comment */}
-                        <p className="text-xs sm:text-sm font-semibold text-black/90 leading-relaxed italic mb-4">
+                      {/* Review Comment - Expanded Text Area */}
+                      <div className="flex-1 flex flex-col justify-center my-1.5">
+                        <p className="text-xs sm:text-[13px] font-semibold text-black/90 leading-snug italic">
                           "{review.comment}"
                         </p>
-
-                        {/* Reviewer Name / Designation */}
-                        <p className="text-xs sm:text-sm font-black text-black uppercase tracking-wide">
-                          - {review.designation || review.userName}
-                        </p>
                       </div>
 
-                      {/* Bottom Action Button */}
-                      <div className="pt-2">
-                        <Link
-                          href={review.buttonLink || "/all"}
-                          className="block w-full py-2.5 bg-[#eab308] hover:bg-[#d9a207] text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-xs active:scale-95"
-                        >
-                          {review.buttonText || "EXPLORE COLLECTION"}
-                        </Link>
-                      </div>
+                      {/* Reviewer Name / Designation */}
+                      <p className="text-[11px] sm:text-xs font-black text-black uppercase tracking-wide mt-2 mb-2.5">
+                        - {review.designation || review.userName}
+                      </p>
+                    </div>
+
+                    {/* Bottom Action Button */}
+                    <div className="pt-2 w-full">
+                      <Link
+                        href={review.buttonLink || "/all"}
+                        className="block w-full py-2 bg-[#eab308] hover:bg-[#d9a207] text-black text-[11px] font-black uppercase tracking-wider rounded-xl transition-all shadow-xs active:scale-95 text-center"
+                      >
+                        {review.buttonText || "EXPLORE COLLECTION"}
+                      </Link>
                     </div>
                   </div>
                 ))}
