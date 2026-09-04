@@ -28,11 +28,24 @@ export default function Navbar() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMobileCollectionsOpen, setIsMobileCollectionsOpen] = useState(false);
   const [user, setUser] = useState<{ fullName: string | null; phoneNumber: string } | null>(null);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Prevent background body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
   // Cart store hydration handling
   const [cartCount, setCartCount] = useState(0);
@@ -314,60 +327,72 @@ export default function Navbar() {
 
         {/* Mobile Menu Panel */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-black border-t border-white/10 animate-in slide-in-from-top duration-300 font-serif">
-            <div className="px-6 pt-8 pb-12 space-y-6 font-serif">
+          <div className="md:hidden fixed inset-x-0 top-16 bottom-0 z-50 bg-black/95 backdrop-blur-md border-t border-white/10 overflow-y-auto overscroll-contain animate-in slide-in-from-top duration-300 font-serif">
+            <div className="px-6 pt-6 pb-36 space-y-5 font-serif">
 
               {/* Navigation Links */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <Link
                   href="/"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-white hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-2"
+                  className="block text-white hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-1.5"
                 >
                   Home
                 </Link>
                 <Link
                   href="/my-story"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-white hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-2"
+                  className="block text-white hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-1.5"
                 >
                   About Us
                 </Link>
                 <Link
                   href="/blogs"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-white hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-2"
+                  className="block text-white hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-1.5"
                 >
                   Blog
                 </Link>
 
-                {/* Collections Section */}
-                <div className="space-y-2 py-2">
-                  <h3 className="text-[11px] font-medium uppercase tracking-[0.2em] text-[#C5A059]">Collections</h3>
-                  <div className="flex flex-col space-y-1 pl-3 border-l border-white/20">
-                    {categories.length === 0 ? (
-                      <span className="text-white/50 py-2 text-xs font-medium uppercase tracking-wider">
-                        No Collections Available
-                      </span>
-                    ) : (
-                      categories.map((cat) => (
-                        <Link
-                          key={cat.id}
-                          href={cat.link || `/category/${cat.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-white hover:text-[#C5A059] transition-colors py-2 text-xs font-medium uppercase tracking-wider flex items-center gap-2"
-                        >
-                          <span className="capitalize">{cat.name}</span>
-                        </Link>
-                      ))
-                    )}
-                  </div>
+                {/* Collections Section (Collapsible Accordion) */}
+                <div className="py-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileCollectionsOpen(!isMobileCollectionsOpen)}
+                    className="w-full flex items-center justify-between text-left text-sm font-medium uppercase tracking-widest text-[#C5A059] py-1.5 cursor-pointer"
+                  >
+                    <span>Collections</span>
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 text-[#C5A059] ${isMobileCollectionsOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                  {isMobileCollectionsOpen && (
+                    <div className="flex flex-col space-y-1 pl-3 my-2 border-l border-white/20 animate-in fade-in duration-200">
+                      {categories.length === 0 ? (
+                        <span className="text-white/50 py-2 text-xs font-medium uppercase tracking-wider">
+                          No Collections Available
+                        </span>
+                      ) : (
+                        categories.map((cat) => (
+                          <Link
+                            key={cat.id}
+                            href={cat.link || `/category/${cat.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="text-white hover:text-[#C5A059] transition-colors py-1.5 text-xs font-medium uppercase tracking-wider flex items-center gap-2"
+                          >
+                            <span className="capitalize">{cat.name}</span>
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <Link
                   href="/contact"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`block hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-2 ${
+                  className={`block hover:text-[#eab308] text-sm font-medium uppercase tracking-widest transition-colors py-1.5 ${
                     pathname === "/contact" ? "text-[#eab308]" : "text-white"
                   }`}
                 >
@@ -426,9 +451,9 @@ export default function Navbar() {
                         setIsMobileMenuOpen(false);
                         setIsLogoutModalOpen(true);
                       }}
-                      className="w-full mt-4 flex items-center justify-center space-x-2 px-4 py-3 rounded-xl border border-red-500/25 text-red-700 hover:text-red-900 hover:bg-red-500/5 transition-all font-bold uppercase tracking-widest text-[10px] cursor-pointer"
+                      className="w-full mt-4 flex items-center justify-center space-x-2 px-4 py-3 rounded-xl border border-red-500/40 bg-red-500/10 text-red-400 hover:text-red-300 hover:bg-red-500/20 transition-all font-bold uppercase tracking-widest text-[11px] cursor-pointer shadow-sm"
                     >
-                      <LogOut size={14} />
+                      <LogOut size={15} />
                       <span>Logout</span>
                     </button>
                   </div>
