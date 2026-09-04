@@ -71,7 +71,7 @@ export default function CancellationReturns() {
                 <strong>By email:</strong> <a href="mailto:info@vkdryfishbasket.com" className="text-[#8c6239] hover:underline font-semibold">info@vkdryfishbasket.com</a>
               </li>
               <li>
-                <strong>By phone number:</strong> <a href="tel:+919848160769" className="text-[#8c6239] hover:underline font-semibold">+91 98481 60769</a>
+                <strong>By phone number:</strong> <a href="tel:+919848357279" className="text-[#8c6239] hover:underline font-semibold">+91 98483 57279</a>
               </li>
             </ul>
             <p>We will reimburse You no later than 7 days from the day on which We receive the returned Goods. We will use the same means of payment as You used for the Order, and You will not incur any fees for such reimbursement.</p>
@@ -134,7 +134,7 @@ export default function CancellationReturns() {
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone size={16} className="text-[#8c6239]" />
-                <span>By phone number: <a href="tel:+919848160769" className="text-[#8c6239] hover:underline font-bold">+91 98481 60769</a></span>
+                <span>By phone number: <a href="tel:+919848357279" className="text-[#8c6239] hover:underline font-bold">+91 98483 57279</a></span>
               </li>
               <li className="flex items-start gap-2.5">
                 <MapPin size={16} className="text-[#8c6239] shrink-0 mt-0.5" />

@@ -408,7 +408,7 @@ export default function TermsConditions() {
               </li>
               <li className="flex items-center gap-2.5">
                 <Phone size={16} className="text-[#8c6239]" />
-                <span>Phone: <a href="tel:+919848160769" className="text-[#8c6239] hover:underline font-bold">+91 98481 60769</a></span>
+                <span>Phone: <a href="tel:+919848357279" className="text-[#8c6239] hover:underline font-bold">+91 98483 57279</a></span>
               </li>
               <li className="flex items-start gap-2.5">
                 <MapPin size={16} className="text-[#8c6239] shrink-0 mt-0.5" />
