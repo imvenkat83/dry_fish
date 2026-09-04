@@ -175,6 +175,7 @@ export default function Home() {
             preload="auto"
             className="w-full h-full object-cover"
           >
+            <source src="/videos/home-banner.mp4" type="video/mp4" />
             <source src="/videos/WhatsApp%20Video%202026-09-04%20at%202.00.20%20PM.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>

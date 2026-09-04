@@ -52,5 +52,5 @@ sqlite.db
 scratch/
 env*
 
-# Large media assets (>100MB)
-public/videos/
+# Large uncompressed media (>100MB)
+public/videos/*WhatsApp*
