@@ -40,8 +40,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${playfair.variable} antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];var r=n&&n.type==='reload';var s=sessionStorage.getItem('vk_landing_seen')==='true';if(s||r){document.documentElement.classList.add('landing-dismissed');}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-brand-light font-inter text-brand-dark flex flex-col">
         <AnnouncementBar />
         <Navbar />

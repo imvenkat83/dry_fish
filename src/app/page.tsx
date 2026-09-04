@@ -7,7 +7,7 @@ import ProductCard from "@/components/ProductCard";
 import ReelsCarouselSection from "@/components/ReelsCarouselSection";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import { getFirstProductImageUrl, getProductImageUrls } from "@/utils/product";
-import { ChevronLeft, ChevronRight, Sun, Leaf, FlaskConical, Package, Star, Sparkles, Volume2, VolumeX } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sun, Leaf, FlaskConical, Package, Star, Sparkles } from "lucide-react";
 
 type NavItem = {
   id: number;
@@ -60,48 +60,207 @@ export default function Home() {
   const [founderPromoList, setFounderPromoList] = useState<any[]>([]);
   const [latestProducts, setLatestProducts] = useState<any[]>([]);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.muted = true;
-      videoRef.current.play().catch(() => {});
+  // Landing Page Video & Background Preload State
+  const [showLandingVideo, setShowLandingVideo] = useState(() => {
+    if (typeof window !== "undefined") {
+      return !document.documentElement.classList.contains("landing-dismissed");
     }
-  }, []);
+    return true;
+  });
+  const [isPreloadComplete, setIsPreloadComplete] = useState(false);
+  const landingVideoRef = useRef<HTMLVideoElement>(null);
 
-  const toggleSound = () => {
-    if (videoRef.current) {
-      const nextMuted = !videoRef.current.muted;
-      videoRef.current.muted = nextMuted;
-      setIsMuted(nextMuted);
+  // Start the home video from 0:00 when the home page opens
+  const startHomeVideoFromBeginning = () => {
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    const playVideo = () => {
+      try {
+        vid.currentTime = 0;
+        vid.muted = true;
+        const p = vid.play();
+        if (p !== undefined) {
+          p.catch(() => {});
+        }
+      } catch (e) {}
+    };
+
+    if (vid.readyState >= 1) {
+      playVideo();
+    } else {
+      vid.addEventListener("loadedmetadata", playVideo, { once: true });
+      vid.addEventListener("canplay", playVideo, { once: true });
+      playVideo();
     }
   };
 
+  // Show landing video only on initial session arrival, not on reload
   useEffect(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const isDismissed = document.documentElement.classList.contains("landing-dismissed");
+
+        if (isDismissed) {
+          // Reload / revisit: no landing video, play home video directly from 0:00
+          setShowLandingVideo(false);
+          startHomeVideoFromBeginning();
+          return;
+        }
+
+        // First visit in this session: display landing video
+        setShowLandingVideo(true);
+        if (videoRef.current) {
+          videoRef.current.pause();
+          videoRef.current.currentTime = 0;
+        }
+      }
+    } catch (e) {
+      setShowLandingVideo(false);
+      startHomeVideoFromBeginning();
+    }
+  }, []);
+
+  // Auto-play landing video when visible
+  useEffect(() => {
+    if (showLandingVideo && landingVideoRef.current) {
+      landingVideoRef.current.muted = true;
+      landingVideoRef.current.play().catch((err) => {
+        console.warn("Landing video autoplay notice:", err);
+      });
+    }
+  }, [showLandingVideo]);
+
+  // Prevent background scrolling while landing video is playing
+  useEffect(() => {
+    if (showLandingVideo) {
+      document.body.style.overflow = "hidden";
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+      }
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showLandingVideo]);
+
+  // Dismiss landing video: mark as seen and trigger exit transition
+  const dismissLandingVideo = () => {
+    try {
+      if (typeof window !== "undefined") {
+        document.documentElement.classList.add("landing-dismissed");
+        sessionStorage.setItem("vk_landing_seen", "true");
+      }
+    } catch (e) {}
+
+    // Ensure home video stays paused at 0:00 until overlay finishes fading out
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+    setShowLandingVideo(false);
+  };
+
+  const handleLandingEnded = () => {
+    dismissLandingVideo();
+  };
+
+  useEffect(() => {
+    function preloadImage(url: string): Promise<void> {
+      return new Promise((resolve) => {
+        if (!url || typeof url !== "string") return resolve();
+        const img = new Image();
+        img.src = url;
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      });
+    }
+
     async function loadAllPageData() {
       try {
-        await Promise.allSettled([
+        const results = await Promise.allSettled([
           fetch("/api/admin/nav").then(res => res.json()).then(data => { if (data.success) setNavItems(data.data); }),
           fetch("/api/admin/settings?key=homepage_banner").then(res => res.json()).then(data => { if (data.success && data.data) setBannerUrl(data.data.value); }),
           fetch("/api/admin/offers").then(res => res.json()).then(data => { if (data.success) setOffers(data.data); }),
-          fetch("/api/admin/reviews").then(res => res.json()).then(data => { if (data.success) setReviews(data.data || []); }),
-          fetch("/api/products/latest").then(res => res.json()).then(data => { if (data.success) setLatestProducts(data.data || []); }),
-          fetch("/api/admin/homepage-categories").then(res => res.json()).then(data => { if (data.success) setHomepageCatCards(data.data); }),
+          fetch("/api/admin/reviews").then(res => res.json()).then(data => { if (data.success) setReviews(data.data || []); return data.data || []; }),
+          fetch("/api/products/latest").then(res => res.json()).then(data => { if (data.success) setLatestProducts(data.data || []); return data.data || []; }),
+          fetch("/api/admin/homepage-categories").then(res => res.json()).then(data => { if (data.success) setHomepageCatCards(data.data); return data.data || []; }),
           fetch("/api/admin/faqs").then(res => res.json()).then(data => { if (data.success) setFaqs(data.data || []); }),
           fetch("/api/admin/settings?key=founder_promo").then(res => res.json()).then(data => {
             if (data.success && data.data) {
               try {
                 const parsed = JSON.parse(data.data.value);
                 if (Array.isArray(parsed)) setFounderPromoList(parsed);
+                return parsed;
               } catch {}
             }
+            return [];
           }),
+          fetch("/api/products/featured").then(res => res.json()).then(data => (data.success && Array.isArray(data.data) ? data.data : [])).catch(() => []),
         ]);
+
+        // Eagerly preload key images into browser cache while landing video plays
+        const imageUrls: string[] = [
+          "/images/home-banner-poster.jpg",
+          "/images/banner_2.png",
+          "/images/vk_logo_transparent.png",
+          "/images/fssai_logo.svg",
+        ];
+
+        // Homepage categories
+        const catRes = results[5];
+        if (catRes.status === "fulfilled" && Array.isArray(catRes.value)) {
+          catRes.value.forEach((cat: any) => {
+            if (cat.imageUrl) imageUrls.push(cat.imageUrl);
+          });
+        }
+
+        // Latest products
+        const prodRes = results[4];
+        if (prodRes.status === "fulfilled" && Array.isArray(prodRes.value)) {
+          prodRes.value.forEach((prod: any) => {
+            const mainImg = getFirstProductImageUrl(prod.images, prod.colors);
+            if (mainImg) imageUrls.push(mainImg);
+          });
+        }
+
+        // Featured products
+        const featRes = results[8];
+        if (featRes.status === "fulfilled" && Array.isArray(featRes.value)) {
+          featRes.value.forEach((prod: any) => {
+            const mainImg = getFirstProductImageUrl(prod.images, prod.colors);
+            if (mainImg) imageUrls.push(mainImg);
+          });
+        }
+
+        // Reviews
+        const revRes = results[3];
+        if (revRes.status === "fulfilled" && Array.isArray(revRes.value)) {
+          revRes.value.forEach((rev: any) => {
+            if (rev.imageUrl) imageUrls.push(rev.imageUrl);
+          });
+        }
+
+        // Founder promo
+        const promoRes = results[7];
+        if (promoRes.status === "fulfilled" && Array.isArray(promoRes.value)) {
+          promoRes.value.forEach((p: any) => {
+            if (p.imageUrl) imageUrls.push(p.imageUrl);
+          });
+        }
+
+        // Preload all gathered images in parallel
+        await Promise.allSettled(imageUrls.map(preloadImage));
       } catch (err) {
         console.error("Failed to load initial page data:", err);
       } finally {
         setIsLoading(false);
+        setIsPreloadComplete(true);
       }
     }
     loadAllPageData();
@@ -145,51 +304,56 @@ export default function Home() {
     return list;
   }, [homepageCatCards]);
 
-  if (isLoading) {
-    return (
-      <div className="fixed inset-0 z-[100] bg-[#FAF6ED] flex flex-col items-center justify-center p-6 text-center select-none font-serif">
-        <div className="relative">
-          <div className="w-52 h-52 sm:w-64 sm:h-64 flex items-center justify-center bg-transparent p-1 animate-pulse">
-            <img src="/images/vk_logo_transparent.png" alt="Dry Fish Basket Logo" className="w-full h-full object-contain" />
-          </div>
-          <div className="absolute bottom-2 right-2 p-3 bg-[#8c6239] text-[#fcd34d] rounded-full shadow-lg animate-spin">
-            <Sparkles size={24} />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-brand-light text-black font-sans selection:bg-brand-accent/30">
+    <div className="min-h-screen bg-brand-light text-black font-sans selection:bg-brand-accent/30 relative">
+      {/* Full-screen Video Landing Page Overlay with Parallel Background Preload */}
+      <AnimatePresence
+        onExitComplete={() => {
+          // Landing overlay has finished exiting and homepage is now fully opened
+          startHomeVideoFromBeginning();
+        }}
+      >
+        {showLandingVideo && (
+          <motion.div
+            id="landing-video-overlay"
+            data-testid="landing-video-overlay"
+            key="landing-video-overlay"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.35, ease: "easeOut" } }}
+            className="fixed inset-0 z-[9999] bg-black flex items-center justify-center overflow-hidden select-none cursor-pointer"
+            onClick={dismissLandingVideo}
+          >
+            <video
+              ref={landingVideoRef}
+              src="/videos/landing.mp4"
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+              onEnded={handleLandingEnded}
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Static Home Video Banner */}
       <div className="w-full relative overflow-hidden border-b border-brand/10 group mt-0 bg-[#FAF6ED]">
-        <div className="relative w-full h-auto aspect-video md:h-[calc(100vh-4rem)] md:max-h-[800px] overflow-hidden bg-black flex items-center justify-center">
+        <div className="relative w-full h-auto aspect-video md:h-[calc(100vh-4rem)] md:max-h-[800px] overflow-hidden bg-[#FAF6ED] flex items-center justify-center">
           <video
             ref={videoRef}
-            autoPlay
-            muted={isMuted}
+            muted
             loop
             playsInline
             preload="auto"
+            poster="/images/home-banner-poster.jpg"
             className="w-full h-full object-cover"
           >
             <source src="/videos/home-banner.mp4" type="video/mp4" />
             <source src="/videos/WhatsApp%20Video%202026-09-04%20at%202.00.20%20PM.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
-
-          {/* Sound Toggle Button */}
-          <button
-            type="button"
-            onClick={toggleSound}
-            className="absolute bottom-4 right-4 z-20 px-3.5 py-2 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-all shadow-lg cursor-pointer flex items-center gap-1.5 text-xs font-semibold border border-white/10 select-none"
-            aria-label={isMuted ? "Unmute video" : "Mute video"}
-          >
-            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-            <span className="text-[11px] uppercase tracking-wider">{isMuted ? "Unmute" : "Mute"}</span>
-          </button>
         </div>
       </div>
 

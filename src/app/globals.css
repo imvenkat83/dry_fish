@@ -137,3 +137,7 @@ body.hide-footer footer {
   animation-play-state: paused;
 }
 
+html.landing-dismissed #landing-video-overlay {
+  display: none !important;
+}
+
