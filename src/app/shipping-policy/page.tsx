@@ -1,145 +1,72 @@
 import React from "react";
 
 export const metadata = {
-  title: "Shipping Policy - Dry Fish Basket",
-  description: "Read the shipping locations, timelines, and charges policy of Dry Fish Basket.",
+  title: "Shipping Policy / Delivery Policy - Dry Fish Basket",
+  description: "Read the official Shipping and Delivery Policy of Dry Fish Basket.",
 };
 
 export default function ShippingPolicyPage() {
   return (
     <main className="min-h-screen bg-[#FAF6ED] text-[#3b2314] font-sans selection:bg-[#8c6239]/20 pb-24">
-      <div className="max-w-3xl mx-auto px-6 pt-16 pb-12">
-        <h1 className="text-3xl md:text-4xl font-serif font-black text-center text-[#8c6239] mb-10 tracking-wide">
-          Shipping policy
+      <div className="max-w-4xl mx-auto px-6 pt-16 pb-12">
+        <h1 className="text-3xl md:text-5xl font-serif font-black text-[#8c6239] mb-10 tracking-wide">
+          Shipping Policy
         </h1>
 
-        <div className="space-y-8 text-xs md:text-sm text-black/85 leading-relaxed font-medium">
+        <div className="space-y-8 text-sm text-black/85 leading-relaxed font-medium bg-white p-8 md:p-12 rounded-3xl border border-[#8c6239]/10 shadow-sm">
           
-          {/* Section 1 */}
-          <div className="space-y-2 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              1. Shipping Locations
+          {/* Section 1: Shipment processing time */}
+          <div className="space-y-3">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Shipment processing time
             </h2>
-            <p>
-              We currently ship orders <strong>all over India</strong>, including major cities, towns, and remote locations covered by our courier partners.
-            </p>
+            <p>All orders within India will be delivered within 3-7 business days.</p>
+            <p>All International shipments will be delivered as per the destination, please reach out to our customer support for additional details.</p>
+            <p>All sweets, snacks, pickles, and special food items require 1 day preparation so that the orders will be delayed by 1 day.</p>
           </div>
 
-          {/* Section 2 */}
-          <div className="space-y-2 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              2. Order Processing Time
+          {/* Section 2: Shipment confirmation and order tracking */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Shipment confirmation and order tracking
             </h2>
-            <ul className="list-disc pl-5 space-y-1.5">
-              <li>
-                Orders are processed within <strong>24-48 hours</strong> (excluding Sundays and public holidays).
-              </li>
-              <li>
-                You will receive an email/SMS notification once your order is confirmed and shipped.
-              </li>
-            </ul>
+            <p>We use multiple services based on your delivery location, once after our shipment has started you will receive emails and mobile notification about shipment tracking.</p>
           </div>
 
-          {/* Section 3 */}
-          <div className="space-y-3 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              3. Delivery Time
+          {/* Section 3: Customs, duties, and taxes */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Customs, duties, and taxes
             </h2>
-            <p>Estimated delivery timelines:</p>
-            <ul className="list-disc pl-5 space-y-1.5">
-              <li><strong>Metro Cities:</strong> 2-4 working days</li>
-              <li><strong>Tier 1 &amp; Tier 2 Cities:</strong> 3-6 working days</li>
-              <li><strong>Remote Areas / Village Locations:</strong> 5-9 working days</li>
-            </ul>
-            <blockquote className="border-l-4 border-[#8c6239] bg-white p-4 italic rounded-r-xl border-[#8c6239]/10 text-xs">
-              Delivery timelines may vary due to weather, strikes, or courier delays.
-            </blockquote>
+            <p>All custom duties and taxes should be paid by the customer. We do not take any responsibility for the same.</p>
           </div>
 
-          {/* Section 4 */}
-          <div className="space-y-4 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              4. Shipping Charges
+          {/* Section 4: Damages */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Damages
             </h2>
-            <p>Choose one option based on your business:</p>
-            
-            <div className="space-y-2 pl-2">
-              <h3 className="font-bold text-[#8c6239]">Option A – Free Shipping (Recommended for marketing)</h3>
-              <p>We offer <strong>Free Shipping across India</strong> on all orders.</p>
-            </div>
-
-            <div className="space-y-2 pl-2">
-              <h3 className="font-bold text-[#8c6239]">Option B – Standard Charges</h3>
-              <ul className="list-disc pl-5 space-y-1.5">
-                <li>Standard shipping fee: <strong>₹49 – ₹99</strong> (calculated at checkout)</li>
-                <li>COD charges may apply (₹30–₹50 based on courier partner)</li>
-              </ul>
-            </div>
+            <p>Any damages during the shipment is not our concern, however every shipment has been insured by the specified amount which customers can pay while check out and will be able to claim the insured amount. All damages should be reported with photo or video proof within 24 hours of delivery.</p>
           </div>
 
-          {/* Section 5 */}
-          <div className="space-y-2 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              5. Cash on Delivery (COD)
+          {/* Section 5: International Shipping Policy */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              International Shipping Policy
             </h2>
-            <ul className="list-disc pl-5 space-y-1.5">
-              <li>COD available for most PIN codes in India.</li>
-              <li>For high-value orders, prepaid payment may be required.</li>
-            </ul>
+            <p>At Dry Fish Basket we do not import or export any goods from India to any other countries. You may place the order online for international countries through our partners but Dry Fish Basket is not liable for shipment of your goods. You may contact the vendor directly on <a href="mailto:info@vkdryfishbasket.com" className="text-[#8c6239] hover:underline font-semibold">info@vkdryfishbasket.com</a> further to any queries all the import and export duties should be borne by you only.</p>
           </div>
 
-          {/* Section 6 */}
-          <div className="space-y-2 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              6. Order Tracking
+          {/* Section 6: Incorrect Address or Contact Information */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Incorrect Address or Contact Information
             </h2>
-            <p>
-              Once shipped, you will receive a <strong>tracking link</strong> via SMS/Email where you can track your order in real-time.
-            </p>
-          </div>
-
-          {/* Section 7 */}
-          <div className="space-y-2 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              7. Packaging &amp; Handling
-            </h2>
-            <ul className="list-disc pl-5 space-y-1.5">
-              <li>All products are packed securely to prevent damage.</li>
-              <li>Temperature-sensitive products (like frozen or dry fish) are packed in <strong>insulated packaging</strong> to maintain freshness.</li>
-            </ul>
-          </div>
-
-          {/* Section 8 */}
-          <div className="space-y-2 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              8. Delivery Attempts
-            </h2>
-            <p>
-              Courier partners attempt <strong>2-3 deliveries</strong>. If the customer is unreachable or address is incorrect, the order may be returned to origin.
-            </p>
-          </div>
-
-          {/* Section 9 */}
-          <div className="space-y-2 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              9. Delayed or Missing Deliveries
-            </h2>
-            <p>If your order is delayed:</p>
-            <ul className="list-disc pl-5 space-y-1.5">
-              <li>
-                Contact our support team at <strong>info@vkdryfishbasket.com / +91 98483 57279</strong>. We will coordinate with the courier partner and update you.
-              </li>
-            </ul>
-          </div>
-
-          {/* Section 10 */}
-          <div className="space-y-2">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              10. Undeliverable Locations
-            </h2>
-            <p>
-              Some PIN codes may not be serviceable. If your location is undeliverable, we will inform you and issue a refund or alternate delivery method.
-            </p>
+            <p>The customer is solely responsible for providing a complete, accurate, and deliverable shipping address along with a valid contact number at the time of placing the order.</p>
+            <p>If the customer provides an incorrect, incomplete, invalid, or unreachable contact number, or an incorrect, incomplete, or undeliverable shipping address, and the shipment cannot be successfully delivered, no further delivery attempts shall be made by Dry Fish Basket or its logistics partners.</p>
+            <p>In such cases, the shipment will be returned to the designated warehouse or return facility. The customer may request re-dispatch of the same shipment to a corrected address only after payment of all applicable re-shipping, handling, storage, and administrative charges as determined by Dry Fish Basket.</p>
+            <p>No refund, replacement, exchange, cancellation, credit note, or compensation shall be provided for orders returned due to incorrect or incomplete customer-provided information. Any products that are perishable, food-related, or have limited shelf life may become ineligible for re-dispatch at the sole discretion of Dry Fish Basket.</p>
+            <p>Dry Fish Basket shall not be held liable for any loss, damage, delay, deterioration of product quality, or additional expenses arising from incorrect customer-provided contact details or shipping information.</p>
           </div>
 
         </div>

@@ -2,7 +2,6 @@
 
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface CategoryItem {
   id: number | string;
@@ -71,16 +70,6 @@ export default function CategoryCarousel({ items }: { items: CategoryItem[] }) {
     setIsDragging(false);
   };
 
-  // Manual Arrow Scroll
-  const scrollByAmount = (direction: "left" | "right") => {
-    if (!scrollRef.current) return;
-    const amount = scrollRef.current.clientWidth * 0.6;
-    scrollRef.current.scrollBy({
-      left: direction === "left" ? -amount : amount,
-      behavior: "smooth",
-    });
-  };
-
   return (
     <section 
       className="w-full py-6 md:py-8 bg-[#FAF6ED] border-b border-brand/10 relative group"
@@ -90,38 +79,20 @@ export default function CategoryCarousel({ items }: { items: CategoryItem[] }) {
         handleMouseUpOrLeave();
       }}
     >
-      {/* Left Arrow Button */}
-      <button
-        type="button"
-        onClick={() => scrollByAmount("left")}
-        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-[#3b2314] shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 cursor-pointer border border-brand/10"
-        aria-label="Scroll Left"
-      >
-        <ChevronLeft size={20} />
-      </button>
-
-      {/* Right Arrow Button */}
-      <button
-        type="button"
-        onClick={() => scrollByAmount("right")}
-        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white text-[#3b2314] shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 cursor-pointer border border-brand/10"
-        aria-label="Scroll Right"
-      >
-        <ChevronRight size={20} />
-      </button>
-
       {/* Horizontal Scroll & Drag Container */}
       <div
         ref={scrollRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUpOrLeave}
-        className={`w-full flex items-center gap-6 md:gap-8 overflow-x-auto scrollbar-none px-4 select-none cursor-grab ${
+        className={`w-full flex items-center gap-6 md:gap-8 overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden px-4 select-none cursor-grab ${
           isDragging ? "cursor-grabbing" : ""
         }`}
         style={{
           scrollBehavior: isDragging ? "auto" : "smooth",
           WebkitOverflowScrolling: "touch",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
         }}
       >
         {displayItems.map((item, index) => {

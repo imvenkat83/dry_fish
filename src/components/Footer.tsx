@@ -51,15 +51,12 @@ export default function Footer() {
               Contact Us
             </h3>
             <ul className="space-y-3.5 text-xs font-sans text-[#FFFDF6]/90">
-              {/* Phone Numbers */}
-              <li className="flex items-start gap-3">
-                <div className="p-2 bg-white/10 rounded-xl text-[#fcd34d] shrink-0 mt-0.5">
+              {/* Phone Number */}
+              <li className="flex items-center gap-3">
+                <div className="p-2 bg-white/10 rounded-xl text-[#fcd34d] shrink-0">
                   <Phone size={15} />
                 </div>
-                <div className="flex flex-col space-y-0.5">
-                  <a href="tel:+919848160769" className="hover:text-[#fcd34d] transition-colors font-medium">+91 98481 60769</a>
-                  <a href="tel:+919848357279" className="hover:text-[#fcd34d] transition-colors font-medium">+91 98483 57279</a>
-                </div>
+                <a href="tel:+919848160769" className="hover:text-[#fcd34d] transition-colors font-medium">+91 98481 60769</a>
               </li>
 
               {/* Address */}
@@ -118,16 +115,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/shipping-policy" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
-                  Shipping &amp; Delivery
-                </Link>
-              </li>
-              <li>
-                <Link href="/cancellation-returns" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
-                  Refund &amp; Return Policy
-                </Link>
-              </li>
-              <li>
                 <Link href="/my-story" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
                   About Us
                 </Link>
@@ -140,45 +127,30 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Delivery Locations */}
+          {/* Column 4: Policies */}
           <div className="flex flex-col space-y-4">
             <h3 className="text-lg font-serif font-bold text-[#fcd34d] tracking-wide border-b border-[#fcd34d]/20 pb-2">
-              Delivery Locations
+              Policies
             </h3>
             <ul className="space-y-2.5 text-xs font-sans text-[#FFFDF6]/85">
               <li>
-                <Link href="/location/hyderabad" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
-                  Dry Fish in Hyderabad
+                <Link href="/cancellation-returns" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
+                  Return &amp; Refund Policy
                 </Link>
               </li>
               <li>
-                <Link href="/location/mumbai" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
-                  Dry Fish in Mumbai
+                <Link href="/shipping-policy" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
+                  Delivery Policy
                 </Link>
               </li>
               <li>
-                <Link href="/location/delhi" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
-                  Dry Fish in Delhi
+                <Link href="/privacy-policy" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
+                  Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/location/chennai" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
-                  Dry Fish in Chennai
-                </Link>
-              </li>
-              <li>
-                <Link href="/location/bangalore" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
-                  Dry Fish in Bangalore
-                </Link>
-              </li>
-              <li>
-                <Link href="/location/kolkata" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
-                  Dry Fish in Kolkata
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all font-semibold">
-                  Dry Fish Wholesale Inquiry
+                <Link href="/terms-conditions" className="hover:text-[#fcd34d] hover:translate-x-1 inline-block transition-all">
+                  Terms and Conditions
                 </Link>
               </li>
             </ul>

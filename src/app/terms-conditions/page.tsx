@@ -1,409 +1,242 @@
 import React from "react";
-import { 
-  Sparkles, 
-  UserCheck, 
-  Shirt, 
-  Tag, 
-  ClipboardCheck, 
-  CreditCard, 
-  Truck, 
-  XCircle, 
-  RotateCcw, 
-  Coins, 
-  User, 
-  Shield, 
-  Award, 
-  AlertTriangle, 
-  Scale, 
-  Lock, 
-  Globe, 
-  Clock, 
-  Mail,
-  Phone,
-  MapPin
-} from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 
 export const metadata = {
-  title: "Terms & Conditions - Dry Fish Basket",
-  description: "Terms and conditions for using the Dry Fish Basket website and purchasing premium products.",
+  title: "Terms and Conditions - Dry Fish Basket",
+  description: "Read the official Terms of Use and Agreement for Dry Fish Basket.",
 };
 
 export default function TermsConditions() {
-  const sections = [
-    {
-      title: "1. Eligibility",
-      icon: UserCheck,
-      content: (
-        <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          By using this website, you confirm that you are at least 18 years of age or are using the website under the supervision of a parent or legal guardian.
-        </p>
-      ),
-    },
-    {
-      title: "2. Products",
-      icon: Shirt,
-      content: (
-        <div className="space-y-3 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          <p>
-            We make every effort to display our products, colors, designs, fabrics, and descriptions as accurately as possible. However, due to differences in screen settings and lighting conditions, actual product colors may vary slightly from the images displayed on the website.
-          </p>
-          <p>
-            As many of our products are made-to-order or stitched specifically for customers, slight variations in measurements, embroidery, prints, or fabric texture may occur and shall not be considered defects.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "3. Pricing",
-      icon: Tag,
-      content: (
-        <ul className="space-y-2.5 text-sm md:text-base pl-1">
-          {[
-            "All prices are displayed in Indian Rupees (INR).",
-            "Prices are inclusive of applicable taxes unless otherwise stated.",
-            "Shipping charges, if applicable, will be displayed during checkout.",
-            "We reserve the right to change product prices at any time without prior notice."
-          ].map((item, idx) => (
-            <li key={idx} className="flex items-start gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] mt-2 shrink-0" />
-              <span className="text-[#8c6239]/90 leading-snug">{item}</span>
-            </li>
-          ))}
-        </ul>
-      ),
-    },
-    {
-      title: "4. Orders",
-      icon: ClipboardCheck,
-      content: (
-        <div className="space-y-4 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          <p>
-            After placing an order, you will receive an order confirmation via email or SMS.
-          </p>
-          <p className="font-semibold text-[#8c6239]">We reserve the right to:</p>
-          <ul className="space-y-2 pl-1">
-            {[
-              "Accept or reject any order.",
-              "Cancel orders suspected of fraud or unauthorized transactions.",
-              "Limit product quantities.",
-              "Refuse service where required."
-            ].map((item, idx) => (
-              <li key={idx} className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0" />
-                <span className="text-[#8c6239]/90">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="text-[#8c6239]/70 italic bg-[#C5A059]/10 p-3 rounded-xl border-l-4 border-[#C5A059]">
-            Order confirmation does not guarantee acceptance. We may cancel an order if a product becomes unavailable, due to pricing errors, technical issues, or any unforeseen circumstances. In such cases, any payment received will be refunded to the original payment method.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "5. Payment Policy",
-      icon: CreditCard,
-      content: (
-        <div className="space-y-4 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          <p>
-            We accept <strong className="text-[#8c6239]">prepaid payments only</strong> through secure payment gateways.
-          </p>
-          <p className="font-semibold text-[#8c6239]">Accepted payment methods may include:</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {["UPI", "Credit Cards", "Debit Cards", "Net Banking", "Digital Wallets"].map((method, idx) => (
-              <div key={idx} className="bg-[#8c6239]/5 px-3 py-2 rounded-lg text-center font-medium border border-brand/5">
-                {method}
-              </div>
-            ))}
-          </div>
-          <p className="font-bold text-red-700 bg-red-50 py-2.5 px-4 rounded-xl border-l-4 border-red-500">
-            Cash on Delivery (COD) is NOT available.
-          </p>
-          <p className="text-xs text-[#8c6239]/60">
-            All online payments are securely processed by trusted third-party payment providers. We do not store your card or banking details.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "6. Shipping & Delivery",
-      icon: Truck,
-      content: (
-        <div className="space-y-3 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          <p>
-            Orders are processed after successful payment confirmation.
-          </p>
-          <p className="font-semibold text-[#8c6239]">Estimated delivery timelines are provided for convenience and may vary depending on:</p>
-          <ul className="space-y-2 pl-1">
-            {["Customer location", "Courier partner delays", "Public holidays", "Weather conditions", "Unforeseen operational issues"].map((item, idx) => (
-              <li key={idx} className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0" />
-                <span className="text-[#8c6239]/90">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p>
-            Once the order is shipped, tracking details will be shared with the customer. While we strive to deliver within the estimated timeframe, delivery dates are not guaranteed.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "7. Order Cancellation",
-      icon: XCircle,
-      content: (
-        <div className="space-y-3 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          <p>
-            Customers may request cancellation only before the packaging or dispatch process has started.
-          </p>
-          <p className="font-bold text-[#8c6239] bg-[#C5A059]/10 p-4 rounded-xl border-l-4 border-[#C5A059]">
-            Once an order has been confirmed and packaging, sorting, or dispatch has commenced, the order CANNOT be cancelled, modified, or refunded.
-          </p>
-          <p>
-            Since each batch of dried fish is packed specifically for the customer's order, cancellations after packaging begins are not possible.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "8. Returns & Exchanges",
-      icon: RotateCcw,
-      content: (
-        <div className="space-y-4 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          <p>
-            As our products are perishable food items prepared specifically for each customer's order, <strong className="text-[#8c6239]">we do not accept returns or exchanges</strong> for correctly delivered products.
-          </p>
-          <p className="font-semibold text-[#8c6239]">Returns or exchanges will only be considered in the following exceptional circumstances:</p>
-          <ul className="space-y-2 pl-1">
-            {["Wrong product delivered.", "Product received in a damaged condition due to transit.", "Verified preparation defect."].map((item, idx) => (
-              <li key={idx} className="flex items-start gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] mt-2 shrink-0" />
-                <span className="text-[#8c6239]/90">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p>
-            Customers must notify us within <strong className="text-[#8c6239]">48 hours</strong> of delivery by contacting our customer support and providing clear photographs or videos of the product and packaging. Claims made after 48 hours may not be accepted.
-          </p>
-          <p className="text-xs text-[#8c6239]/60">
-            Products that have been used, washed, ironed, altered, damaged by the customer, or returned without original packaging or tags will not be eligible for replacement. The final decision regarding replacement shall rest solely with Dry Fish Basket after inspection.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "9. Refund Policy",
-      icon: Coins,
-      content: (
-        <div className="space-y-3 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          <p>
-            Since we do not accept returns for correctly delivered products, <strong className="text-[#8c6239]">refunds are generally not provided</strong>.
-          </p>
-          <p className="font-semibold text-[#8c6239]">Refunds will only be issued in the following cases:</p>
-          <ul className="space-y-2 pl-1">
-            {["The order cannot be fulfilled by us.", "The ordered product becomes unavailable.", "Duplicate payment has been successfully verified.", "A refund is approved after verification of a wrong, damaged, or defective product."].map((item, idx) => (
-              <li key={idx} className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0" />
-                <span className="text-[#8c6239]/90">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p>
-            Approved refunds will be processed to the original payment method within <strong className="text-[#8c6239]">5–10 business days</strong>. Depending on your bank or payment service provider, the credit may take additional time to appear in your account.
-          </p>
-          <p className="text-xs text-[#8c6239]/60 italic">
-            Shipping charges, payment gateway charges, convenience fees, and other applicable service charges are non-refundable unless the refund is due to our error.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "10. Customer Responsibilities",
-      icon: User,
-      content: (
-        <div className="space-y-3 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          <p className="font-semibold text-[#8c6239]">Customers are responsible for:</p>
-          <ul className="space-y-2 pl-1">
-            {["Providing accurate personal information.", "Providing a complete and correct shipping address.", "Entering the correct mobile number and email address.", "Selecting the correct size before placing the order."].map((item, idx) => (
-              <li key={idx} className="flex items-start gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] mt-2 shrink-0" />
-                <span className="text-[#8c6239]/90">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p>
-            We shall not be responsible for delays or delivery failures caused by incorrect customer information.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "11. Account Responsibility",
-      icon: Shield,
-      content: (
-        <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          If you create an account on our website, you are responsible for maintaining the confidentiality of your login credentials. You are responsible for all activities that occur under your account. Please notify us immediately if you believe your account has been accessed without authorization.
-        </p>
-      ),
-    },
-    {
-      title: "12. Intellectual Property",
-      icon: Award,
-      content: (
-        <div className="space-y-3 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          <p>
-            All website content including logos, product photographs, designs, graphics, text, videos, layouts, and source content is the exclusive property of <strong className="text-[#8c6239]">Dry Fish Basket</strong> and is protected under applicable copyright, trademark, and intellectual property laws.
-          </p>
-          <p className="text-xs text-[#8c6239]/60 font-semibold">
-            No content may be copied, reproduced, distributed, or used without prior written permission.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "13. Prohibited Activities",
-      icon: AlertTriangle,
-      content: (
-        <div className="space-y-3 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          <p className="font-semibold text-[#8c6239]">Users shall not:</p>
-          <ul className="space-y-2 pl-1">
-            {["Attempt unauthorized access to our systems.", "Copy or reproduce website content.", "Interfere with website functionality.", "Upload malicious software.", "Engage in fraudulent transactions.", "Misuse promotional offers or discounts."].map((item, idx) => (
-              <li key={idx} className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0" />
-                <span className="text-[#8c6239]/90">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="text-xs text-red-600 font-semibold">
-            Violation of these terms may result in account suspension and legal action where applicable.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "14. Limitation of Liability",
-      icon: Scale,
-      content: (
-        <div className="space-y-3 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          <p>
-            To the maximum extent permitted by law, <strong className="text-[#8c6239]">Dry Fish Basket</strong> shall not be liable for any indirect, incidental, special, or consequential damages arising from:
-          </p>
-          <ul className="space-y-1.5 pl-1">
-            {["Use of the website.", "Delay in delivery.", "Temporary website downtime.", "Product color variations due to screen settings.", "Courier delays beyond our control."].map((item, idx) => (
-              <li key={idx} className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0" />
-                <span className="text-[#8c6239]/90">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="font-semibold">
-            Our maximum liability shall not exceed the amount paid by the customer for the affected order.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "15. Privacy",
-      icon: Lock,
-      content: (
-        <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          Your use of this website is also governed by our Privacy Policy, which explains how we collect, use, and protect your personal information.
-        </p>
-      ),
-    },
-    {
-      title: "16. Governing Law",
-      icon: Globe,
-      content: (
-        <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          These Terms & Conditions shall be governed by and interpreted in accordance with the laws of India. Any disputes arising out of these Terms shall be subject to the exclusive jurisdiction of the courts located in <strong className="text-[#8c6239]">Karnataka, India</strong>.
-        </p>
-      ),
-    },
-    {
-      title: "17. Changes to Terms & Conditions",
-      icon: Clock,
-      content: (
-        <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          We reserve the right to modify or update these Terms & Conditions at any time without prior notice. The latest version will always be available on our website. Continued use of the website after any updates constitutes acceptance of the revised Terms & Conditions.
-        </p>
-      ),
-    },
-    {
-      title: "18. Contact Us",
-      icon: Mail,
-      content: (
-        <div className="bg-[#8c6239]/5 p-5 md:p-8 rounded-2xl border border-brand/5 space-y-4">
-          <p className="font-semibold text-lg text-[#8c6239]">Dry Fish Basket</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm md:text-base">
-            <a href="mailto:info@vkdryfishbasket.com" className="flex items-center gap-3 text-[#8c6239]/80 hover:text-[#C5A059] transition">
-              <Mail size={18} className="text-[#C5A059]" />
-              <span>info@vkdryfishbasket.com</span>
-            </a>
-            <div className="flex items-center gap-3 text-[#8c6239]/80">
-              <Phone size={18} className="text-[#C5A059]" />
-              <span>+91 96115 26047</span>
-            </div>
-            <div className="flex items-start gap-3 text-[#8c6239]/80 md:col-span-2">
-              <MapPin size={18} className="text-[#C5A059] shrink-0 mt-1" />
-              <span>Siddhapura, Karnataka, India</span>
-            </div>
-          </div>
-          <div className="pt-2 border-t border-[#8c6239]/10 text-xs text-[#8c6239]/50 font-bold uppercase tracking-wider">
-            Business Hours: Monday to Saturday, 10:00 AM – 7:00 PM (IST)
-          </div>
-        </div>
-      ),
-    },
-  ];
-
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#FCFBF8] via-[#FDFBF7] to-[#F7F3EB] text-[#8c6239] py-16 px-6 relative overflow-hidden">
-      {/* Decorative background blurs */}
-      <div className="absolute -left-40 top-40 w-96 h-96 bg-[#C5A059]/5 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute -right-40 bottom-40 w-96 h-96 bg-[#8c6239]/5 rounded-full blur-[120px] pointer-events-none"></div>
+    <main className="min-h-screen bg-[#FAF6ED] text-[#3b2314] font-sans selection:bg-[#8c6239]/20 pb-24">
+      <div className="max-w-4xl mx-auto px-6 pt-16 pb-12">
+        <h1 className="text-3xl md:text-5xl font-serif font-black text-[#8c6239] mb-2 tracking-wide">
+          Terms and Conditions
+        </h1>
+        <p className="text-xs uppercase tracking-widest font-black text-[#8c6239]/60 mb-2">TERMS OF USE</p>
+        <p className="text-xs text-black/50 mb-10">Last updated July 23, 2020</p>
 
-      <div className="max-w-4xl mx-auto relative z-10">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <span className="text-[#C5A059] font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Legals & agreements</span>
-          <h1 className="text-4xl md:text-5xl font-playfair font-bold text-[#8c6239] leading-tight mb-4 flex items-center justify-center gap-3">
-            Terms & Conditions <Sparkles size={24} className="text-[#C5A059] shrink-0" />
-          </h1>
-          <div className="w-20 h-1 bg-[#C5A059] mx-auto rounded-full mb-6"></div>
+        <div className="space-y-8 text-sm text-black/85 leading-relaxed font-medium bg-white p-8 md:p-12 rounded-3xl border border-[#8c6239]/10 shadow-sm">
           
-          <p className="text-xs text-[#8c6239]/60 font-black uppercase tracking-widest mb-6">
-            Effective Date: 06/08/2026
-          </p>
+          {/* Section 1: AGREEMENT TO TERMS */}
+          <div className="space-y-3">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              AGREEMENT TO TERMS
+            </h2>
+            <p>
+              These Terms of Use constitute a legally binding agreement made between you, whether personally or on behalf of an entity (&quot;you&quot;) and Dry Fish Basket (&quot;Company&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;), concerning your access to and use of the <a href="https://www.vkdryfishbasket.com" target="_blank" rel="noopener noreferrer" className="text-[#8c6239] hover:underline font-semibold">https://www.vkdryfishbasket.com/</a> website as well as any other media form, media channel, mobile website or mobile application related, linked, or otherwise connected thereto (collectively, the &quot;Site&quot;). You agree that by accessing the Site, you have read, understood, and agreed to be bound by all of these Terms of Use. IF YOU DO NOT AGREE WITH ALL OF THESE TERMS OF USE, THEN YOU ARE EXPRESSLY PROHIBITED FROM USING THE SITE AND YOU MUST DISCONTINUE USE IMMEDIATELY.
+            </p>
+            <p>
+              Supplemental terms and conditions or documents that may be posted on the Site from time to time are hereby expressly incorporated herein by reference. We reserve the right, in our sole discretion, to make changes or modifications to these Terms of Use at any time and for any reason. We will alert you about any changes by updating the &quot;Last updated&quot; date of these Terms of Use, and you waive any right to receive specific notice of each such change. It is your responsibility to periodically review these Terms of Use to stay informed of updates. You will be subject to, and will be deemed to have been made aware of and to have accepted, the changes in any revised Terms of Use by your continued use of the Site after the date such revised Terms of Use are posted.
+            </p>
+            <p>
+              The information provided on the Site is not intended for distribution to or use by any person or entity in any jurisdiction or country where such distribution or use would be contrary to law or regulation or which would subject us to any registration requirement within such jurisdiction or country. Accordingly, those persons who choose to access the Site from other locations do so on their own initiative and are solely responsible for compliance with local laws, if and to the extent local laws are applicable.
+            </p>
+          </div>
 
-          <p className="text-lg text-[#8c6239]/70 font-medium leading-relaxed max-w-2xl mx-auto">
-            Welcome to <strong className="text-[#8c6239]">Dry Fish Basket</strong>. These Terms & Conditions govern your access to and use of our website and the purchase of products offered through our online store. By using our website or placing an order, you agree to be bound by these Terms & Conditions.
-          </p>
-        </div>
+          {/* Section 2: INTELLECTUAL PROPERTY RIGHTS */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              INTELLECTUAL PROPERTY RIGHTS
+            </h2>
+            <p>
+              Unless otherwise indicated, the Site is our proprietary property and all source code, databases, functionality, software, website designs, audio, video, text, photographs, and graphics on the Site (collectively, the &quot;Content&quot;) and the trademarks, service marks, and logos contained therein (the &quot;Marks&quot;) are owned or controlled by us or licensed to us, and are protected by copyright and trademark laws and various other intellectual property rights and unfair competition laws of India, international copyright laws, and international conventions. The Content and the Marks are provided on the Site &quot;AS IS&quot; for your information and personal use only. Except as expressly provided in these Terms of Use, no part of the Site and no Content or Marks may be copied, reproduced, aggregated, republished, uploaded, posted, publicly displayed, encoded, translated, transmitted, distributed, sold, licensed, or otherwise exploited for any commercial purpose whatsoever, without our express prior written permission.
+            </p>
+            <p>
+              Provided that you are eligible to use the Site, you are granted a limited license to access and use the Site and to download or print a copy of any portion of the Content to which you have properly gained access solely for your personal, non-commercial use. We reserve all rights not expressly granted to you in and to the Site, the Content and the Marks.
+            </p>
+          </div>
 
-        {/* Policy Content */}
-        <div className="space-y-6 animate-fadeIn">
-          {sections.map((section, idx) => {
-            const Icon = section.icon;
-            return (
-              <div 
-                key={idx} 
-                className="bg-[#FFFDF6] p-6 md:p-10 rounded-[2rem] border border-[#8c6239]/5 shadow-sm hover:shadow-md transition-all duration-300"
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-2xl bg-[#8c6239]/5 flex items-center justify-center text-white">
-                    <Icon size={22} />
-                  </div>
-                  <h2 className="text-xl md:text-2xl font-playfair font-bold text-[#8c6239]">
-                    {section.title}
-                  </h2>
-                </div>
-                <div className="pl-0 md:pl-16">
-                  {section.content}
-                </div>
-              </div>
-            );
-          })}
+          {/* Section 3: USER REPRESENTATIONS */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              USER REPRESENTATIONS
+            </h2>
+            <p>
+              By using the Site, you represent and warrant that: (1) all registration information you submit will be true, accurate, current, and complete; (2) you will maintain the accuracy of such information and promptly update such registration information as necessary; (3) you have the legal capacity and you agree to comply with these Terms of Use; (4) you are not a minor in the jurisdiction in which you reside, or if a minor, you have received parental permission to use the Site; (5) you will not access the Site through automated or non-human means, whether through a bot, script or otherwise; (6) you will not use the Site for any illegal or unauthorized purpose; and (7) your use of the Site will not violate any applicable law or regulation.
+            </p>
+            <p>
+              If you provide any information that is untrue, inaccurate, not current, or incomplete, we have the right to suspend or terminate your account and refuse any and all current or future use of the Site (or any portion thereof).
+            </p>
+          </div>
+
+          {/* Section 4: USER REGISTRATION */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              USER REGISTRATION
+            </h2>
+            <p>
+              You may be required to register with the Site. You agree to keep your password confidential and will be responsible for all use of your account and password. We reserve the right to remove, reclaim, or change a username you select if we determine, in our sole discretion, that such username is inappropriate, obscene, or otherwise objectionable.
+            </p>
+          </div>
+
+          {/* Section 5: PRODUCTS */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              PRODUCTS
+            </h2>
+            <p>
+              We make every effort to display as accurately as possible the colors, features, specifications, and details of the products available on the Site. However, we do not guarantee that the colors, features, specifications, and details of the products will be accurate, complete, reliable, current, or free of other errors, and your electronic display may not accurately reflect the actual colors and details of the products. All products are subject to availability, and we cannot guarantee that items will be in stock. We reserve the right to discontinue any products at any time for any reason. Prices for all products are subject to change.
+            </p>
+          </div>
+
+          {/* Section 6: PURCHASES AND PAYMENT */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              PURCHASES AND PAYMENT
+            </h2>
+            <p>We accept the following forms of payment:</p>
+            <ul className="list-disc pl-6 space-y-1">
+              <li>Visa</li>
+              <li>Mastercard</li>
+              <li>American Express</li>
+              <li>Discover</li>
+              <li>UPI / Netbanking / RuPay</li>
+            </ul>
+            <p>
+              You agree to provide current, complete, and accurate purchase and account information for all purchases made via the Site. You further agree to promptly update account and payment information, including email address, payment method, and payment card expiration date, so that we can complete your transactions and contact you as needed. Sales tax will be added to the price of purchases as deemed required by us. We may change prices at any time. All payments shall be in INR.
+            </p>
+            <p>
+              You agree to pay all charges at the prices then in effect for your purchases and any applicable shipping fees, and you authorize us to charge your chosen payment provider for any such amounts upon placing your order. We reserve the right to correct any errors or mistakes in pricing, even if we have already requested or received payment.
+            </p>
+            <p>
+              We reserve the right to refuse any order placed through the Site. We may, in our sole discretion, limit or cancel quantities purchased per person, per household, or per order. These restrictions may include orders placed by or under the same customer account, the same payment method, and/or orders that use the same billing or shipping address. We reserve the right to limit or prohibit orders that, in our sole judgment, appear to be placed by dealers, resellers, or distributors.
+            </p>
+          </div>
+
+          {/* Section 7: RETURN POLICY */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              RETURN POLICY
+            </h2>
+            <p>
+              Please review our <a href="/cancellation-returns" className="text-[#8c6239] hover:underline font-bold">Return Policy</a> posted on the Site prior to making any purchases.
+            </p>
+          </div>
+
+          {/* Section 8: PROHIBITED ACTIVITIES */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              PROHIBITED ACTIVITIES
+            </h2>
+            <p>
+              You may not access or use the Site for any purpose other than that for which we make the Site available. The Site may not be used in connection with any commercial endeavors except those that are specifically endorsed or approved by us.
+            </p>
+            <p>As a user of the Site, you agree not to:</p>
+            <ol className="list-decimal pl-6 space-y-2">
+              <li>Systematically retrieve data or other content from the Site to create or compile, directly or indirectly, a collection, compilation, database, or directory without written permission from us.</li>
+              <li>Make any unauthorized use of the Site, including collecting usernames and/or email addresses of users by electronic or other means for the purpose of sending unsolicited email, or creating user accounts by automated means or under false pretenses.</li>
+              <li>Use a buying agent or purchasing agent to make purchases on the Site.</li>
+              <li>Use the Site to advertise or offer to sell goods and services.</li>
+              <li>Circumvent, disable, or otherwise interfere with security-related features of the Site, including features that prevent or restrict the use or copying of any Content or enforce limitations on the use of the Site and/or the Content contained therein.</li>
+              <li>Engage in unauthorized framing of or linking to the Site.</li>
+              <li>Trick, defraud, or mislead us and other users, especially in any attempt to learn sensitive account information such as user passwords.</li>
+              <li>Make improper use of our support services or submit false reports of abuse or misconduct.</li>
+              <li>Engage in any automated use of the system, such as using scripts to send comments or messages, or using any data mining, robots, or similar data gathering and extraction tools.</li>
+              <li>Interfere with, disrupt, or create an undue burden on the Site or the networks or services connected to the Site.</li>
+              <li>Attempt to impersonate another user or person or use the username of another user.</li>
+              <li>Sell or otherwise transfer your profile.</li>
+              <li>Use any information obtained from the Site in order to harass, abuse, or harm another person.</li>
+            </ol>
+          </div>
+
+          {/* Section 9: USER GENERATED CONTRIBUTIONS */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              USER GENERATED CONTRIBUTIONS
+            </h2>
+            <p>
+              The Site may invite you to chat, contribute to, or participate in blogs, message boards, online forums, and other functionality, and may provide you with the opportunity to create, submit, post, display, transmit, perform, publish, distribute, or broadcast content and materials to us or on the Site, including but not limited to text, writings, video, audio, photographs, graphics, comments, suggestions, or personal information or other material (collectively, &quot;Contributions&quot;). Contributions may be viewable by other users of the Site and the Marketplace Offerings and through third-party websites. As such, any Contributions you transmit may be treated as non-confidential and non-proprietary. When you create or make available any Contributions, you thereby represent and warrant that:
+            </p>
+            <ol className="list-decimal pl-6 space-y-2">
+              <li>The creation, distribution, transmission, public display, or performance, and the accessing, downloading, or copying of your Contributions do not and will not infringe the proprietary rights, including but not limited to the copyright, patent, trademark, trade secret, or moral rights of any third party.</li>
+              <li>You are the creator and owner of or have the necessary licenses, rights, consents, releases, and permissions to use and to authorize us, the Site, and other users of the Site to use your Contributions in any manner contemplated by the Site and these Terms of Use.</li>
+              <li>You have the written consent, release, and/or permission of each and every identifiable individual person in your Contributions to use the name or likeness of each and every such identifiable individual person to enable inclusion and use of your Contributions in any manner contemplated by the Site and these Terms of Use.</li>
+              <li>Your Contributions are not false, inaccurate, or misleading.</li>
+              <li>Your Contributions are not unsolicited or unauthorized advertising, promotional materials, pyramid schemes, chain letters, spam, mass mailings, or other forms of solicitation.</li>
+              <li>Your Contributions are not obscene, lewd, lascivious, filthy, violent, harassing, libelous, slanderous, or otherwise objectionable (as determined by us).</li>
+              <li>Your Contributions do not ridicule, mock, disparage, intimidate, or abuse anyone.</li>
+              <li>Your Contributions do not advocate the violent overthrow of any government or incite, encourage, or threaten physical harm against another.</li>
+              <li>Your Contributions do not violate any applicable law, regulation, or rule.</li>
+              <li>Your Contributions do not violate the privacy or publicity rights of any third party.</li>
+              <li>Your Contributions do not contain any material that solicits personal information from anyone under the age of 18 or exploits people under the age of 18 in a sexual or violent manner.</li>
+              <li>Your Contributions do not violate any applicable law concerning child pornography, or otherwise intended to protect the health or well-being of minors.</li>
+              <li>Your Contributions do not include any offensive comments that are connected to race, national origin, gender, sexual preference, or physical handicap.</li>
+              <li>Your Contributions do not otherwise violate, or link to material that violates, any provision of these Terms of Use, or any applicable law or regulation.</li>
+            </ol>
+            <p>
+              Any use of the Site or the Marketplace Offerings in violation of the foregoing violates these Terms of Use and may result in, among other things, termination or suspension of your rights to use the Site and the Marketplace Offerings.
+            </p>
+          </div>
+
+          {/* Section 10: CONTRIBUTION LICENSE */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              CONTRIBUTION LICENSE
+            </h2>
+            <p>
+              By posting your Contributions to any part of the Site or making Contributions accessible to the Site by linking your account from the Site to any of your social networking accounts, you automatically grant, and you represent and warrant that you have the right to grant, to us an unrestricted, unlimited, irrevocable, perpetual, non-exclusive, transferable, royalty-free, fully-paid, worldwide right, and license to host, use, copy, reproduce, disclose, sell, resell, publish, broadcast, retitle, archive, store, cache, publicly perform, publicly display, reformat, translate, transmit, excerpt (in whole or in part), and distribute such Contributions (including, without limitation, your image and voice) for any purpose, commercial, advertising, or otherwise, and to prepare derivative works of, or incorporate into other works, such Contributions, and grant and authorize sublicenses of the foregoing. The use and distribution may occur in any media formats and through any media channels.
+            </p>
+            <p>
+              This license will apply to any form, media, or technology now known or hereafter developed, and includes our use of your name, company name, and franchise name, as applicable, and any of the trademarks, service marks, trade names, logos, and personal and commercial images you provide. You waive all moral rights in your Contributions, and you warrant that moral rights have not otherwise been asserted in your Contributions.
+            </p>
+            <p>
+              We do not assert any ownership over your Contributions. You retain full ownership of all of your Contributions and any intellectual property rights or other proprietary rights associated with your Contributions. We are not liable for any statements or representations in your Contributions provided by you in any area on the Site. You are solely responsible for your Contributions to the Site and you expressly agree to exonerate us from any and all responsibility and to refrain from any legal action against us regarding your Contributions.
+            </p>
+          </div>
+
+          {/* Section 11: GUIDELINES FOR REVIEWS */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              GUIDELINES FOR REVIEWS
+            </h2>
+            <p>
+              We may provide you areas on the Site to leave reviews or ratings. When posting a review, you must comply with the following criteria: (1) you should have firsthand experience with the person/entity being reviewed; (2) your reviews should not contain offensive profanity, or abusive, racist, offensive, or hate language; (3) your reviews should not contain discriminatory references based on religion, race, gender, national origin, age, marital status, sexual orientation, or disability; (4) your reviews should not contain references to illegal activity; (5) you should not be affiliated with competitors if posting negative reviews; (6) you should not make any conclusions as to the legality of conduct; (7) you may not post any false or misleading statements; and (8) you may not organize a campaign encouraging others to post reviews, whether positive or negative.
+            </p>
+            <p>
+              We may accept, reject, or remove reviews in our sole discretion. We have absolutely no obligation to screen reviews or to delete reviews, even if anyone considers reviews objectionable or inaccurate. Reviews are not endorsed by us, and do not necessarily represent our opinions or the views of any of our affiliates or partners. We do not assume liability for any review or for any claims, liabilities, or losses resulting from any review. By posting a review, you hereby grant to us a perpetual, non-exclusive, worldwide, royalty-free, fully-paid, assignable, and sublicensable right and license to reproduce, modify, translate, transmit by any means, display, perform, and/or distribute all content relating to reviews.
+            </p>
+          </div>
+
+          {/* Section 12: MOBILE APPLICATION LICENSE */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              MOBILE APPLICATION LICENSE
+            </h2>
+            
+            <h3 className="text-base font-bold text-[#3b2314]">Use License</h3>
+            <p>
+              If you access the Marketplace Offerings via a mobile application, then we grant you a revocable, non-exclusive, non-transferable, limited right to install and use the mobile application on wireless electronic devices owned or controlled by you, and to access and use the mobile application on such devices strictly in accordance with the terms and conditions of this mobile application license contained in these Terms of Use. You shall not: (1) decompile, reverse engineer, disassemble, attempt to derive the source code of, or decrypt the application; (2) make any modification, adaptation, improvement, enhancement, translation, or derivative work from the application; (3) violate any applicable laws, rules, or regulations in connection with your access or use of the application; (4) remove, alter, or obscure any proprietary notice (including any notice of copyright or trademark) posted by us or the licensors of the application; (5) use the application for any revenue generating endeavor, commercial enterprise, or other purpose for which it is not designed or intended; (6) make the application available over a network or other environment permitting access or use by multiple devices or users at the same time; (7) use the application for creating a product, service, or software that is, directly or indirectly, competitive with or in any way a substitute for the application; (8) use the application to send automated queries to any website or to send any unsolicited commercial e-mail; or (9) use any proprietary information or any of our interfaces or our other intellectual property in the design, development, manufacture, licensing, or distribution of any applications, accessories, or devices for use with the application.
+            </p>
+
+            <h3 className="text-base font-bold text-[#3b2314] pt-2">Apple and Android Devices</h3>
+            <p>
+              The following terms apply when you use a mobile application obtained from either the Apple Store or Google Play (each an &quot;App Distributor&quot;) to access the Marketplace Offerings: (1) the license granted to you for our mobile application is limited to a non-transferable license to use the application on a device that utilizes the Apple iOS or Android operating systems, as applicable, and in accordance with the usage rules set forth in the applicable App Distributor&apos;s terms of service; (2) we are responsible for providing any maintenance and support services with respect to the mobile application as specified in the terms and conditions of this mobile application license contained in these Terms of Use or as otherwise required under applicable law, and you acknowledge that each App Distributor has no obligation whatsoever to furnish any maintenance and support services with respect to the mobile application; (3) in the event of any failure of the mobile application to conform to any applicable warranty, you may notify the applicable App Distributor, and the App Distributor, in accordance with its terms and policies, may refund the purchase price, if any, paid for the mobile application, and to the maximum extent permitted by applicable law, the App Distributor will have no other warranty obligation whatsoever with respect to the mobile application; (4) you represent and warrant that (i) you are not located in a country that is subject to a U.S. government embargo, or that has been designated by the U.S. government as a &quot;terrorist supporting&quot; country and (ii) you are not listed on any U.S. government list of prohibited or restricted parties; (5) you must comply with applicable third-party terms of agreement when using the mobile application, e.g., if you have a VoIP application, then you must not be in violation of their wireless data agreement.
+            </p>
+          </div>
+
+          {/* Contact Footer */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Contact Us
+            </h2>
+            <p>If you have any questions or concerns regarding these Terms and Conditions, please reach out to us:</p>
+            <ul className="space-y-2.5 font-semibold text-[#3b2314]">
+              <li className="flex items-center gap-2.5">
+                <Mail size={16} className="text-[#8c6239]" />
+                <span>Email: <a href="mailto:info@vkdryfishbasket.com" className="text-[#8c6239] hover:underline font-bold">info@vkdryfishbasket.com</a></span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Phone size={16} className="text-[#8c6239]" />
+                <span>Phone: <a href="tel:+919848160769" className="text-[#8c6239] hover:underline font-bold">+91 98481 60769</a></span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <MapPin size={16} className="text-[#8c6239] shrink-0 mt-0.5" />
+                <span>Address: H.No 806, Sahabhavana Township, Bandlaguda Nagole, Hyderabad - 500068</span>
+              </li>
+            </ul>
+          </div>
+
         </div>
       </div>
     </main>

@@ -1,273 +1,181 @@
 import React from "react";
-import { 
-  ShieldCheck, 
-  Sparkles, 
-  User, 
-  Settings, 
-  Lock, 
-  Cookie, 
-  Share2, 
-  FileText, 
-  ExternalLink, 
-  Users, 
-  Clock,
-  Mail
-} from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 
 export const metadata = {
   title: "Privacy Policy - Dry Fish Basket",
-  description: "Privacy policy for Dry Fish Basket store and services.",
+  description: "Read the official Privacy Policy of Dry Fish Basket.",
 };
 
 export default function PrivacyPolicy() {
-  const sections = [
-    {
-      title: "1. Information We Collect",
-      icon: User,
-      content: (
-        <div>
-          <p className="mb-4 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-            We may collect the following information when you interact with our website or make a purchase:
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm md:text-base">
-            {[
-              "Full Name",
-              "Email Address",
-              "Mobile Number",
-              "Shipping & Billing Address",
-              "Payment Information (processed securely through third-party payment gateways)",
-              "Order History",
-              "Device Information",
-              "IP Address",
-              "Browser Type",
-              "Cookies and Website Usage Data"
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-start gap-2.5 bg-[#8c6239]/5 p-3 rounded-xl border border-brand/5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] mt-2 shrink-0" />
-                <span className="text-[#8c6239]/90 leading-snug">{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "2. How We Use Your Information",
-      icon: Settings,
-      content: (
-        <div>
-          <p className="mb-4 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-            We use your information to provide, maintain, and improve our services, including to:
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm md:text-base">
-            {[
-              "Process and deliver your orders",
-              "Verify your identity",
-              "Send order confirmations and shipping updates",
-              "Respond to customer support requests",
-              "Improve our products and services",
-              "Personalize your shopping experience",
-              "Send promotional offers (only with your consent)",
-              "Detect fraud and maintain website security",
-              "Comply with legal obligations"
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-start gap-2.5 bg-[#8c6239]/5 p-3 rounded-xl border border-brand/5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] mt-2 shrink-0" />
-                <span className="text-[#8c6239]/90 leading-snug">{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "3. Payment Security",
-      icon: Lock,
-      content: (
-        <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          We do not store your debit/credit card details. All payments are securely processed through trusted payment gateway providers using industry-standard encryption.
-        </p>
-      ),
-    },
-    {
-      title: "4. Cookies",
-      icon: Cookie,
-      content: (
-        <div>
-          <p className="mb-4 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-            Our website uses cookies to enhance your experience, analyze website traffic, and show relevant updates. Specifically, we use cookies to:
-          </p>
-          <ul className="space-y-2 mb-4 text-sm md:text-base pl-1">
-            {[
-              "Keep you logged in",
-              "Remember your shopping cart",
-              "Improve website performance",
-              "Analyze visitor behavior",
-              "Personalize content"
-            ].map((item, idx) => (
-              <li key={idx} className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0" />
-                <span className="text-[#8c6239]/90">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/70 italic bg-[#C5A059]/10 p-4 rounded-xl border-l-4 border-[#C5A059]">
-            You may disable cookies through your browser settings, although some website features may not function properly.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "5. Sharing of Information",
-      icon: Share2,
-      content: (
-        <div>
-          <p className="mb-4 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-            We may share your information with trusted partners to perform service actions, such as:
-          </p>
-          <ul className="space-y-2 mb-4 text-sm md:text-base pl-1">
-            {[
-              "Delivery Partners",
-              "Payment Gateway Providers",
-              "Technology Service Providers",
-              "Legal Authorities when required by law"
-            ].map((item, idx) => (
-              <li key={idx} className="flex items-center gap-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] shrink-0" />
-                <span className="text-[#8c6239]/90">{item}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/80 font-bold text-[#8c6239]">
-            We never sell your personal information to third parties.
-          </p>
-        </div>
-      ),
-    },
-    {
-      title: "6. Data Protection",
-      icon: ShieldCheck,
-      content: (
-        <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          We implement appropriate technical and organizational security measures to protect your personal information from unauthorized access, misuse, alteration, or disclosure.
-        </p>
-      ),
-    },
-    {
-      title: "7. Your Rights",
-      icon: FileText,
-      content: (
-        <div>
-          <p className="mb-4 text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-            Depending on your location, you may have certain rights regarding your personal information, including the right to request to:
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm md:text-base mb-6">
-            {[
-              "Access your personal data",
-              "Update inaccurate information",
-              "Delete your account",
-              "Withdraw marketing consent",
-              "Request a copy of your stored data"
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-start gap-2.5 bg-[#8c6239]/5 p-3 rounded-xl border border-brand/5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C5A059] mt-2 shrink-0" />
-                <span className="text-[#8c6239]/90 leading-snug">{item}</span>
-              </div>
-            ))}
-          </div>
-          <div className="pt-4 border-t border-[#8c6239]/10 flex flex-col sm:flex-row items-start sm:items-center gap-2">
-            <span className="text-sm text-[#8c6239]/60 font-semibold">To exercise these rights, contact us at:</span>
-            <a href="mailto:info@vkdryfishbasket.com" className="inline-flex items-center gap-2 text-[#C5A059] font-bold hover:underline">
-              <Mail size={16} />
-              info@vkdryfishbasket.com
-            </a>
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: "8. Third-Party Links",
-      icon: ExternalLink,
-      content: (
-        <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          Our website may contain links to third-party websites. We are not responsible for their privacy practices or content.
-        </p>
-      ),
-    },
-    {
-      title: "9. Children's Privacy",
-      icon: Users,
-      content: (
-        <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          Our services are not intended for children under the age of 18. We do not knowingly collect personal information from minors.
-        </p>
-      ),
-    },
-    {
-      title: "10. Policy Updates",
-      icon: Clock,
-      content: (
-        <p className="text-sm md:text-base leading-relaxed text-[#8c6239]/80">
-          We may update this Privacy Policy periodically. Changes will be posted on this page with the revised effective date.
-        </p>
-      ),
-    },
-  ];
-
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#FCFBF8] via-[#FDFBF7] to-[#F7F3EB] text-[#8c6239] py-16 px-6 relative overflow-hidden">
-      {/* Decorative background blurs */}
-      <div className="absolute -left-40 top-40 w-96 h-96 bg-[#C5A059]/5 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute -right-40 bottom-40 w-96 h-96 bg-[#8c6239]/5 rounded-full blur-[120px] pointer-events-none"></div>
+    <main className="min-h-screen bg-[#FAF6ED] text-[#3b2314] font-sans selection:bg-[#8c6239]/20 pb-24">
+      <div className="max-w-4xl mx-auto px-6 pt-16 pb-12">
+        <h1 className="text-3xl md:text-5xl font-serif font-black text-[#8c6239] mb-10 tracking-wide">
+          Privacy Policy
+        </h1>
 
-      <div className="max-w-4xl mx-auto relative z-10">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <span className="text-[#C5A059] font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Legals & transparency</span>
-          <h1 className="text-4xl md:text-5xl font-playfair font-bold text-[#8c6239] leading-tight mb-4 flex items-center justify-center gap-3">
-            Privacy Policy <Sparkles size={24} className="text-[#C5A059] shrink-0" />
-          </h1>
-          <div className="w-20 h-1 bg-[#C5A059] mx-auto rounded-full mb-8"></div>
+        <div className="space-y-8 text-sm text-black/85 leading-relaxed font-medium bg-white p-8 md:p-12 rounded-3xl border border-[#8c6239]/10 shadow-sm">
           
-          <p className="text-lg text-[#8c6239]/70 font-medium leading-relaxed max-w-2xl mx-auto">
-            Welcome to <strong className="text-[#8c6239]">Dry Fish Basket</strong>. We value your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or make a purchase.
+          <p>
+            Dry Fish Basket, accessible from <a href="https://www.vkdryfishbasket.com" target="_blank" rel="noopener noreferrer" className="text-[#8c6239] hover:underline font-semibold">vkdryfishbasket.com</a>, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by vkdryfishbasket.com and how we use it.
           </p>
-        </div>
 
-        {/* Policy Content */}
-        <div className="space-y-6">
-          {sections.map((section, idx) => {
-            const Icon = section.icon;
-            return (
-              <div 
-                key={idx} 
-                className="bg-[#FFFDF6] p-6 md:p-10 rounded-[2rem] border border-[#8c6239]/5 shadow-sm hover:shadow-md transition-all duration-300"
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-2xl bg-[#8c6239]/5 flex items-center justify-center text-white">
-                    <Icon size={22} />
-                  </div>
-                  <h2 className="text-xl md:text-2xl font-playfair font-bold text-[#8c6239]">
-                    {section.title}
-                  </h2>
-                </div>
-                <div className="pl-0 md:pl-16">
-                  {section.content}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Footer contact note */}
-        <div className="mt-16 text-center bg-[#FFFDF6] p-8 rounded-[2rem] border border-[#8c6239]/5 shadow-sm max-w-xl mx-auto">
-          <p className="text-sm text-[#8c6239]/60 font-semibold mb-2">Have questions about our privacy practices?</p>
-          <p className="text-lg font-bold text-[#8c6239]">
-            Contact us at{" "}
-            <a href="mailto:info@vkdryfishbasket.com" className="text-[#C5A059] hover:underline">
-              info@vkdryfishbasket.com
-            </a>
+          <p>
+            If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us.
           </p>
+
+          <p>
+            This Privacy Policy applies only to our online activities and is valid for visitors to our website with regards to the information that they shared and/or collect in vkdryfishbasket.com. This policy is not applicable to any information collected offline or via channels other than this website.
+          </p>
+
+          {/* Section 1: Consent */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Consent
+            </h2>
+            <p>
+              By using our website, you hereby consent to our Privacy Policy and agree to its terms.
+            </p>
+          </div>
+
+          {/* Section 2: Information we collect */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Information we collect
+            </h2>
+            <p>
+              The personal information that you are asked to provide, and the reasons why you are asked to provide it, will be made clear to you at the point we ask you to provide your personal information.
+            </p>
+            <p>
+              If you contact us directly, we may receive additional information about you such as your name, email address, phone number, the contents of the message and/or attachments you may send us, and any other information you may choose to provide.
+            </p>
+            <p>
+              When you register for an Account, we may ask for your contact information, including items such as name, company name, address, email address, and telephone number.
+            </p>
+          </div>
+
+          {/* Section 3: How we use your information */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              How we use your information
+            </h2>
+            <p>We use the information we collect in various ways, including to:</p>
+            <ul className="list-disc pl-6 space-y-1.5">
+              <li>Provide, operate, and maintain our website</li>
+              <li>Improve, personalize, and expand our website</li>
+              <li>Understand and analyze how you use our website</li>
+              <li>Develop new products, services, features, and functionality</li>
+              <li>Communicate with you, either directly or through one of our partners, including for customer service, to provide you with updates and other information relating to the website, and for marketing and promotional purposes</li>
+              <li>Send you emails</li>
+              <li>Find and prevent fraud</li>
+            </ul>
+          </div>
+
+          {/* Section 4: Log Files */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Log Files
+            </h2>
+            <p>
+              vkdryfishbasket.com follows a standard procedure of using log files. These files log visitors when they visit websites. All hosting companies do this and a part of hosting services&apos; analytics. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users&apos; movement on the website, and gathering demographic information.
+            </p>
+          </div>
+
+          {/* Section 5: Advertising Partners Privacy Policies */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Advertising Partners Privacy Policies
+            </h2>
+            <p>
+              You may consult this list to find the Privacy Policy for each of the advertising partners of vkdryfishbasket.com.
+            </p>
+            <p>
+              Third-party ad servers or ad networks uses technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on vkdryfishbasket.com, which are sent directly to users&apos; browser. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit.
+            </p>
+            <p>
+              Note that vkdryfishbasket.com has no access to or control over these cookies that are used by third-party advertisers.
+            </p>
+          </div>
+
+          {/* Section 6: Third Party Privacy Policies */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Third Party Privacy Policies
+            </h2>
+            <p>
+              vkdryfishbasket.com&apos;s Privacy Policy does not apply to other advertisers or websites. Thus, we are advising you to consult the respective Privacy Policies of these third-party ad servers for more detailed information. It may include their practices and instructions about how to opt-out of certain options.
+            </p>
+            <p>
+              You can choose to disable cookies through your individual browser options. To know more detailed information about cookie management with specific web browsers, it can be found at the browsers&apos; respective websites.
+            </p>
+          </div>
+
+          {/* Section 7: CCPA Privacy Rights */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              CCPA Privacy Rights (Do Not Sell My Personal Information)
+            </h2>
+            <p>Under the CCPA, among other rights, California consumers have the right to:</p>
+            <ul className="list-disc pl-6 space-y-1.5">
+              <li>Request that a business that collects a consumer&apos;s personal data disclose the categories and specific pieces of personal data that a business has collected about consumers.</li>
+              <li>Request that a business delete any personal data about the consumer that a business has collected.</li>
+              <li>Request that a business that sells a consumer&apos;s personal data, not sell the consumer&apos;s personal data.</li>
+            </ul>
+            <p>If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please contact us.</p>
+          </div>
+
+          {/* Section 8: GDPR Data Protection Rights */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              GDPR Data Protection Rights
+            </h2>
+            <p>We would like to make sure you are fully aware of all of your data protection rights. Every user is entitled to the following:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li><strong>The right to access</strong> – You have the right to request copies of your personal data. We may charge you a small fee for this service.</li>
+              <li><strong>The right to rectification</strong> – You have the right to request that we correct any information you believe is inaccurate. You also have the right to request that we complete the information you believe is incomplete.</li>
+              <li><strong>The right to erasure</strong> – You have the right to request that we erase your personal data, under certain conditions.</li>
+              <li><strong>The right to restrict processing</strong> – You have the right to request that we restrict the processing of your personal data, under certain conditions.</li>
+              <li><strong>The right to object to processing</strong> – You have the right to object to our processing of your personal data, under certain conditions.</li>
+              <li><strong>The right to data portability</strong> – You have the right to request that we transfer the data that we have collected to another organization, or directly to you, under certain conditions.</li>
+            </ul>
+            <p>If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please contact us.</p>
+          </div>
+
+          {/* Section 9: Children's Information */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Children&apos;s Information
+            </h2>
+            <p>
+              Another part of our priority is adding protection for children while using the internet. We encourage parents and guardians to observe, participate in, and/or monitor and guide their online activity.
+            </p>
+            <p>
+              vkdryfishbasket.com does not knowingly collect any Personal Identifiable Information from children under the age of 13. If you think that your child provided this kind of information on our website, we strongly encourage you to contact us immediately and we will do our best efforts to promptly remove such information from our records.
+            </p>
+          </div>
+
+          {/* Contact Footer */}
+          <div className="space-y-3 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl font-serif font-bold text-[#8c6239]">
+              Contact Us
+            </h2>
+            <p>If you have any questions or concerns about our Privacy Policy, please reach out to us:</p>
+            <ul className="space-y-2.5 font-semibold text-[#3b2314]">
+              <li className="flex items-center gap-2.5">
+                <Mail size={16} className="text-[#8c6239]" />
+                <span>Email: <a href="mailto:info@vkdryfishbasket.com" className="text-[#8c6239] hover:underline font-bold">info@vkdryfishbasket.com</a></span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Phone size={16} className="text-[#8c6239]" />
+                <span>Phone: <a href="tel:+919848160769" className="text-[#8c6239] hover:underline font-bold">+91 98481 60769</a></span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <MapPin size={16} className="text-[#8c6239] shrink-0 mt-0.5" />
+                <span>Address: H.No 806, Sahabhavana Township, Bandlaguda Nagole, Hyderabad - 500068</span>
+              </li>
+            </ul>
+          </div>
+
         </div>
       </div>
     </main>

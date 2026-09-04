@@ -1,153 +1,144 @@
 import React from "react";
-import { Check, X, Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 
 export const metadata = {
-  title: "Refund Policy - Dry Fish Basket",
-  description: "Read the refund and returns policy of Dry Fish Basket premium products.",
+  title: "Return and Refund Policy - Dry Fish Basket",
+  description: "Read the official Return and Refund Policy of Dry Fish Basket.",
 };
 
 export default function CancellationReturns() {
   return (
     <main className="min-h-screen bg-[#FAF6ED] text-[#3b2314] font-sans selection:bg-[#8c6239]/20 pb-24">
-      <div className="max-w-3xl mx-auto px-6 pt-16 pb-12">
-        <h1 className="text-3xl md:text-4xl font-serif font-black text-center text-[#8c6239] mb-10 tracking-wide">
-          Refund policy
+      <div className="max-w-4xl mx-auto px-6 pt-16 pb-12">
+        <h1 className="text-3xl md:text-5xl font-serif font-black text-[#8c6239] mb-4 tracking-wide">
+          Returns and Refund Policy
         </h1>
+        <p className="text-xs text-black/50 mb-10">Last updated: July 23, 2020</p>
 
-        <div className="space-y-8 text-xs md:text-sm text-black/85 leading-relaxed font-medium">
+        <div className="space-y-8 text-sm text-black/85 leading-relaxed font-medium bg-white p-8 md:p-12 rounded-3xl border border-[#8c6239]/10 shadow-sm">
           
-          {/* Section 1 */}
-          <div className="space-y-4 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              1. Returns Policy
+          <p>Thank you for shopping at Dry Fish Basket.</p>
+          <p>If, for any reason, You are not completely satisfied with a purchase We invite You to review our policy on refunds and returns.</p>
+          <p>The following terms are applicable for any products that You purchased with Us.</p>
+
+          {/* Section 1: Interpretation and Definitions */}
+          <div className="space-y-4 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl md:text-2xl font-serif font-bold text-[#8c6239]">
+              Interpretation and Definitions
             </h2>
+            
+            <h3 className="text-base font-bold text-[#3b2314]">Interpretation</h3>
             <p>
-              Since dry fish is a <strong>perishable and consumable product</strong>, we only accept returns under the following conditions:
+              The words of which the initial letter is capitalized have meanings defined under the following conditions.
+              The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.
             </p>
 
-            <div className="space-y-3 bg-white p-5 rounded-2xl border border-[#8c6239]/10">
-              <h3 className="font-bold text-green-700 flex items-center gap-2 text-xs md:text-sm">
-                <Check size={16} className="bg-green-100 text-green-700 rounded-full p-0.5" />
-                We accept returns if:
-              </h3>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>The wrong product was delivered</li>
-                <li>The product was <strong>damaged</strong> during delivery</li>
-                <li>The product is <strong>spoiled</strong> upon arrival</li>
-                <li>There is a <strong>quantity mismatch</strong></li>
-              </ul>
-            </div>
-
-            <div className="space-y-3 bg-white p-5 rounded-2xl border border-[#8c6239]/10">
-              <h3 className="font-bold text-red-700 flex items-center gap-2 text-xs md:text-sm">
-                <X size={16} className="bg-red-100 text-red-700 rounded-full p-0.5" />
-                We do NOT accept returns for:
-              </h3>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>Change of mind after receiving the product</li>
-                <li>Taste, smell, or texture preference</li>
-                <li>Delay caused by courier partners</li>
-                <li>Products damaged due to improper storage after delivery</li>
-                <li>Opened or partially used products</li>
-              </ul>
-            </div>
-
-            <p className="text-xs text-red-700 font-bold bg-red-50 p-4 rounded-xl border border-red-100">
-              Important: All issues must be reported within <strong>24 hours of delivery</strong>, along with photo or video proof, to qualify for return/replacement.
-            </p>
-          </div>
-
-          {/* Section 2 */}
-          <div className="space-y-4 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              2. Refund Policy
-            </h2>
-            <p>Refunds will be issued in the following situations:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Product received damaged or spoiled</li>
-              <li>Wrong item delivered</li>
-              <li>Order cancelled before shipping</li>
-              <li>Order undeliverable due to courier limitations</li>
-            </ul>
-
-            <div className="space-y-2 pt-2">
-              <h3 className="font-bold text-[#8c6239]">Refund Mode:</h3>
-              <ul className="list-disc pl-5 space-y-1">
-                <li><strong>Prepaid Orders:</strong> Refunded to original payment method within <strong>5-7 working days</strong></li>
-                <li><strong>COD Orders:</strong> Refunded via <strong>UPI/Bank Transfer</strong></li>
-              </ul>
-            </div>
-            <p className="italic text-black/60">If the product is not eligible for return, refunds cannot be processed.</p>
-          </div>
-
-          {/* Section 3 */}
-          <div className="space-y-2 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              3. Replacement Policy
-            </h2>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>If replacement is approved, the order will be delivered within 5-7 days.</li>
-            </ul>
-          </div>
-
-          {/* Section 4 */}
-          <div className="space-y-2 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              4. Order Cancellation Policy
-            </h2>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Orders can be cancelled within <strong>1 hour of placing the order</strong>.</li>
-              <li>Once the order is processed or shipped, cancellations are <strong>not permitted</strong>.</li>
-              <li>Frequent COD cancellations may lead to blocked or restricted COD access.</li>
-            </ul>
-          </div>
-
-          {/* Section 5 */}
-          <div className="space-y-2 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              5. Return Request Procedure
-            </h2>
-            <p>To request a return, refund, or replacement:</p>
-            <ol className="list-decimal pl-5 space-y-1.5">
-              <li>Contact us within <strong>24 hours</strong> of delivery</li>
-              <li>Provide your <strong>Order ID</strong></li>
-              <li>Share clear <strong>photos or videos</strong> showing the issue</li>
-              <li>Our team will verify and update you on the resolution</li>
-              <li>Refund or replacement will be processed accordingly</li>
-            </ol>
-          </div>
-
-          {/* Section 6 */}
-          <div className="space-y-2 border-b border-[#8c6239]/10 pb-6">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              6. Non-Refundable Shipping Fees
-            </h2>
-            <p>Shipping charges are <strong>non-refundable</strong>, except when:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>We send the wrong product</li>
-              <li>Product is damaged/spoiled in transit</li>
-              <li>Order cannot be delivered</li>
-            </ul>
-          </div>
-
-          {/* Section 7 */}
-          <div className="space-y-3">
-            <h2 className="text-sm md:text-base font-serif font-black text-[#8c6239]">
-              7. Contact Us
-            </h2>
-            <p>For any return or refund related concerns, reach out to us:</p>
-            <ul className="space-y-2 pl-1 font-semibold text-black/90">
-              <li className="flex items-center gap-2">
-                <Mail size={14} className="text-[#8c6239]" />
-                <span>Email: info@vkdryfishbasket.com</span>
+            <h3 className="text-base font-bold text-[#3b2314] pt-2">Definitions</h3>
+            <p>For the purposes of this Return and Refund Policy:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>
+                <strong>You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.
               </li>
-              <li className="flex items-center gap-2">
-                <Phone size={14} className="text-[#8c6239]" />
-                <span>Phone / WhatsApp: +91 98483 57279</span>
+              <li>
+                <strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to Dry Fish Basket, H.No 806, Sahabhavana Township, Bandlaguda Nagole, Hyderabad - 500068.
               </li>
-              <li className="flex items-center gap-2">
-                <MapPin size={14} className="text-[#8c6239]" />
-                <span>Address: Bhimavaram, Andhra Pradesh - 534206</span>
+              <li>
+                <strong>Service</strong> refers to the Website.
+              </li>
+              <li>
+                <strong>Website</strong> refers to Dry Fish Basket, accessible from <a href="https://www.vkdryfishbasket.com" target="_blank" rel="noopener noreferrer" className="text-[#8c6239] hover:underline font-semibold">https://www.vkdryfishbasket.com/</a>
+              </li>
+              <li>
+                <strong>Goods</strong> refer to the items offered for sale on the Service.
+              </li>
+              <li>
+                <strong>Orders</strong> mean a request by You to purchase Goods from Us.
+              </li>
+            </ul>
+          </div>
+
+          {/* Section 2: Your Order Cancellation Rights */}
+          <div className="space-y-4 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl md:text-2xl font-serif font-bold text-[#8c6239]">
+              Your Order Cancellation Rights
+            </h2>
+            <p>You are entitled to cancel Your Order within 2 hours without giving any reason for doing so.</p>
+            <p>The deadline for cancelling an Order is 2 hours from the time on which You have placed the order. No cancellation is possible in case products have been shipped.</p>
+            <p className="font-semibold text-red-700">Cancellation fees: 3% on the total transaction value will be deducted for payment gateway.</p>
+            <p>In order to exercise Your right of cancellation, You must inform Us of your decision by means of a clear statement. You can inform us of your decision by:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>
+                <strong>By email:</strong> <a href="mailto:info@vkdryfishbasket.com" className="text-[#8c6239] hover:underline font-semibold">info@vkdryfishbasket.com</a>
+              </li>
+              <li>
+                <strong>By phone number:</strong> <a href="tel:+919848160769" className="text-[#8c6239] hover:underline font-semibold">+91 98481 60769</a>
+              </li>
+            </ul>
+            <p>We will reimburse You no later than 7 days from the day on which We receive the returned Goods. We will use the same means of payment as You used for the Order, and You will not incur any fees for such reimbursement.</p>
+          </div>
+
+          {/* Section 3: Conditions for Returns */}
+          <div className="space-y-4 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl md:text-2xl font-serif font-bold text-[#8c6239]">
+              Conditions for Returns
+            </h2>
+            <p>In order for the Goods to be eligible for a return, please make sure that:</p>
+            <ul className="list-disc pl-6 space-y-1.5">
+              <li>The Goods were purchased in the last 7 days</li>
+              <li>The Goods are in the original packaging</li>
+            </ul>
+
+            <p className="font-bold text-[#3b2314] pt-2">The following Goods cannot be returned:</p>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>The supply of Goods made to Your specifications or clearly personalized.</li>
+              <li>The supply of Goods which according to their nature are not suitable to be returned, deteriorate rapidly or where the date of expiry is over.</li>
+              <li>The supply of Goods which are not suitable for return due to health protection or hygiene reasons and were unsealed after delivery.</li>
+              <li>The supply of Goods which are, after delivery, according to their nature, inseparably mixed with other items.</li>
+              <li>All food products, as we will be dealing with food products no returns are accepted under any circumstances.</li>
+            </ul>
+            <p>We reserve the right to refuse returns of any merchandise that does not meet the above return conditions in our sole discretion.</p>
+            <p>Only regular priced Goods may be refunded. Unfortunately, Goods on sale cannot be refunded. This exclusion may not apply to You if it is not permitted by applicable law.</p>
+          </div>
+
+          {/* Section 4: Returning Goods */}
+          <div className="space-y-4 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl md:text-2xl font-serif font-bold text-[#8c6239]">
+              Returning Goods
+            </h2>
+            <p>You are responsible for the cost and risk of returning the Goods to Us. You should send the Goods at the following address:</p>
+            <div className="bg-[#FAF6ED] p-4 rounded-xl border border-[#8c6239]/15 font-semibold text-[#3b2314]">
+              H.No 806, Sahabhavana Township, Bandlaguda Nagole, Hyderabad - 500068
+            </div>
+            <p>We cannot be held responsible for Goods damaged or lost in return shipment. Therefore, We recommend an insured and trackable mail service. We are unable to issue a refund without actual receipt of the Goods or proof of received return delivery.</p>
+          </div>
+
+          {/* Section 5: Gifts */}
+          <div className="space-y-4 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl md:text-2xl font-serif font-bold text-[#8c6239]">
+              Gifts
+            </h2>
+            <p>If the Goods were marked as a gift when purchased and then shipped directly to you, You&apos;ll receive a gift credit for the value of your return. Once the returned product is received, a gift certificate will be mailed to You.</p>
+            <p>If the Goods weren&apos;t marked as a gift when purchased, or the gift giver had the Order shipped to themselves to give it to You later, We will send the refund to the gift giver.</p>
+          </div>
+
+          {/* Section 6: Contact us */}
+          <div className="space-y-4 border-t border-[#8c6239]/10 pt-6">
+            <h2 className="text-xl md:text-2xl font-serif font-bold text-[#8c6239]">
+              Contact us
+            </h2>
+            <p>If you have any questions about our Returns and Refunds Policy, please contact us:</p>
+            <ul className="space-y-2.5 font-semibold text-[#3b2314]">
+              <li className="flex items-center gap-2.5">
+                <Mail size={16} className="text-[#8c6239]" />
+                <span>By email: <a href="mailto:info@vkdryfishbasket.com" className="text-[#8c6239] hover:underline font-bold">info@vkdryfishbasket.com</a></span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Phone size={16} className="text-[#8c6239]" />
+                <span>By phone number: <a href="tel:+919848160769" className="text-[#8c6239] hover:underline font-bold">+91 98481 60769</a></span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <MapPin size={16} className="text-[#8c6239] shrink-0 mt-0.5" />
+                <span>Address: H.No 806, Sahabhavana Township, Bandlaguda Nagole, Hyderabad - 500068</span>
               </li>
             </ul>
           </div>

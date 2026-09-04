@@ -131,24 +131,13 @@ export default function Home() {
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-[100] bg-[#FAF6ED] flex flex-col items-center justify-center p-6 text-center select-none font-serif">
-        <div className="relative mb-6">
+        <div className="relative">
           <div className="w-52 h-52 sm:w-64 sm:h-64 flex items-center justify-center bg-transparent p-1 animate-pulse">
             <img src="/images/vk_logo_transparent.png" alt="Dry Fish Basket Logo" className="w-full h-full object-contain" />
           </div>
           <div className="absolute bottom-2 right-2 p-3 bg-[#8c6239] text-[#fcd34d] rounded-full shadow-lg animate-spin">
             <Sparkles size={24} />
           </div>
-        </div>
-
-        <h2 className="text-2xl sm:text-3xl font-bold text-[#3b2314] tracking-wide mb-1 font-serif">
-          Dry Fish Basket
-        </h2>
-        <p className="text-xs uppercase tracking-[0.25em] text-[#8c6239] font-black font-sans mb-8">
-          Loading Store...
-        </p>
-
-        <div className="w-48 h-1.5 bg-[#8c6239]/15 rounded-full overflow-hidden relative">
-          <div className="absolute inset-y-0 bg-[#8c6239] w-1/2 rounded-full animate-marquee" />
         </div>
       </div>
     );
