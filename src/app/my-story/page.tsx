@@ -42,11 +42,11 @@ export default function MyStory() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-stretch">
           
           {/* Left Column: Authentic Dry Fish & Prawns Varieties */}
-          <div className="relative rounded-[2rem] overflow-hidden border border-[#8c6239]/15 shadow-sm bg-brand/5 group h-full min-h-[280px]">
+          <div className="relative rounded-[2rem] overflow-hidden border border-[#8c6239]/15 shadow-sm bg-brand/5 group h-72 sm:h-80 md:h-auto min-h-[260px] md:min-h-0">
             <img
               src="/images/about_dry_fish_varieties.jpg"
               alt="Authentic Dry Fish and Dry Prawns varieties at Dry Fish Basket"
-              className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none" />
             <div className="absolute bottom-4 left-4 right-4 text-white space-y-1">
@@ -60,7 +60,7 @@ export default function MyStory() {
           </div>
 
           {/* Right Column: Why Choose Dry Fish Basket text */}
-          <div className="bg-[#FAF6ED] border border-[#8c6239]/15 rounded-[2rem] p-6 md:p-7 flex flex-col justify-center space-y-3 shadow-sm text-left">
+          <div className="bg-[#FAF6ED] border border-[#8c6239]/15 rounded-[2rem] p-6 md:p-7 flex flex-col justify-between space-y-3 shadow-sm text-left">
             <div className="space-y-2.5">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <h2 className="text-lg md:text-xl font-serif font-black text-[#8c6239] flex items-center gap-2">
