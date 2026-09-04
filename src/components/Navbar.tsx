@@ -325,10 +325,32 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Menu Panel */}
+        {/* Mobile Menu Fullscreen Overlay */}
         {isMobileMenuOpen && (
-          <div className="md:hidden fixed inset-x-0 top-16 bottom-0 z-50 bg-black/95 backdrop-blur-md border-t border-white/10 overflow-y-auto overscroll-contain animate-in slide-in-from-top duration-300 font-serif">
-            <div className="px-6 pt-6 pb-36 space-y-5 font-serif">
+          <div className="md:hidden fixed inset-0 z-[100] bg-black text-white flex flex-col overflow-y-auto overscroll-contain animate-in fade-in duration-200 font-serif">
+            {/* Top Bar with Logo & Close Button */}
+            <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-black/95 backdrop-blur-md border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <img
+                  src="/logo_fin.png"
+                  alt="Dry Fish Basket Logo"
+                  className="h-8 w-8 object-contain rounded-full bg-white/10 p-0.5"
+                />
+                <span className="font-serif text-base font-bold text-white tracking-wide">
+                  Dry Fish Basket
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                aria-label="Close menu"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="px-6 pt-6 pb-36 space-y-5 font-serif flex-1">
 
               {/* Navigation Links */}
               <div className="space-y-3">
