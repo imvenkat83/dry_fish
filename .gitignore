@@ -51,3 +51,6 @@ sqlite.db
 # Scratch and temporary env
 scratch/
 env*
+
+# Large media assets (>100MB)
+public/videos/

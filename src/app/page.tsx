@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import ProductGrid from "@/components/ProductGrid";
 import ProductCard from "@/components/ProductCard";
 import ReelsCarouselSection from "@/components/ReelsCarouselSection";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import { getFirstProductImageUrl, getProductImageUrls } from "@/utils/product";
-import { ChevronLeft, ChevronRight, Sun, Leaf, FlaskConical, Package, Star, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sun, Leaf, FlaskConical, Package, Star, Sparkles, Volume2, VolumeX } from "lucide-react";
 
 type NavItem = {
   id: number;
@@ -60,6 +60,23 @@ export default function Home() {
   const [founderPromoList, setFounderPromoList] = useState<any[]>([]);
   const [latestProducts, setLatestProducts] = useState<any[]>([]);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.play().catch(() => {});
+    }
+  }, []);
+
+  const toggleSound = () => {
+    if (videoRef.current) {
+      const nextMuted = !videoRef.current.muted;
+      videoRef.current.muted = nextMuted;
+      setIsMuted(nextMuted);
+    }
+  };
 
   useEffect(() => {
     async function loadAllPageData() {
@@ -146,129 +163,34 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-brand-light text-black font-sans selection:bg-brand-accent/30">
 
-      {/* Dynamic Home Banner Carousel (Separate Laptop and Mobile Views) */}
-      {banners.length > 0 && (
-        <div className="w-full relative overflow-hidden border-b border-brand/10 group mt-0 bg-[#FAF6ED]">
-          <div className="relative w-full h-auto md:h-[calc(100vh-4rem)] overflow-hidden bg-[#FAF6ED]">
-            <AnimatePresence initial={false} mode="wait">
-              <motion.div
-                key={currentBannerIndex}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="w-full h-auto md:h-full md:absolute md:inset-0"
-              >
-                {(() => {
-                  const currentBanner = banners[currentBannerIndex];
-                  if (!currentBanner) return null;
+      {/* Static Home Video Banner */}
+      <div className="w-full relative overflow-hidden border-b border-brand/10 group mt-0 bg-[#FAF6ED]">
+        <div className="relative w-full h-auto aspect-video md:h-[calc(100vh-4rem)] md:max-h-[800px] overflow-hidden bg-black flex items-center justify-center">
+          <video
+            ref={videoRef}
+            autoPlay
+            muted={isMuted}
+            loop
+            playsInline
+            preload="auto"
+            className="w-full h-full object-cover"
+          >
+            <source src="/videos/WhatsApp%20Video%202026-09-04%20at%202.00.20%20PM.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
 
-                  const desktopUrl = currentBanner.url;
-                  const mobileUrl = currentBanner.mobileUrl || currentBanner.url;
-                  const link = currentBanner.link;
-
-                  const renderMedia = (src: string, className: string) => {
-                    if (isVideoUrl(src)) {
-                      return <video src={src} className={className} autoPlay muted loop playsInline />;
-                    }
-                    return (
-                      <img
-                        src={src}
-                        alt={`Promo Banner ${currentBannerIndex + 1}`}
-                        className={className}
-                      />
-                    );
-                  };
-
-                  const content = (
-                    <div className="w-full h-auto md:h-full relative">
-                      {/* Laptop / Desktop View Image (visible on md screens and up) */}
-                      <div className="hidden md:block w-full h-full">
-                        {renderMedia(desktopUrl, "w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.01]")}
-                      </div>
-
-                      {/* Mobile View Image (visible on mobile screens below md) */}
-                      <div className="block md:hidden w-full h-auto">
-                        {renderMedia(mobileUrl, "w-full h-auto block transition-transform duration-1000 ease-out group-hover:scale-[1.01]")}
-                      </div>
-                    </div>
-                  );
-
-                  if (link === "#featured-collections") {
-                    return (
-                      <a
-                        href="#featured-collections"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          document.getElementById("featured-collections")?.scrollIntoView({ behavior: "smooth" });
-                        }}
-                        className="block w-full h-full cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
-                      >
-                        {content}
-                      </a>
-                    );
-                  }
-                  if (link) {
-                    return (
-                      <Link
-                        href={link}
-                        className="block w-full h-full cursor-pointer hover:scale-[1.005] active:scale-[0.995] transition-all duration-300"
-                      >
-                        {content}
-                      </Link>
-                    );
-                  }
-                  return content;
-                })()}
-              </motion.div>
-            </AnimatePresence>
-            <div className="absolute inset-0 bg-black/[0.02] pointer-events-none"></div>
-
-            {/* Navigation Arrows */}
-            {banners.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setCurrentBannerIndex(
-                      (prev) => (prev - 1 + banners.length) % banners.length
-                    )
-                  }
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-black shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 cursor-pointer"
-                  aria-label="Previous Banner"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setCurrentBannerIndex((prev) => (prev + 1) % banners.length)
-                  }
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-black shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 cursor-pointer"
-                  aria-label="Next Banner"
-                >
-                  <ChevronRight size={20} />
-                </button>
-
-                {/* Pagination Dots */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-                  {banners.map((_, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setCurrentBannerIndex(idx)}
-                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${idx === currentBannerIndex
-                          ? "bg-[#C5A059] w-6"
-                          : "bg-white/60 hover:bg-white w-2"
-                        }`}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+          {/* Sound Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleSound}
+            className="absolute bottom-4 right-4 z-20 px-3.5 py-2 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md transition-all shadow-lg cursor-pointer flex items-center gap-1.5 text-xs font-semibold border border-white/10 select-none"
+            aria-label={isMuted ? "Unmute video" : "Mute video"}
+          >
+            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            <span className="text-[11px] uppercase tracking-wider">{isMuted ? "Unmute" : "Mute"}</span>
+          </button>
         </div>
-      )}
+      </div>
 
       {/* 2.5. Categories Section (Auto-scrolls, pauses on hover, supports manual scroll, drag, & arrow buttons) */}
       {!isLoading && categoryMarqueeItems.length > 0 && (
