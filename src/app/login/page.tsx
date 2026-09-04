@@ -41,6 +41,44 @@ export default function Login() {
     if (error) setError("");
   };
 
+  const setupRecaptcha = () => {
+    if (!auth) return null;
+    try {
+      if ((window as any).recaptchaVerifier) {
+        return (window as any).recaptchaVerifier;
+      }
+      
+      const container = document.getElementById("recaptcha-container");
+      if (container) {
+        container.innerHTML = "";
+      }
+
+      const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+        size: "invisible",
+        callback: () => {},
+        "expired-callback": () => {
+          setError("reCAPTCHA expired. Please resend verification code.");
+        },
+      });
+      
+      (window as any).recaptchaVerifier = verifier;
+      return verifier;
+    } catch (e: any) {
+      console.error("Recaptcha setup error:", e);
+      try {
+        const container = document.getElementById("recaptcha-container");
+        if (container) container.innerHTML = "";
+        const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+          size: "invisible",
+        });
+        (window as any).recaptchaVerifier = verifier;
+        return verifier;
+      } catch (err2) {
+        return null;
+      }
+    }
+  };
+
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     if (phone.length !== 10) return;
@@ -49,30 +87,41 @@ export default function Login() {
     setError("");
     
     try {
-      // Proactively set the session cookie client-side
-      document.cookie = `auth_session=${phone}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
+      let sentViaFirebase = false;
 
-      // Sync session credentials with the backend
-      const res = await fetch("/api/auth/sync", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
-      });
-      const data = await res.json();
-      
-      if (!data.success) {
-        throw new Error(data.error || "Login failed");
+      if (auth) {
+        try {
+          // Attempt Real Firebase Phone Auth SMS OTP
+          const appVerifier = setupRecaptcha();
+          const formattedPhone = `+91${phone}`;
+          const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
+          setConfirmationResult(confirmation);
+          sentViaFirebase = true;
+        } catch (firebaseErr: any) {
+          console.warn("Firebase SMS limit or billing constraint reached, falling back to system OTP:", firebaseErr.message);
+        }
       }
-      
-      if (data.isNewUser) {
-        setStep("profile");
-      } else {
-        const redirect = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
-        window.location.href = redirect;
+
+      if (!sentViaFirebase) {
+        // System OTP API Fallback
+        const res = await fetch("/api/auth/send-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone }),
+        });
+        const data = await res.json();
+        
+        if (!data.success) {
+          throw new Error(data.error || "Failed to send verification code.");
+        }
       }
+
+      setStep("otp");
+      setTimer(30);
+      setOtp("");
     } catch (err: any) {
-      console.error("Login error:", err);
-      setError(err.message || "Failed to log in. Please try again.");
+      console.error("Send OTP error:", err);
+      setError(err.message || "Failed to send OTP. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -80,11 +129,69 @@ export default function Login() {
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (otp.length !== 6) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      if (confirmationResult) {
+        // Real Firebase OTP Verification
+        const userCredential = await confirmationResult.confirm(otp);
+        const idToken = await userCredential.user.getIdToken();
+
+        // Sync authenticated user credentials with backend
+        const res = await fetch("/api/auth/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, idToken }),
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+          throw new Error(data.error || "Authentication sync failed.");
+        }
+
+        if (data.isNewUser) {
+          setStep("profile");
+        } else {
+          const redirect = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
+          window.location.href = redirect;
+        }
+      } else {
+        // Fallback API verification
+        const res = await fetch("/api/auth/verify-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, otp }),
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+          throw new Error(data.error || "Invalid verification code.");
+        }
+
+        // Proactively set session cookie client-side
+        document.cookie = `auth_session=${phone}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
+
+        if (data.isNewUser) {
+          setStep("profile");
+        } else {
+          const redirect = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
+          window.location.href = redirect;
+        }
+      }
+    } catch (err: any) {
+      console.error("Verify OTP error:", err);
+      setError(err.message || "Verification failed. Please check your OTP code.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim()) return;
+    if (!fullName.trim() || !email.trim()) return;
     
     setLoading(true);
     setError("");

@@ -5,6 +5,7 @@ import Link from "next/link";
 import ProductGrid from "@/components/ProductGrid";
 import ProductCard from "@/components/ProductCard";
 import ReelsCarouselSection from "@/components/ReelsCarouselSection";
+import CategoryCarousel from "@/components/CategoryCarousel";
 import { getFirstProductImageUrl, getProductImageUrls } from "@/utils/product";
 import { ChevronLeft, ChevronRight, Sun, Leaf, FlaskConical, Package, Star, Sparkles } from "lucide-react";
 
@@ -280,75 +281,9 @@ export default function Home() {
         </div>
       )}
 
-      {/* 2.5. Categories Marquee Section (Continuously autoscrolls to the left) */}
+      {/* 2.5. Categories Section (Auto-scrolls, pauses on hover, supports manual scroll, drag, & arrow buttons) */}
       {!isLoading && categoryMarqueeItems.length > 0 && (
-        <section className="w-full py-6 md:py-8 overflow-hidden bg-[#FAF6ED] border-b border-brand/10 relative">
-          <div className="w-full flex items-center overflow-hidden relative">
-            <div
-              className="flex animate-marquee hover:[animation-play-state:paused] whitespace-nowrap"
-              style={{ animationDuration: "35s" }}
-            >
-              <div className="flex shrink-0 gap-6 md:gap-8 items-center px-4">
-                {categoryMarqueeItems.map((item, index) => {
-                  const cardImage = item.imageUrl && item.imageUrl.includes(",") 
-                    ? item.imageUrl.split(",")[0] 
-                    : (item.imageUrl || "/images/placeholder.png");
-                  return (
-                    <Link
-                      key={`${item.id}-${index}`}
-                      href={item.link || `/category/${item.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
-                      className="group flex flex-col items-center shrink-0 w-[180px] sm:w-[220px] md:w-[260px] transition-transform duration-300"
-                    >
-                      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-brand/10 shadow-sm transition-transform duration-500 group-hover:scale-[1.03] relative bg-white">
-                        <img
-                          src={cardImage}
-                          alt={item.name}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                          onError={e => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = "/images/placeholder.png";
-                          }}
-                        />
-                      </div>
-                      <h3 className="mt-3 text-center font-serif text-[#3b2314] font-bold text-sm md:text-base tracking-tight group-hover:text-[#8c6239] transition-colors leading-tight">
-                        {item.name}
-                      </h3>
-                    </Link>
-                  );
-                })}
-              </div>
-              <div className="flex shrink-0 gap-6 md:gap-8 items-center px-4" aria-hidden="true">
-                {categoryMarqueeItems.map((item, index) => {
-                  const cardImage = item.imageUrl && item.imageUrl.includes(",") 
-                    ? item.imageUrl.split(",")[0] 
-                    : (item.imageUrl || "/images/placeholder.png");
-                  return (
-                    <Link
-                      key={`dup-${item.id}-${index}`}
-                      href={item.link || `/category/${item.name.toLowerCase().trim().replace(/\s+/g, "-")}`}
-                      className="group flex flex-col items-center shrink-0 w-[180px] sm:w-[220px] md:w-[260px] transition-transform duration-300"
-                    >
-                      <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-brand/10 shadow-sm transition-transform duration-500 group-hover:scale-[1.03] relative bg-white">
-                        <img
-                          src={cardImage}
-                          alt={item.name}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                          onError={e => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = "/images/placeholder.png";
-                          }}
-                        />
-                      </div>
-                      <h3 className="mt-3 text-center font-serif text-[#3b2314] font-bold text-sm md:text-base tracking-tight group-hover:text-[#8c6239] transition-colors leading-tight">
-                        {item.name}
-                      </h3>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
+        <CategoryCarousel items={categoryMarqueeItems} />
       )}
 
       {/* 3. Main Content Section */}
