@@ -25,7 +25,7 @@ export default function Footer() {
           <div className="flex flex-col space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 flex items-center justify-center bg-white/10 rounded-2xl border border-white/20 p-1">
-                <img src="/images/vk_logo_transparent.png" alt="Dry Fish Basket Logo" className="w-full h-full object-contain" />
+                <img src="/images/footer_logo.png" alt="Dry Fish Basket Logo" className="w-full h-full object-contain" />
               </div>
               <div>
                 <h3 className="text-2xl font-serif font-bold text-[#fcd34d] tracking-wide leading-none">
