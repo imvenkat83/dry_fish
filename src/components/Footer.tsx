@@ -24,14 +24,18 @@ export default function Footer() {
           {/* Column 1: Brand & Slogan */}
           <div className="flex flex-col space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 flex items-center justify-center bg-white/10 rounded-2xl border border-white/20 p-1">
-                <img src="/images/footer_logo.png" alt="Dry Fish Basket Logo" className="w-full h-full object-contain" />
+              <div className="flex items-center justify-center shrink-0">
+                <img
+                  src="/images/footer_logo.png"
+                  alt="Dry Fish Basket Logo"
+                  className="h-11 sm:h-12 w-auto object-contain"
+                />
               </div>
               <div>
-                <h3 className="text-2xl font-serif font-bold text-[#fcd34d] tracking-wide leading-none">
+                <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#fcd34d] tracking-wide leading-none whitespace-nowrap">
                   Dry Fish Basket
                 </h3>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-[#FFFDF6]/70 font-sans mt-1">Authentic Coastal Delicacies</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-[#FFFDF6]/70 font-sans mt-1 whitespace-nowrap">Authentic Coastal Delicacies</p>
               </div>
             </div>
 
