@@ -8,13 +8,18 @@ async function isAdmin(request?: Request) {
   return !!(await verifyAdminRequest(request));
 }
 
-// GET all homepage category cards (publicly accessible)
+// GET homepage category cards
 export async function GET(request: Request) {
   try {
-    const data = await db
-      .select()
-      .from(homepageCategories)
-      .orderBy(asc(homepageCategories.order));
+    const { searchParams } = new URL(request.url);
+    const showAll = searchParams.get("all") === "true";
+
+    let query = db.select().from(homepageCategories);
+    if (!showAll) {
+      query = query.where(eq(homepageCategories.isActive, true)) as typeof query;
+    }
+
+    const data = await query.orderBy(asc(homepageCategories.order));
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
     console.error("Fetch Homepage Categories Error:", error);
@@ -33,7 +38,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { name, imageUrl, promoText, actionText, link, order, filterTypes } = body;
+    const { name, imageUrl, promoText, actionText, link, order, filterTypes, isActive } = body;
 
     if (!name || !imageUrl || !promoText) {
       return NextResponse.json(
@@ -52,6 +57,7 @@ export async function POST(request: Request) {
         link: link || null,
         order: order || 0,
         filterTypes: filterTypes || null,
+        isActive: isActive !== undefined ? !!isActive : true,
       })
       .returning();
 
@@ -84,7 +90,7 @@ export async function PUT(request: Request) {
       }
       return NextResponse.json({ success: true });
     } else {
-      const { id, name, imageUrl, promoText, actionText, link, order, filterTypes } = body;
+      const { id, name, imageUrl, promoText, actionText, link, order, filterTypes, isActive } = body;
 
       if (!id) {
         return NextResponse.json(
@@ -101,6 +107,7 @@ export async function PUT(request: Request) {
       if (link !== undefined) updates.link = link || null;
       if (order !== undefined) updates.order = order;
       if (filterTypes !== undefined) updates.filterTypes = filterTypes || null;
+      if (isActive !== undefined) updates.isActive = !!isActive;
 
       const result = await db
         .update(homepageCategories)

@@ -56,6 +56,7 @@ interface Product {
   avgRating: number; numReviews: number; category: string | null;
   gender: string | null; totalStock: number;
   isFeatured: boolean | number | null;
+  isActive?: boolean | number | null;
   isCustomizable: boolean | number | null;
   enabledMeasurements: string | null;
   tags: string | null;
@@ -93,6 +94,7 @@ export default function ProductManagement() {
   const [avgRating, setAvgRating] = useState("4.3");
   const [numReviews, setNumReviews] = useState("1");
   const [isFeatured, setIsFeatured] = useState(false);
+  const [isActive, setIsActive] = useState(true);
   const [isCustomizable, setIsCustomizable] = useState(false);
   const [tags, setTags] = useState("");
   const [style, setStyle] = useState("");
@@ -464,7 +466,7 @@ export default function ProductManagement() {
     setNameError("");
     setIsNameChecking(false);
     setAvgRating("4.3"); setNumReviews("1");
-    setIsFeatured(false); setIsCustomizable(false); setTags("");
+    setIsFeatured(false); setIsActive(true); setIsCustomizable(false); setTags("");
     setStyle(""); setFabricComposition(""); setWeave(""); setNeckStyle(""); setKeyWords(""); setFilterCategory("");
     setSpecRows([
       { id: Math.random().toString(), key: "Weight", value: "", isCustom: false },
@@ -513,6 +515,7 @@ export default function ProductManagement() {
         setAvgRating((p.avgRating ?? 4.3).toString());
         setNumReviews((p.numReviews ?? 1).toString());
         setIsFeatured(!!p.isFeatured);
+        setIsActive(p.isActive !== false);
         setIsCustomizable(!!p.isCustomizable);
         setTags(p.tags || "");
         setStyle(p.style || "");
@@ -673,6 +676,7 @@ export default function ProductManagement() {
       const payload = { 
         id: editingId, name, description, images: imagesToSave, variations, 
         avgRating, numReviews, category, gender, colors: selectedColors, tags, isFeatured,
+        isActive: isActive,
         isCustomizable: false,
         enabledMeasurements: null,
         style: style ? style.trim() : null,
@@ -697,6 +701,26 @@ export default function ProductManagement() {
       }
       else showToast(data.details || data.error || "Failed to save product.");
     } catch (err: any) { showToast(err.message || "Network error."); } finally { setIsSubmitting(false); }
+  };
+
+  const handleToggleActiveProduct = async (product: Product) => {
+    const newStatus = !(product.isActive !== false);
+    try {
+      const res = await fetch("/api/admin/products", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: product.id, isActive: newStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`Product "${product.name}" ${newStatus ? "enabled" : "disabled"}`);
+        fetchProducts();
+      } else {
+        showToast(data.error || "Failed to update product status.");
+      }
+    } catch {
+      showToast("Network error.");
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -917,23 +941,44 @@ export default function ProductManagement() {
                   <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Enter general description, stories, or recipe information for this product..." rows={4} className={`${INPUT} resize-y min-h-[80px]`} />
                 </div>
 
-                <div className="flex items-center justify-between p-6 bg-brand/5 rounded-[2.5rem] border border-brand/10 transition-all hover:bg-brand/[0.08]">
-                  <div className="flex items-center space-x-4">
-                    <div className={`p-3 rounded-2xl transition-all ${isFeatured ? "bg-brand-accent/20 text-black-accent" : "bg-brand/10 text-black/30"}`}>
-                      <Sparkles size={20} className={isFeatured ? "animate-pulse" : ""} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between p-6 bg-brand/5 rounded-[2.5rem] border border-brand/10 transition-all hover:bg-brand/[0.08]">
+                    <div className="flex items-center space-x-4">
+                      <div className={`p-3 rounded-2xl transition-all ${isFeatured ? "bg-brand-accent/20 text-black-accent" : "bg-brand/10 text-black/30"}`}>
+                        <Sparkles size={20} className={isFeatured ? "animate-pulse" : ""} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black text-black uppercase tracking-widest">Featured Product</p>
+                        <p className="text-[10px] text-black/40 font-medium">Spotlight this item on the homepage</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-xs font-black text-black uppercase tracking-widest">Featured Product</p>
-                      <p className="text-[10px] text-black/40 font-medium">Spotlight this item on the homepage</p>
-                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => setIsFeatured(!isFeatured)} 
+                      className={`w-14 h-7 rounded-full transition-all relative flex items-center px-1 ${isFeatured ? "bg-brand-accent shadow-[0_0_15px_rgba(197,160,89,0.3)]" : "bg-brand/20"}`}
+                    >
+                      <div className={`w-5 h-5 rounded-full bg-white shadow-lg transition-transform duration-300 ease-out ${isFeatured ? "translate-x-7" : "translate-x-0"}`} />
+                    </button>
                   </div>
-                  <button 
-                    type="button" 
-                    onClick={() => setIsFeatured(!isFeatured)} 
-                    className={`w-14 h-7 rounded-full transition-all relative flex items-center px-1 ${isFeatured ? "bg-brand-accent shadow-[0_0_15px_rgba(197,160,89,0.3)]" : "bg-brand/20"}`}
-                  >
-                    <div className={`w-5 h-5 rounded-full bg-white shadow-lg transition-transform duration-300 ease-out ${isFeatured ? "translate-x-7" : "translate-x-0"}`} />
-                  </button>
+
+                  <div className="flex items-center justify-between p-6 bg-brand/5 rounded-[2.5rem] border border-brand/10 transition-all hover:bg-brand/[0.08]">
+                    <div className="flex items-center space-x-4">
+                      <div className={`p-3 rounded-2xl transition-all ${isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}>
+                        <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-green-600' : 'bg-red-500'}`} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black text-black uppercase tracking-widest">Display Status</p>
+                        <p className="text-[10px] text-black/40 font-medium">{isActive ? "Visible on storefront" : "Hidden from customers"}</p>
+                      </div>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => setIsActive(!isActive)} 
+                      className={`w-14 h-7 rounded-full transition-all relative flex items-center px-1 ${isActive ? "bg-green-600 shadow-[0_0_15px_rgba(34,197,94,0.3)]" : "bg-gray-300"}`}
+                    >
+                      <div className={`w-5 h-5 rounded-full bg-white shadow-lg transition-transform duration-300 ease-out ${isActive ? "translate-x-7" : "translate-x-0"}`} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1285,16 +1330,32 @@ export default function ProductManagement() {
                           {off > 0 && <span className="text-[8px] text-green-600 font-bold">{off}% OFF</span>}
                         </div>
                         <div className="flex items-center justify-between mt-2">
-                           <button 
-                             onClick={(e) => {
-                               e.stopPropagation();
-                               openStockModal(product);
-                             }}
-                             title="Click to manage stock"
-                             className={`text-[8px] font-black px-2 py-0.5 rounded-full hover:scale-105 active:scale-95 transition-all cursor-pointer ${(product.totalStock || 0) > 10 ? "bg-green-50 text-green-600 border border-green-100" : "bg-red-50 text-red-600 border border-red-100"}`}
-                           >
-                            {product.totalStock || 0} STOCK
-                          </button>
+                           <div className="flex items-center space-x-1">
+                             <button 
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 openStockModal(product);
+                               }}
+                               title="Click to manage stock"
+                               className={`text-[8px] font-black px-2 py-0.5 rounded-full hover:scale-105 active:scale-95 transition-all cursor-pointer ${(product.totalStock || 0) > 10 ? "bg-green-50 text-green-600 border border-green-100" : "bg-red-50 text-red-600 border border-red-100"}`}
+                             >
+                              {product.totalStock || 0} STOCK
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleActiveProduct(product);
+                              }}
+                              title={product.isActive !== false ? "Click to Hide Product" : "Click to Display Product"}
+                              className={`text-[8px] font-black px-2 py-0.5 rounded-full hover:scale-105 active:scale-95 transition-all cursor-pointer border ${
+                                product.isActive !== false 
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
+                                  : "bg-red-50 text-red-600 border-red-200"
+                              }`}
+                            >
+                              {product.isActive !== false ? "ENABLED" : "DISABLED"}
+                            </button>
+                          </div>
                           <div className="flex space-x-1">
                             <button onClick={() => handleEdit(product.id)} className={`p-1.5 rounded-lg transition-all ${isCurrentlyEditing ? "bg-brand text-[#064e3b]" : "bg-brand/5 text-black hover:bg-brand hover:text-white"}`}><Edit3 size={10} /></button>
                             <button onClick={() => handleDelete(product.id)} className="p-1.5 bg-red-50 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-all"><Trash2 size={10} /></button>

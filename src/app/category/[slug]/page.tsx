@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { navigationMenu, pageSections, products, homepageCategories, productVariations } from "@/db/schema";
-import { eq, inArray, asc, or } from "drizzle-orm";
+import { eq, inArray, asc, or, and } from "drizzle-orm";
 import CategoryFilterSection from "@/components/CategoryFilterSection";
 import Link from "next/link";
 
@@ -15,7 +15,7 @@ export default async function CategoryPage({ params }: PageProps) {
   const href = `/category/${slug}`;
   const menuResult = await db.select()
     .from(navigationMenu)
-    .where(eq(navigationMenu.href, href))
+    .where(and(eq(navigationMenu.href, href), eq(navigationMenu.isActive, true)))
     .limit(1);
 
   let categoryName = "";
@@ -24,6 +24,7 @@ export default async function CategoryPage({ params }: PageProps) {
 
   const homeCatResult = await db.select()
     .from(homepageCategories)
+    .where(eq(homepageCategories.isActive, true))
     .limit(100);
 
   let matchingHomeCat = homeCatResult.find(
@@ -73,7 +74,7 @@ export default async function CategoryPage({ params }: PageProps) {
         if (productIds.length > 0) {
           hydratedProducts = await db.select()
             .from(products)
-            .where(inArray(products.id, productIds));
+            .where(and(inArray(products.id, productIds), eq(products.isActive, true)));
         }
 
         return {
@@ -91,10 +92,13 @@ export default async function CategoryPage({ params }: PageProps) {
     displayProducts = await db.select()
       .from(products)
       .where(
-        or(
-          eq(products.category, categoryName),
-          eq(products.category, slug),
-          eq(products.category, categorySlug)
+        and(
+          or(
+            eq(products.category, categoryName),
+            eq(products.category, slug),
+            eq(products.category, categorySlug)
+          ),
+          eq(products.isActive, true)
         )
       );
   }

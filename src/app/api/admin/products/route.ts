@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       avgRating, numReviews, category, gender, colors, tags, isFeatured, 
       isCustomizable, enabledMeasurements,
       style, fabricComposition, weave, neckStyle, keyWords, filterCategory,
-      specifications
+      specifications, isActive
     } = body;
 
     // Validation
@@ -129,6 +129,7 @@ export async function POST(request: Request) {
         gender: (gender as "men" | "women" | "unisex") || "unisex",
         tags: tags || null,
         isFeatured: !!isFeatured,
+        isActive: isActive !== undefined ? !!isActive : true,
         isCustomizable: !!isCustomizable,
         enabledMeasurements: enabledMeasurements || null,
         style: style || null,
@@ -185,7 +186,7 @@ export async function PATCH(request: Request) {
       avgRating, numReviews, category, gender, colors, tags, isFeatured, 
       isCustomizable, enabledMeasurements,
       style, fabricComposition, weave, neckStyle, keyWords, filterCategory,
-      specifications
+      specifications, isActive
     } = body;
 
     if (!id) return NextResponse.json({ success: false, error: "ID is required" }, { status: 400 });
@@ -230,6 +231,7 @@ export async function PATCH(request: Request) {
     if (gender !== undefined) updateData.gender = gender;
     if (tags !== undefined) updateData.tags = tags;
     if (isFeatured !== undefined) updateData.isFeatured = !!isFeatured;
+    if (isActive !== undefined) updateData.isActive = !!isActive;
     if (isCustomizable !== undefined) updateData.isCustomizable = !!isCustomizable;
     if (enabledMeasurements !== undefined) updateData.enabledMeasurements = enabledMeasurements;
     if (style !== undefined) updateData.style = style || null;

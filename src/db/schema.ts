@@ -43,6 +43,7 @@ export const products = sqliteTable("products", {
   keyWords: text("key_words"),
   filterCategory: text("filter_category"),
   specifications: text("specifications"),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
   createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
 });
 
@@ -155,6 +156,7 @@ export const homepageCategories = sqliteTable("homepage_categories", {
   link: text("link"),
   order: integer("order").notNull().default(0),
   filterTypes: text("filter_types"),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
   createdAt: text("created_at").$defaultFn(() => new Date().toISOString()),
 });
 

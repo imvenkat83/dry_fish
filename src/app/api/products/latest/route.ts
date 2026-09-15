@@ -26,6 +26,7 @@ export async function GET() {
     })
     .from(products)
     .leftJoin(productVariations, eq(products.id, productVariations.productId))
+    .where(eq(products.isActive, true))
     .groupBy(products.id)
     .orderBy(desc(products.id))
     .limit(8);

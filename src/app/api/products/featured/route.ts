@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { products, productVariations } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -22,7 +22,7 @@ export async function GET() {
     })
     .from(products)
     .leftJoin(productVariations, eq(products.id, productVariations.productId))
-    .where(eq(products.isFeatured, true))
+    .where(and(eq(products.isFeatured, true), eq(products.isActive, true)))
     .groupBy(products.id);
 
     return NextResponse.json({ success: true, data: results });

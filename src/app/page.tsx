@@ -63,12 +63,7 @@ export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Landing Page Video & Background Preload State
-  const [showLandingVideo, setShowLandingVideo] = useState(() => {
-    if (typeof window !== "undefined") {
-      return !document.documentElement.classList.contains("landing-dismissed");
-    }
-    return true;
-  });
+  const [showLandingVideo, setShowLandingVideo] = useState(false);
   const [isPreloadComplete, setIsPreloadComplete] = useState(false);
   const landingVideoRef = useRef<HTMLVideoElement>(null);
 

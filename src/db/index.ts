@@ -25,6 +25,9 @@ if (process.env.NODE_ENV !== "production") {
 
 // Auto-ensure required tables & columns exist
 client.execute("ALTER TABLE users ADD COLUMN email TEXT;").catch(() => {});
+client.execute("ALTER TABLE products ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1;").catch(() => {});
+client.execute("ALTER TABLE homepage_categories ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1;").catch(() => {});
+client.execute("ALTER TABLE navigation_menu ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1;").catch(() => {});
 client.execute(`
   CREATE TABLE IF NOT EXISTS reels (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

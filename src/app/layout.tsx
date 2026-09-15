@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import "./globals.css";
 
+import Script from "next/script";
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -43,14 +45,14 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${inter.variable} ${playfair.variable} antialiased`}
     >
-      <head>
-        <script
+      <body className="min-h-screen bg-brand-light font-inter text-brand-dark flex flex-col">
+        <Script
+          id="vk-landing-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var n=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];var r=n&&n.type==='reload';var s=sessionStorage.getItem('vk_landing_seen')==='true';if(s||r){document.documentElement.classList.add('landing-dismissed');}}catch(e){}})();`,
           }}
         />
-      </head>
-      <body className="min-h-screen bg-brand-light font-inter text-brand-dark flex flex-col">
         <AnnouncementBar />
         <Navbar />
         <main className="flex-1">

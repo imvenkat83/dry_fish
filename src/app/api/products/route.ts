@@ -22,6 +22,7 @@ export async function GET() {
     })
     .from(products)
     .leftJoin(productVariations, eq(products.id, productVariations.productId))
+    .where(eq(products.isActive, true))
     .groupBy(products.id);
 
     return NextResponse.json({ success: true, data: results });

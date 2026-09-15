@@ -27,6 +27,7 @@ interface HomepageCategory {
   link: string | null;
   order: number;
   filterTypes?: string | null;
+  isActive?: boolean | number;
 }
 
 export default function CategorySettingsPage() {
@@ -49,12 +50,13 @@ export default function CategorySettingsPage() {
   const [link, setLink] = useState("");
   const [order, setOrder] = useState(0);
   const [filterTypes, setFilterTypes] = useState("");
+  const [isActive, setIsActive] = useState(true);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/admin/homepage-categories");
+      const res = await fetch("/api/admin/homepage-categories?all=true");
       const data = await res.json();
       if (data.success) {
         setCategories(data.data);
@@ -86,6 +88,7 @@ export default function CategorySettingsPage() {
     setLink("");
     setOrder(categories.length);
     setFilterTypes("");
+    setIsActive(true);
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -169,6 +172,7 @@ export default function CategorySettingsPage() {
       link: defaultLink,
       order: Number(order) || 0,
       filterTypes: null,
+      isActive: isActive,
     };
 
     try {
@@ -213,6 +217,28 @@ export default function CategorySettingsPage() {
     setLink(item.link || "");
     setOrder(item.order);
     setFilterTypes(item.filterTypes || "");
+    setIsActive(item.isActive !== false);
+  };
+
+  const handleToggleActive = async (item: HomepageCategory) => {
+    const newStatus = !(item.isActive !== false);
+    try {
+      const res = await fetch("/api/admin/homepage-categories", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: item.id, isActive: newStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSuccess(`Category "${item.name}" ${newStatus ? "enabled" : "disabled"}`);
+        fetchData();
+        router.refresh();
+      } else {
+        setError(data.error || "Failed to update category status");
+      }
+    } catch (err) {
+      setError("Network error");
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -367,6 +393,29 @@ export default function CategorySettingsPage() {
             </div>
 
 
+            <div>
+              <label className="block text-[10px] font-black text-black/40 uppercase tracking-[0.2em] mb-2 ml-1">
+                Display Status
+              </label>
+              <button 
+                type="button"
+                onClick={() => setIsActive(!isActive)}
+                className={`w-full py-3 px-5 rounded-2xl border-2 transition-all font-bold text-xs uppercase tracking-widest flex items-center justify-between cursor-pointer ${
+                  isActive 
+                    ? "border-green-100 bg-green-50 text-green-700" 
+                    : "border-gray-200 bg-gray-50 text-gray-400"
+                }`}
+              >
+                <span className="flex items-center space-x-2">
+                  <span className={`w-2.5 h-2.5 rounded-full ${isActive ? 'bg-green-500' : 'bg-gray-400'}`}></span>
+                  <span>{isActive ? "Displayed (Enabled)" : "Hidden (Disabled)"}</span>
+                </span>
+                <span className={`text-[10px] px-2.5 py-1 rounded-full font-black ${isActive ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
+                  {isActive ? "ENABLE" : "DISABLE"}
+                </span>
+              </button>
+            </div>
+
             {(() => {
               const isFormValid = name.trim().length > 0 && imageUrl.trim().length > 0;
               
@@ -408,7 +457,7 @@ export default function CategorySettingsPage() {
         <div className="lg:col-span-7 space-y-6">
           <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-brand/5">
             <h2 className="text-xl font-playfair font-bold text-black mb-6 border-b border-brand/5 pb-4">
-              Active Category Cards ({categories.length})
+              Category Cards ({categories.length})
             </h2>
 
             {categories.length === 0 ? (
@@ -419,78 +468,97 @@ export default function CategorySettingsPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {categories.map((item, index) => (
-                  <div 
-                    key={item.id} 
-                    className="relative border border-brand/5 bg-brand-light/40 rounded-3xl p-5 flex flex-col group hover:shadow-md transition-all duration-300"
-                  >
-                    {/* Visual Card Display */}
-                    <div className="flex gap-4 items-center">
-                      <div className="w-20 h-20 bg-white rounded-full overflow-hidden shadow-sm border-[3px] border-[#064e3b]/20 relative flex-shrink-0">
-                        <img 
-                          src={item.imageUrl && item.imageUrl.includes(",") ? item.imageUrl.split(",")[0] : item.imageUrl} 
-                          alt={item.name} 
-                          className="w-full h-full object-cover" 
-                          onError={e => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = "/images/placeholder.png";
-                          }}
-                        />
-                      </div>
-                      
-                      {/* Info & Metadata */}
-                      <div className="flex-1 flex flex-col justify-center py-1 min-w-0">
-                        <div>
-                          <h3 className="font-playfair font-bold text-black text-lg truncate leading-tight">{item.name}</h3>
-                          <span className="text-[10px] text-black/40 uppercase tracking-widest font-black block mt-1">
-                            Link: <span className="text-black/60 font-semibold lowercase tracking-normal truncate inline-block max-w-[120px] align-middle">{item.link || "none"}</span>
+                {categories.map((item, index) => {
+                  const isCatActive = item.isActive !== false;
+                  return (
+                    <div 
+                      key={item.id} 
+                      className={`relative border rounded-3xl p-5 flex flex-col justify-between group hover:shadow-md transition-all duration-300 ${
+                        isCatActive 
+                          ? "border-brand/10 bg-white" 
+                          : "border-red-100 bg-red-50/20 opacity-75"
+                      }`}
+                    >
+                      {/* Visual Card Header */}
+                      <div className="flex gap-4 items-center">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full overflow-hidden shadow-sm border-[3px] border-[#064e3b]/20 relative flex-shrink-0">
+                          <img 
+                            src={item.imageUrl && item.imageUrl.includes(",") ? item.imageUrl.split(",")[0] : item.imageUrl} 
+                            alt={item.name} 
+                            className="w-full h-full object-cover" 
+                            onError={e => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = "/images/placeholder.png";
+                            }}
+                          />
+                        </div>
+                        
+                        {/* Info & Title */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <h3 className="font-playfair font-bold text-black text-base sm:text-lg truncate leading-tight">{item.name}</h3>
+                            <button
+                              onClick={() => handleToggleActive(item)}
+                              className={`px-2.5 py-1 rounded-full font-black text-[9px] uppercase tracking-widest transition-all cursor-pointer border flex items-center space-x-1 shrink-0 ${
+                                isCatActive 
+                                  ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100" 
+                                  : "bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                              }`}
+                              title={isCatActive ? "Click to Disable" : "Click to Enable"}
+                            >
+                              <span className={`w-1.5 h-1.5 rounded-full ${isCatActive ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                              <span>{isCatActive ? "ENABLED" : "DISABLED"}</span>
+                            </button>
+                          </div>
+                          <span className="text-[10px] text-black/40 uppercase tracking-widest font-black block mt-1 truncate">
+                            Link: <span className="text-black/60 font-semibold lowercase tracking-normal">{item.link || "none"}</span>
                           </span>
                         </div>
+                      </div>
 
-                        {/* Control Actions */}
-                        <div className="flex flex-col gap-2 mt-3">
-                          {/* Row 1: Edit / Delete */}
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => handleEditClick(item)}
-                              className="p-2.5 bg-white text-black hover:text-[#C5A059] rounded-xl shadow-sm border border-brand/5 hover:scale-105 transition-all flex items-center justify-center w-9 h-9"
-                              title="Edit Card"
-                            >
-                              <Edit3 size={14} />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(item.id)}
-                              className="p-2.5 bg-white text-red-500 hover:bg-red-50 rounded-xl shadow-sm border border-brand/5 hover:scale-105 transition-all flex items-center justify-center w-9 h-9"
-                              title="Delete Card"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
+                      {/* Footer Controls Row */}
+                      <div className="flex items-center justify-between mt-4 pt-3 border-t border-brand/5">
+                        {/* Reorder Buttons */}
+                        <div className="flex items-center space-x-1.5">
+                          <button
+                            onClick={() => handleReorder(index, "up")}
+                            disabled={index === 0}
+                            className="p-2 bg-brand/5 text-black hover:text-[#C5A059] hover:bg-brand/10 rounded-xl transition-all disabled:opacity-20 flex items-center justify-center w-8 h-8 cursor-pointer"
+                            title="Move Up"
+                          >
+                            <ArrowUp size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleReorder(index, "down")}
+                            disabled={index === categories.length - 1}
+                            className="p-2 bg-brand/5 text-black hover:text-[#C5A059] hover:bg-brand/10 rounded-xl transition-all disabled:opacity-20 flex items-center justify-center w-8 h-8 cursor-pointer"
+                            title="Move Down"
+                          >
+                            <ArrowDown size={14} />
+                          </button>
+                        </div>
 
-                          {/* Row 2: Reorder */}
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => handleReorder(index, "up")}
-                              disabled={index === 0}
-                              className="p-2.5 bg-white text-black hover:text-[#C5A059] rounded-xl shadow-sm border border-brand/5 disabled:opacity-30 flex items-center justify-center w-9 h-9"
-                              title="Move Up"
-                            >
-                              <ArrowUp size={14} />
-                            </button>
-                            <button
-                              onClick={() => handleReorder(index, "down")}
-                              disabled={index === categories.length - 1}
-                              className="p-2.5 bg-white text-black hover:text-[#C5A059] rounded-xl shadow-sm border border-brand/5 disabled:opacity-30 flex items-center justify-center w-9 h-9"
-                              title="Move Down"
-                            >
-                              <ArrowDown size={14} />
-                            </button>
-                          </div>
+                        {/* Action Buttons: Edit & Delete */}
+                        <div className="flex items-center space-x-1.5">
+                          <button
+                            onClick={() => handleEditClick(item)}
+                            className="p-2 bg-brand/5 text-black hover:bg-[#8c6239] hover:text-white rounded-xl transition-all flex items-center justify-center w-8 h-8 cursor-pointer"
+                            title="Edit Card"
+                          >
+                            <Edit3 size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            className="p-2 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all flex items-center justify-center w-8 h-8 cursor-pointer"
+                            title="Delete Card"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
