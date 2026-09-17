@@ -20,30 +20,32 @@ function parseJwt(token: string) {
 }
 
 /**
- * Validates the session cookie value. Supports both Firebase ID Tokens (JWT) 
- * and local 10-digit plain phone mock sessions for development/testing environment.
+ * Validates the session cookie value in middleware Edge runtime.
  */
 function verifySession(token: string | undefined): { phone: string } | null {
   if (!token) return null;
 
-  // Support local developer mock session (10-digit number) only in non-production
+  // Support local developer mock session (10-digit number) strictly in development
   const isRawPhone = /^\d{10}$/.test(token);
-  if (isRawPhone && process.env.NODE_ENV !== "production") {
+  if (isRawPhone && process.env.NODE_ENV === "development") {
     return { phone: token };
   }
 
-  // Parse and verify Firebase JWT
+  // Parse JWT payload (backend session token or Firebase ID token)
   const payload = parseJwt(token);
   if (!payload) return null;
 
-  const isExpired = payload.exp * 1000 < Date.now();
-  if (isExpired) return null;
+  if (payload.exp && payload.exp * 1000 < Date.now()) {
+    return null;
+  }
 
-  const phone = payload.phone_number;
-  if (!phone) return null;
+  const phone = payload.phone || payload.phone_number;
+  if (!phone || typeof phone !== "string") return null;
 
   // Strip country code (+91)
-  const cleanPhone = phone.replace(/^\+91/, "").replace(/\D/g, "");
+  const cleanPhone = phone.replace(/^\+91/, "").replace(/\D/g, "").slice(-10);
+  if (cleanPhone.length !== 10) return null;
+
   return { phone: cleanPhone };
 }
 
@@ -60,8 +62,6 @@ export function proxy(request: NextRequest) {
 
   const userSession = verifySession(sessionCookie);
   const adminSession = verifySession(adminSessionCookie);
-
-  console.log(`[Middleware Debug] Path: ${pathname}, auth_session: ${sessionCookie} (valid: ${!!userSession}), admin_session: ${adminSessionCookie} (valid: ${!!adminSession})`);
 
   // 1. If user is logged in, don't let them go to the login page
   if (userSession && pathname === "/login") {

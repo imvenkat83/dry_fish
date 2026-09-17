@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
 import { isAdminPhone } from "@/utils/admin-helper";
+import { verifySessionToken } from "@/utils/auth-token";
 
 /**
- * Verifies the Firebase ID Token from a session cookie and returns the normalized 10-digit phone number.
- * Supports a local plain 10-digit phone number fallback in development/test.
+ * Verifies the session cookie and returns the normalized 10-digit phone number.
  */
 export async function getVerifiedPhoneFromCookie(cookieName: "auth_session" | "admin_session"): Promise<string | null> {
   try {
@@ -11,21 +11,10 @@ export async function getVerifiedPhoneFromCookie(cookieName: "auth_session" | "a
     const token = cookieStore.get(cookieName)?.value;
     if (!token) return null;
 
-    // Support local developer mock session (10-digit number) only in non-production
-    const isRawPhone = /^\d{10}$/.test(token);
-    if (isRawPhone && process.env.NODE_ENV !== "production") {
-      return token;
-    }
+    const verified = await verifySessionToken(token);
+    if (!verified) return null;
 
-    // Securely verify session cookie using Firebase Admin SDK
-    const { adminAuth } = await import("./firebase-admin");
-    if (!adminAuth) return null;
-    const decoded = await adminAuth.verifySessionCookie(token);
-    const phone = decoded.phone_number;
-    if (!phone) return null;
-
-    // Normalize to 10-digit phone number by stripping country code (+91)
-    return phone.replace(/^\+91/, "").replace(/\D/g, "");
+    return verified.phone;
   } catch (error) {
     console.error(`[Auth Helper] Failed to verify token in cookie '${cookieName}':`, error);
     return null;
@@ -40,4 +29,3 @@ export async function isAdminAuthenticated(): Promise<boolean> {
   if (!phone) return false;
   return isAdminPhone(phone);
 }
-

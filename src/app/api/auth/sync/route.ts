@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { isAdminPhone } from "@/utils/admin-helper";
+import { verifyFirebaseIdToken, createSessionToken } from "@/utils/auth-token";
 
 export async function POST(request: Request) {
   try {
@@ -15,73 +16,34 @@ export async function POST(request: Request) {
 
     let phone: string | null = null;
     let verifiedSessionToken: string | null = null;
-    let isFirebaseSession = false;
 
     if (idToken) {
-      // 1. Firebase Admin ID Token Verification
-      const { adminAuth, firebaseInitError } = await import("@/db/firebase-admin");
+      // 1. Verify Firebase ID Token via Google's official JWKS public keys using pure jose (Edge/Serverless compatible)
+      const verifiedFirebase = await verifyFirebaseIdToken(idToken);
 
-      if (adminAuth) {
-        try {
-          const decodedToken = await adminAuth.verifyIdToken(idToken);
-          const firebasePhoneRaw = decodedToken.phone_number;
+      if (!verifiedFirebase) {
+        return NextResponse.json(
+          { success: false, error: "Invalid or expired Firebase authentication token." },
+          { status: 401 }
+        );
+      }
 
-          if (!firebasePhoneRaw) {
-            return NextResponse.json(
-              { success: false, error: "Verified Firebase token does not contain a phone number." },
-              { status: 400 }
-            );
-          }
+      phone = verifiedFirebase.phone;
 
-          const tokenPhone = firebasePhoneRaw.replace(/^\+91/, "").replace(/\D/g, "").slice(-10);
-
-          // Verify token phone matches requested phone if provided
-          if (rawPhone) {
-            const clientPhone = rawPhone.replace(/^\+91/, "").replace(/\D/g, "").slice(-10);
-            if (clientPhone && clientPhone !== tokenPhone) {
-              return NextResponse.json(
-                { success: false, error: "Phone number mismatch between token and request." },
-                { status: 400 }
-              );
-            }
-          }
-
-          phone = tokenPhone;
-
-          // Create Firebase Session Cookie (5 days duration)
-          const expiresIn = 1000 * 60 * 60 * 24 * 5;
-          try {
-            verifiedSessionToken = await adminAuth.createSessionCookie(idToken, { expiresIn });
-            isFirebaseSession = true;
-          } catch (cookieErr: any) {
-            console.warn("Failed to create Firebase session cookie, using ID token as fallback:", cookieErr.message);
-            verifiedSessionToken = idToken;
-          }
-        } catch (err: any) {
-          console.error("Firebase ID Token verification failed:", err.message);
+      // Verify token phone matches requested phone if provided
+      if (rawPhone) {
+        const clientPhone = rawPhone.replace(/^\+91/, "").replace(/\D/g, "").slice(-10);
+        if (clientPhone && clientPhone !== phone) {
           return NextResponse.json(
-            { success: false, error: "Invalid or expired Firebase authentication token." },
-            { status: 401 }
-          );
-        }
-      } else {
-        // Fallback for dev mode without Firebase Admin Service Account
-        if (process.env.NODE_ENV === "development" && rawPhone) {
-          console.warn("[Auth Sync] Firebase Admin not configured. Falling back to phone session in development mode.");
-          phone = rawPhone.replace(/^\+91/, "").replace(/\D/g, "").slice(-10);
-          verifiedSessionToken = phone;
-        } else {
-          return NextResponse.json(
-            { success: false, error: `Firebase Admin service unavailable: ${firebaseInitError}` },
-            { status: 500 }
+            { success: false, error: "Phone number mismatch between token and request." },
+            { status: 400 }
           );
         }
       }
     } else {
-      // 2. System OTP Fallback strictly for local development
+      // 2. Local development fallback only
       if (process.env.NODE_ENV === "development" && rawPhone) {
         phone = rawPhone.replace(/^\+91/, "").replace(/\D/g, "").slice(-10);
-        verifiedSessionToken = phone;
       } else {
         return NextResponse.json(
           { success: false, error: "Firebase ID Token is required for authentication." },
@@ -108,12 +70,13 @@ export async function POST(request: Request) {
     user = userResult[0];
 
     const isUserAdmin = isAdminPhone(phone);
+    const role: "admin" | "user" = isUserAdmin ? "admin" : "user";
 
     if (!user) {
       // Register new user with appropriate role based on ADMIN_NUMBERS env variable
       await db.insert(users).values({
         phoneNumber: phone,
-        role: isUserAdmin ? "admin" : "user",
+        role,
         lastLoginAt: new Date().toISOString(),
       });
       isNewUser = true;
@@ -131,17 +94,20 @@ export async function POST(request: Request) {
       }
     }
 
+    // Generate signed 30-day session token using pure WebCrypto / jose
+    verifiedSessionToken = await createSessionToken(phone, role);
+
     const cookieName = isUserAdmin ? "admin_session" : "auth_session";
-    const maxAge = isFirebaseSession ? 60 * 60 * 24 * 5 : 60 * 60 * 24 * 30;
+    const maxAge = 60 * 60 * 24 * 30; // 30 days
 
     const response = NextResponse.json({
       success: true,
       isNewUser,
-      role: isUserAdmin ? "admin" : "user",
+      role,
       message: isNewUser ? "Welcome! Please complete your profile." : "Authentication successful."
     });
 
-    response.cookies.set(cookieName, verifiedSessionToken || phone, {
+    response.cookies.set(cookieName, verifiedSessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -159,4 +125,3 @@ export async function POST(request: Request) {
     }, { status: 500 });
   }
 }
-
