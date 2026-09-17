@@ -1,9 +1,8 @@
-import { getApps, initializeApp, cert } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
+import * as admin from "firebase-admin";
 
-const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL || process.env.FIREBASE_CLIENT_EMAIL;
-const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY || process.env.FIREBASE_PRIVATE_KEY;
+const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+const privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
 let adminAuth: any = null;
 let firebaseInitError: string | null = null;
@@ -11,7 +10,7 @@ let firebaseInitError: string | null = null;
 const isDummyKey = !privateKey || privateKey.includes("...") || privateKey.includes("your-") || privateKey.includes("placeholder");
 
 // Safeguard against multiple initializations during Next.js hot-reloading
-if (getApps().length === 0) {
+if (admin.getApps().length === 0) {
   if (projectId && clientEmail && privateKey && !isDummyKey) {
     // Newline and quotes fix for private keys loaded from environment variables
     let formattedPrivateKey = privateKey;
@@ -22,13 +21,14 @@ if (getApps().length === 0) {
     formattedPrivateKey = formattedPrivateKey.replace(/['"]/g, "").replace(/\\n/g, "\n").trim();
 
     try {
-      initializeApp({
-        credential: cert({
+      admin.initializeApp({
+        credential: (admin as any).credential.cert({
           projectId,
           clientEmail,
           privateKey: formattedPrivateKey,
         }),
       });
+
       console.log("[Firebase Admin] Initialized successfully with credentials.");
     } catch (err: any) {
       firebaseInitError = `Initialization failed: ${err.message}`;
@@ -46,10 +46,13 @@ if (getApps().length === 0) {
 }
 
 // Only expose auth service if an app is successfully initialized
-if (getApps().length > 0) {
-  adminAuth = getAuth();
+if (admin.getApps().length > 0) {
+  adminAuth = (admin as any).auth();
 } else if (!firebaseInitError) {
+
   firebaseInitError = "No firebase apps exist after initialization check.";
 }
+
+
 
 export { adminAuth, firebaseInitError };

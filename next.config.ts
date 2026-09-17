@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   // turbopack: {
   //   root: '.',
   // },
-  serverExternalPackages: ['firebase-admin'],
+  serverExternalPackages: ['firebase-admin', 'jwks-rsa', 'jose'],
+
   experimental: {
     scrollRestoration: true,
   },
