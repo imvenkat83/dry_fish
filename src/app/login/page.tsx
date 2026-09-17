@@ -390,7 +390,15 @@ export default function Login() {
       </div>
 
       <p className="mt-10 text-center text-[10px] text-black/40 max-w-xs leading-relaxed uppercase tracking-widest font-bold">
-        Secure login powered by Dry Fish Basket. By continuing, you agree to our <a href="#" className="text-black hover:underline">Terms</a> & <a href="#" className="text-black hover:underline">Privacy</a>.
+        Secure login powered by Dry Fish Basket. By continuing, you agree to our{" "}
+        <Link href="/terms-conditions" className="text-black hover:underline">
+          Terms
+        </Link>{" "}
+        &amp;{" "}
+        <Link href="/privacy-policy" className="text-black hover:underline">
+          Privacy
+        </Link>
+        .
       </p>
     </div>
   );
