@@ -165,6 +165,38 @@ export default function Home() {
     dismissLandingVideo();
   };
 
+  // Viewport IntersectionObserver: Pause hero video when out of viewport, resume timestamp when visible
+  useEffect(() => {
+    if (showLandingVideo) return;
+
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Hero video visible in viewport: resume playing from current timestamp
+            const playPromise = vid.play();
+            if (playPromise !== undefined) {
+              playPromise.catch(() => {});
+            }
+          } else {
+            // Hero video scrolled out of viewport: pause (preserves current timestamp)
+            vid.pause();
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(vid);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [showLandingVideo]);
+
   useEffect(() => {
     function preloadImage(url: string): Promise<void> {
       return new Promise((resolve) => {

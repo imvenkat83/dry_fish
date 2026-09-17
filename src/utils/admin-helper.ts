@@ -1,16 +1,16 @@
 /**
  * Utility for parsing and validating administrative phone numbers.
- * Supports up to 5 comma-separated admin phone numbers from environment variables.
+ * Supports comma-separated admin phone numbers from the ADMIN_NUMBERS environment variable.
  */
 
 export function getAdminPhones(): string[] {
-  const envVal = process.env.ADMIN_PHONE_NUMBER || "9999999999";
+  const envVal = process.env.ADMIN_NUMBERS || "";
   return envVal
     .split(",")
     .map((num) => num.replace(/\D/g, "").slice(-10)) // Normalizes to 10 digits
-    .filter((num) => num.length === 10)
-    .slice(0, 5); // Ignore everything after the first 5 numbers
+    .filter((num) => num.length === 10);
 }
+
 
 export function isAdminPhone(phone: string): boolean {
   if (!phone) return false;
@@ -19,3 +19,4 @@ export function isAdminPhone(phone: string): boolean {
   const adminPhones = getAdminPhones();
   return adminPhones.includes(normalizedInput);
 }
+

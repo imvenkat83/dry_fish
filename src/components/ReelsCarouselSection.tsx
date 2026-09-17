@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { 
   Eye, 
   Play, 
+  Pause,
   ChevronLeft, 
   ChevronRight, 
   Star, 
-  ShoppingBag,
   Sparkles
 } from "lucide-react";
 import { getProductImageUrls } from "@/utils/product";
@@ -32,6 +32,175 @@ interface ReelData {
     images?: any;
     category?: string;
   } | null;
+}
+
+function ReelCardItem({
+  reel,
+  onOpenProductModal,
+}: {
+  reel: ReelData;
+  onOpenProductModal: (product: any) => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const togglePlayPause = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        const playPromise = videoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => setIsPlaying(true))
+            .catch(() => {});
+        }
+      } else {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      }
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (videoRef.current) {
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch(() => {
+            // Auto-play was prevented or interrupted
+          });
+      }
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+      setIsPlaying(false);
+    }
+  };
+
+  const product = reel.product;
+  const productImages = getProductImageUrls(product?.images);
+  const productImage =
+    productImages.length > 0 ? productImages[0] : "/images/placeholder.png";
+
+  return (
+    <div
+      className="snap-start flex-shrink-0 w-[220px] sm:w-[250px] md:w-[270px] aspect-[9/16] relative rounded-3xl overflow-hidden shadow-lg border-2 border-[#3b2314]/25 bg-black group/reel cursor-pointer transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={togglePlayPause}
+    >
+      {/* Muted Video - played on mouse hover or click */}
+      <video
+        ref={videoRef}
+        src={reel.videoUrl}
+        poster={reel.thumbnailUrl || undefined}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        className="w-full h-full object-cover group-hover/reel:scale-105 transition-transform duration-700"
+      />
+
+      {/* Video Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none" />
+
+      {/* Top Badges */}
+      <div className="absolute top-3 inset-x-3 flex items-center justify-between z-10 pointer-events-none">
+        <span className="px-2.5 py-1 bg-[#2563eb] text-white font-black text-[9px] uppercase tracking-widest rounded-md shadow-md">
+          {reel.badgeText || "NEW"}
+        </span>
+        <span className="px-2.5 py-1 bg-black/60 backdrop-blur-md text-white font-bold text-[10px] tracking-wider rounded-md shadow-md flex items-center gap-1">
+          <Eye size={12} />
+          <span>{reel.viewsCount || "2.5M"}</span>
+        </span>
+      </div>
+
+      {/* Center Translucent Play / Pause Button Overlay */}
+      <div
+        className={`absolute inset-0 flex items-center justify-center pointer-events-auto transition-opacity duration-300 ${
+          isPlaying ? "opacity-0 group-hover/reel:opacity-100" : "opacity-80 group-hover/reel:opacity-100"
+        }`}
+        onClick={togglePlayPause}
+      >
+        <button
+          type="button"
+          aria-label={isPlaying ? "Pause video" : "Play video"}
+          className="w-12 h-12 rounded-full bg-black/50 text-white flex items-center justify-center border border-white/40 backdrop-blur-md shadow-xl group-hover/reel:scale-110 transition-transform cursor-pointer"
+        >
+          {isPlaying ? (
+            <Pause size={20} className="fill-white" />
+          ) : (
+            <Play size={20} className="fill-white ml-1" />
+          )}
+        </button>
+      </div>
+
+      {/* Bottom Linked Product Overlay Card */}
+      {product && (
+        <div
+          className="absolute bottom-3 inset-x-3 z-20 bg-white/95 backdrop-blur-md rounded-2xl p-2.5 border border-black/10 shadow-2xl flex items-center justify-between space-x-2 transition-transform duration-300 group-hover/reel:scale-[1.02] cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenProductModal(product);
+          }}
+        >
+          {/* Left: Product Thumbnail */}
+          <img
+            src={productImage}
+            alt={product.name}
+            className="w-11 h-11 rounded-xl object-cover border border-black/10 flex-shrink-0 bg-brand/5"
+          />
+
+          {/* Center: Product Info */}
+          <div className="min-w-0 flex-1">
+            <h4 className="text-[11px] font-black text-[#3b2314] truncate leading-tight">
+              {product.name}
+            </h4>
+
+            {/* Rating Stars */}
+            <div className="flex items-center gap-0.5 my-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  size={10}
+                  className={
+                    i < Math.floor(product.avgRating || 4.5)
+                      ? "fill-black text-black"
+                      : "text-black/20"
+                  }
+                />
+              ))}
+              <span className="text-[8px] font-bold text-gray-500 ml-1">
+                {product.numReviews || 992} REVIEWS
+              </span>
+            </div>
+
+            {/* Prices */}
+            <div className="flex items-baseline space-x-1.5 text-xs">
+              <span className="font-bold text-gray-400 line-through text-[10px]">
+                ₹{product.basePrice}
+              </span>
+              <span className="font-black text-[#3b2314]">
+                ₹{product.salePrice || product.basePrice}
+              </span>
+            </div>
+          </div>
+
+          {/* Right: Eye Quick View Icon */}
+          <div className="w-8 h-8 rounded-full bg-brand/10 text-[#3b2314] flex items-center justify-center flex-shrink-0 group-hover/reel:bg-[#8c6239] group-hover/reel:text-white transition-colors">
+            <Eye size={16} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ReelsCarouselSection() {
@@ -116,99 +285,13 @@ export default function ReelsCarouselSection() {
           ref={scrollContainerRef}
           className="flex gap-4 sm:gap-5 overflow-x-auto snap-x snap-mandatory no-scrollbar py-3 px-2 scroll-smooth"
         >
-          {reels.map((reel) => {
-            const product = reel.product;
-            const productImages = getProductImageUrls(product?.images);
-            const productImage = productImages.length > 0 ? productImages[0] : "/images/placeholder.png";
-
-            return (
-              <div
-                key={reel.id}
-                className="snap-start flex-shrink-0 w-[220px] sm:w-[250px] md:w-[270px] aspect-[9/16] relative rounded-3xl overflow-hidden shadow-lg border-2 border-[#3b2314]/25 bg-black group/reel cursor-pointer transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl"
-                onClick={() => product && handleOpenProductModal(product)}
-              >
-                {/* Auto-playing Muted Video */}
-                <video
-                  src={reel.videoUrl}
-                  poster={reel.thumbnailUrl || undefined}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="w-full h-full object-cover group-hover/reel:scale-105 transition-transform duration-700"
-                />
-
-                {/* Video Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none" />
-
-                {/* Top Badges */}
-                <div className="absolute top-3 inset-x-3 flex items-center justify-between z-10 pointer-events-none">
-                  <span className="px-2.5 py-1 bg-[#2563eb] text-white font-black text-[9px] uppercase tracking-widest rounded-md shadow-md">
-                    {reel.badgeText || "NEW"}
-                  </span>
-                  <span className="px-2.5 py-1 bg-black/60 backdrop-blur-md text-white font-bold text-[10px] tracking-wider rounded-md shadow-md flex items-center gap-1">
-                    <Eye size={12} />
-                    <span>{reel.viewsCount || "2.5M"}</span>
-                  </span>
-                </div>
-
-                {/* Center Translucent Play Icon */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-80 group-hover/reel:opacity-100 transition-opacity">
-                  <div className="w-12 h-12 rounded-full bg-black/40 text-white flex items-center justify-center border border-white/30 backdrop-blur-sm shadow-xl group-hover/reel:scale-110 transition-transform">
-                    <Play size={20} className="fill-white ml-1" />
-                  </div>
-                </div>
-
-                {/* Bottom Linked Product Overlay Card */}
-                {product && (
-                  <div className="absolute bottom-3 inset-x-3 z-20 bg-white/95 backdrop-blur-md rounded-2xl p-2.5 border border-black/10 shadow-2xl flex items-center justify-between space-x-2 transition-transform duration-300 group-hover/reel:scale-[1.02]">
-                    {/* Left: Product Thumbnail */}
-                    <img
-                      src={productImage}
-                      alt={product.name}
-                      className="w-11 h-11 rounded-xl object-cover border border-black/10 flex-shrink-0 bg-brand/5"
-                    />
-
-                    {/* Center: Product Info */}
-                    <div className="min-w-0 flex-1">
-                      <h4 className="text-[11px] font-black text-[#3b2314] truncate leading-tight">
-                        {product.name}
-                      </h4>
-
-                      {/* Rating Stars */}
-                      <div className="flex items-center gap-0.5 my-0.5">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            size={10}
-                            className={i < Math.floor(product.avgRating || 4.5) ? "fill-black text-black" : "text-black/20"}
-                          />
-                        ))}
-                        <span className="text-[8px] font-bold text-gray-500 ml-1">
-                          {product.numReviews || 992} REVIEWS
-                        </span>
-                      </div>
-
-                      {/* Prices */}
-                      <div className="flex items-baseline space-x-1.5 text-xs">
-                        <span className="font-bold text-gray-400 line-through text-[10px]">
-                          ₹{product.basePrice}
-                        </span>
-                        <span className="font-black text-[#3b2314]">
-                          ₹{product.salePrice || product.basePrice}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Right: Eye Quick View Icon */}
-                    <div className="w-8 h-8 rounded-full bg-brand/10 text-[#3b2314] flex items-center justify-center flex-shrink-0 group-hover/reel:bg-[#8c6239] group-hover/reel:text-white transition-colors">
-                      <Eye size={16} />
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {reels.map((reel) => (
+            <ReelCardItem
+              key={reel.id}
+              reel={reel}
+              onOpenProductModal={handleOpenProductModal}
+            />
+          ))}
         </div>
       </div>
 
@@ -221,3 +304,4 @@ export default function ReelsCarouselSection() {
     </section>
   );
 }
+

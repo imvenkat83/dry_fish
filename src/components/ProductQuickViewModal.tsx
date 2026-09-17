@@ -20,7 +20,8 @@ import {
 } from "lucide-react";
 import { getProductImageUrls } from "@/utils/product";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { useCartStore } from "@/store/useCartStore";
 
 interface Variation {
   id: number;
@@ -48,6 +49,9 @@ interface ProductQuickViewProps {
 
 export default function ProductQuickViewModal({ isOpen, onClose, product }: ProductQuickViewProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const addItem = useCartStore((state) => state.addItem);
+
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [fullProduct, setFullProduct] = useState<any | null>(null);
   const [selectedVariation, setSelectedVariation] = useState<Variation | null>(null);
@@ -116,21 +120,38 @@ export default function ProductQuickViewModal({ isOpen, onClose, product }: Prod
 
   const handleAddToCart = async () => {
     setIsAddingToCart(true);
+
     try {
-      const res = await fetch("/api/cart/sync", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId: currentProduct.id,
-          quantity: selectedPackCount,
-          weight: selectedWeight,
-          variationId: selectedVariation?.id,
-        }),
-      });
-      if (res.ok) {
-        setIsAddedSuccess(true);
-        setTimeout(() => setIsAddedSuccess(false), 2500);
+      const sessionRes = await fetch("/api/auth/session", { cache: "no-store" });
+      const sessionData = await sessionRes.json();
+      if (!sessionData || !sessionData.authenticated) {
+        window.location.href = `/login?redirect=${encodeURIComponent(pathname)}`;
+        return;
       }
+    } catch (err) {
+      window.location.href = `/login?redirect=${encodeURIComponent(pathname)}`;
+      return;
+    }
+
+    try {
+      const itemSize = selectedVariation?.size || selectedWeight || "Default";
+      const itemPrice = currentPrice;
+      const itemImage = displayImages.length > 0 ? displayImages[0] : "/images/placeholder.png";
+
+      addItem({
+        id: `prod_${currentProduct.id}_default_${itemSize}`,
+        productId: Number(currentProduct.id),
+        name: currentProduct.name,
+        price: itemPrice,
+        image: itemImage,
+        quantity: selectedPackCount || 1,
+        size: itemSize,
+        color: "default",
+        customizations: null,
+      });
+
+      setIsAddedSuccess(true);
+      setTimeout(() => setIsAddedSuccess(false), 2500);
     } catch (err) {
       console.error("Failed to add to cart", err);
     } finally {

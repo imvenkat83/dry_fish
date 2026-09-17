@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { isAdminPhone } from "@/utils/admin-helper";
 
 /**
  * Verifies the Firebase ID Token from a session cookie and returns the normalized 10-digit phone number.
@@ -32,11 +33,11 @@ export async function getVerifiedPhoneFromCookie(cookieName: "auth_session" | "a
 }
 
 /**
- * Checks if the current admin session is valid and corresponds to the designated administrator phone number.
+ * Checks if the current admin session is valid and corresponds to designated administrator phone numbers.
  */
 export async function isAdminAuthenticated(): Promise<boolean> {
   const phone = await getVerifiedPhoneFromCookie("admin_session");
   if (!phone) return false;
-  const adminPhone = process.env.ADMIN_PHONE_NUMBER || "9999999999";
-  return phone === adminPhone;
+  return isAdminPhone(phone);
 }
+

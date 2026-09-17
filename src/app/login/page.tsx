@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck, User, Phone, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [timer, setTimer] = useState(0);
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -26,6 +27,17 @@ export default function Login() {
     }
     return () => clearInterval(interval);
   }, [timer, step]);
+
+  useEffect(() => {
+    return () => {
+      if (recaptchaVerifierRef.current) {
+        try {
+          recaptchaVerifierRef.current.clear();
+        } catch (e) {}
+        recaptchaVerifierRef.current = null;
+      }
+    };
+  }, []);
 
   // Step 1: Handle Phone Input (Numeric only, max 10)
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,18 +53,42 @@ export default function Login() {
     if (error) setError("");
   };
 
-  const setupRecaptcha = () => {
-    if (!auth) return null;
-    try {
-      if ((window as any).recaptchaVerifier) {
-        return (window as any).recaptchaVerifier;
-      }
-      
-      const container = document.getElementById("recaptcha-container");
-      if (container) {
-        container.innerHTML = "";
-      }
+  const getFirebaseErrorMessage = (err: any) => {
+    const code = err?.code || "";
+    switch (code) {
+      case "auth/invalid-app-credential":
+        return "Invalid Firebase App Credentials or API Key. Please verify your NEXT_PUBLIC_FIREBASE_* keys in .env and restart your dev server.";
+      case "auth/invalid-phone-number":
+        return "The phone number entered is invalid. Please enter a valid 10-digit mobile number.";
+      case "auth/too-many-requests":
+        return "Too many requests. Please wait a few minutes before trying again.";
+      case "auth/invalid-verification-code":
+        return "Incorrect verification code. Please check and try again.";
+      case "auth/code-expired":
+        return "Verification code has expired. Please request a new code.";
+      case "auth/captcha-check-failed":
+        return "reCAPTCHA verification failed. Please check your Firebase authorized domains.";
+      default:
+        return err?.message || "An authentication error occurred. Please try again.";
+    }
+  };
 
+
+  const setupRecaptcha = () => {
+    if (!auth) {
+      throw new Error("Firebase Auth is not initialized. Please verify your client configuration.");
+    }
+
+    if (recaptchaVerifierRef.current) {
+      return recaptchaVerifierRef.current;
+    }
+
+    const container = document.getElementById("recaptcha-container");
+    if (container) {
+      container.innerHTML = "";
+    }
+
+    try {
       const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
         size: "invisible",
         callback: () => {},
@@ -60,21 +96,27 @@ export default function Login() {
           setError("reCAPTCHA expired. Please resend verification code.");
         },
       });
-      
-      (window as any).recaptchaVerifier = verifier;
+
+      recaptchaVerifierRef.current = verifier;
       return verifier;
     } catch (e: any) {
-      console.error("Recaptcha setup error:", e);
+      console.warn("Recaptcha setup initial attempt warning, resetting container:", e?.message);
+      if (container) {
+        container.innerHTML = "";
+      }
       try {
-        const container = document.getElementById("recaptcha-container");
-        if (container) container.innerHTML = "";
         const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
           size: "invisible",
+          callback: () => {},
+          "expired-callback": () => {
+            setError("reCAPTCHA expired. Please resend verification code.");
+          },
         });
-        (window as any).recaptchaVerifier = verifier;
+        recaptchaVerifierRef.current = verifier;
         return verifier;
-      } catch (err2) {
-        return null;
+      } catch (retryErr: any) {
+        console.error("Recaptcha retry failed:", retryErr);
+        throw new Error(retryErr.message || "Failed to initialize reCAPTCHA verifier.");
       }
     }
   };
@@ -82,50 +124,34 @@ export default function Login() {
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     if (phone.length !== 10) return;
-    
+
     setLoading(true);
     setError("");
-    
+
     try {
-      let sentViaFirebase = false;
-
-      if (auth) {
-        try {
-          // Attempt Real Firebase Phone Auth SMS OTP
-          const appVerifier = setupRecaptcha();
-          const formattedPhone = `+91${phone}`;
-          const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
-          setConfirmationResult(confirmation);
-          sentViaFirebase = true;
-        } catch (firebaseErr: any) {
-          console.warn("Firebase SMS limit or billing constraint reached, falling back to system OTP:", firebaseErr.message);
-        }
-      }
-
-      if (!sentViaFirebase) {
-        // System OTP API Fallback
-        const res = await fetch("/api/auth/send-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone }),
-        });
-        const data = await res.json();
-        
-        if (!data.success) {
-          throw new Error(data.error || "Failed to send verification code.");
-        }
-      }
-
+      const appVerifier = setupRecaptcha();
+      const formattedPhone = `+91${phone}`;
+      const confirmation = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
+      setConfirmationResult(confirmation);
       setStep("otp");
       setTimer(30);
       setOtp("");
     } catch (err: any) {
       console.error("Send OTP error:", err);
-      setError(err.message || "Failed to send OTP. Please try again.");
+      if (recaptchaVerifierRef.current) {
+        try { recaptchaVerifierRef.current.clear(); } catch (_) {}
+        recaptchaVerifierRef.current = null;
+      }
+      const container = document.getElementById("recaptcha-container");
+      if (container) {
+        container.innerHTML = "";
+      }
+      setError(getFirebaseErrorMessage(err));
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,59 +161,41 @@ export default function Login() {
     setError("");
 
     try {
-      if (confirmationResult) {
-        // Real Firebase OTP Verification
-        const userCredential = await confirmationResult.confirm(otp);
-        const idToken = await userCredential.user.getIdToken();
+      if (!confirmationResult) {
+        throw new Error("No active verification session. Please request a new code.");
+      }
 
-        // Sync authenticated user credentials with backend
-        const res = await fetch("/api/auth/sync", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, idToken }),
-        });
-        const data = await res.json();
+      // Real Firebase OTP Verification
+      const userCredential = await confirmationResult.confirm(otp);
+      const idToken = await userCredential.user.getIdToken();
 
-        if (!data.success) {
-          throw new Error(data.error || "Authentication sync failed.");
-        }
+      // Sync authenticated user credentials with backend
+      const res = await fetch("/api/auth/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, idToken }),
+      });
+      const data = await res.json();
 
-        if (data.isNewUser) {
-          setStep("profile");
-        } else {
-          const redirect = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
-          window.location.href = redirect;
-        }
+      if (!data.success) {
+        throw new Error(data.error || "Authentication sync failed.");
+      }
+
+      if (data.isNewUser) {
+        setStep("profile");
       } else {
-        // Fallback API verification
-        const res = await fetch("/api/auth/verify-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, otp }),
-        });
-        const data = await res.json();
-
-        if (!data.success) {
-          throw new Error(data.error || "Invalid verification code.");
-        }
-
-        // Proactively set session cookie client-side
-        document.cookie = `auth_session=${phone}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
-
-        if (data.isNewUser) {
-          setStep("profile");
-        } else {
-          const redirect = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
-          window.location.href = redirect;
-        }
+        const redirect = typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("redirect") || "/") : "/";
+        window.location.href = redirect;
       }
     } catch (err: any) {
       console.error("Verify OTP error:", err);
-      setError(err.message || "Verification failed. Please check your OTP code.");
+      setError(getFirebaseErrorMessage(err));
     } finally {
       setLoading(false);
     }
   };
+
+
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -269,10 +277,13 @@ export default function Login() {
                   type="tel" 
                   value={phone}
                   onChange={handlePhoneChange}
+                  maxLength={10}
+                  pattern="[0-9]{10}"
                   placeholder="Enter 10 digits" 
                   className="w-full bg-brand/5 border-2 border-transparent focus:border-brand-accent/30 focus:bg-white rounded-xl py-4 pl-20 pr-4 text-black font-bold tracking-widest placeholder:text-black/20 placeholder:tracking-normal transition-all outline-none"
                   required
                 />
+
               </div>
             </div>
             <button 

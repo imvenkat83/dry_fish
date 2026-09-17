@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ArrowLeft, ShieldCheck, Lock, Phone, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,18 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [confirmationResult, setConfirmationResult] = useState<any>(null);
+  const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (recaptchaVerifierRef.current) {
+        try {
+          recaptchaVerifierRef.current.clear();
+        } catch (e) {}
+        recaptchaVerifierRef.current = null;
+      }
+    };
+  }, []);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/\D/g, "").slice(0, 10);
@@ -26,6 +38,66 @@ export default function AdminLogin() {
     const value = e.target.value.replace(/\D/g, "").slice(0, 6);
     setOtp(value);
     if (error) setError("");
+  };
+
+
+  const getFirebaseErrorMessage = (err: any) => {
+    const code = err?.code || "";
+    switch (code) {
+      case "auth/invalid-app-credential":
+        return "Invalid Firebase App Credentials or API Key. Please verify your NEXT_PUBLIC_FIREBASE_* keys in .env and restart your dev server.";
+      case "auth/invalid-phone-number":
+        return "The phone number entered is invalid. Please enter a valid 10-digit mobile number.";
+      case "auth/too-many-requests":
+        return "Too many requests. Please wait a few minutes before trying again.";
+      case "auth/invalid-verification-code":
+        return "Incorrect verification code. Please check and try again.";
+      case "auth/code-expired":
+        return "Verification code has expired. Please request a new code.";
+      case "auth/captcha-check-failed":
+        return "reCAPTCHA verification failed. Please check your Firebase authorized domains.";
+      default:
+        return err?.message || "An authentication error occurred. Please try again.";
+    }
+  };
+
+
+  const setupRecaptcha = () => {
+    if (!auth) {
+      throw new Error("Firebase Auth is not initialized. Please verify your client configuration.");
+    }
+
+    if (recaptchaVerifierRef.current) {
+      return recaptchaVerifierRef.current;
+    }
+
+    const container = document.getElementById("recaptcha-container");
+    if (container) {
+      container.innerHTML = "";
+    }
+
+    try {
+      const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+        size: "invisible",
+      });
+      recaptchaVerifierRef.current = verifier;
+      return verifier;
+    } catch (e: any) {
+      console.warn("Admin recaptcha setup warning, resetting container:", e?.message);
+      if (container) {
+        container.innerHTML = "";
+      }
+      try {
+        const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+          size: "invisible",
+        });
+        recaptchaVerifierRef.current = verifier;
+        return verifier;
+      } catch (retryErr: any) {
+        console.error("Admin recaptcha retry failed:", retryErr);
+        throw new Error(retryErr.message || "Failed to initialize reCAPTCHA verifier.");
+      }
+    }
   };
 
   const handleSendOTP = async (e: React.FormEvent) => {
@@ -50,40 +122,26 @@ export default function AdminLogin() {
         return;
       }
 
-      let sentViaFirebase = false;
-
-      if (auth && process.env.NEXT_PUBLIC_FIREBASE_API_KEY && process.env.NEXT_PUBLIC_FIREBASE_API_KEY !== "mock") {
-        try {
-          const container = document.getElementById("recaptcha-container");
-          if (container) container.innerHTML = "";
-          const recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-            size: "invisible",
-          });
-          const confirmation = await signInWithPhoneNumber(auth, `+91${phone}`, recaptchaVerifier);
-          setConfirmationResult(confirmation);
-          sentViaFirebase = true;
-        } catch (firebaseErr: any) {
-          console.warn("Firebase Auth SMS failed or key suspended, falling back to system OTP endpoint:", firebaseErr.message);
-        }
-      }
-
-      if (!sentViaFirebase) {
-        // System OTP API Fallback
-        await fetch("/api/auth/send-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone }),
-        }).catch(() => {});
-      }
-      
+      const appVerifier = setupRecaptcha();
+      const confirmation = await signInWithPhoneNumber(auth, `+91${phone}`, appVerifier);
+      setConfirmationResult(confirmation);
       setStep("otp");
     } catch (err: any) {
       console.error("OTP Send Error:", err);
-      setError(err.message || "Failed to send OTP. Please try again.");
+      if (recaptchaVerifierRef.current) {
+        try { recaptchaVerifierRef.current.clear(); } catch (_) {}
+        recaptchaVerifierRef.current = null;
+      }
+      const container = document.getElementById("recaptcha-container");
+      if (container) {
+        container.innerHTML = "";
+      }
+      setError(getFirebaseErrorMessage(err));
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,36 +151,12 @@ export default function AdminLogin() {
     setError("");
 
     try {
-      let idToken = null;
-
-      if (confirmationResult) {
-        try {
-          const result = await confirmationResult.confirm(otp);
-          idToken = await result.user.getIdToken();
-        } catch (fbVerifyErr: any) {
-          console.warn("Firebase confirmation failed, trying system verify-otp fallback:", fbVerifyErr.message);
-        }
+      if (!confirmationResult) {
+        throw new Error("No active verification session. Please request a new code.");
       }
 
-      if (!idToken) {
-        // Verify via system OTP endpoint fallback (accepts OTP generated or demo code 123456 / 999999)
-        const verifyRes = await fetch("/api/auth/verify-otp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone, otp }),
-        });
-        const verifyData = await verifyRes.json();
-        if (!verifyData.success) {
-          const adminPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "123456";
-          if (otp !== adminPass && otp !== "999999") {
-            throw new Error(verifyData.error || "Invalid verification code.");
-          }
-        }
-      }
-
-      // Proactively set the admin session cookie client-side
-      const cookieValue = idToken || phone;
-      document.cookie = `admin_session=${cookieValue}; path=/; max-age=${60 * 60 * 24 * 30}; SameSite=Lax${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
+      const result = await confirmationResult.confirm(otp);
+      const idToken = await result.user.getIdToken();
 
       // Sync administrative session cookies with the backend
       const res = await fetch("/api/auth/sync", {
@@ -132,7 +166,7 @@ export default function AdminLogin() {
       });
       const data = await res.json();
 
-      if (data.success || cookieValue) {
+      if (data.success) {
         router.push("/admin/navigation");
         router.refresh();
       } else {
@@ -140,11 +174,14 @@ export default function AdminLogin() {
       }
     } catch (err: any) {
       console.error("Verification failed:", err);
-      setError(err.message || "Verification failed. Please try again.");
+      setError(getFirebaseErrorMessage(err));
     } finally {
       setLoading(false);
     }
   };
+
+
+
 
   return (
     <div className="min-h-screen bg-[#8c6239] flex flex-col justify-center items-center p-4 font-inter">
@@ -190,10 +227,13 @@ export default function AdminLogin() {
                   type="tel"
                   value={phone}
                   onChange={handlePhoneChange}
+                  maxLength={10}
+                  pattern="[0-9]{10}"
                   placeholder="9999999999"
                   className="w-full bg-[#8c6239]/5 border-2 border-transparent focus:border-[#C5A059]/30 focus:bg-white rounded-xl py-4 pl-20 pr-4 text-[#8c6239] font-bold tracking-widest transition-all outline-none"
                   required
                 />
+
               </div>
             </div>
             <button
