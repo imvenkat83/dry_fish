@@ -11,9 +11,9 @@ export async function getVerifiedPhoneFromCookie(cookieName: "auth_session" | "a
     const token = cookieStore.get(cookieName)?.value;
     if (!token) return null;
 
-    // Support local developer mock session (10-digit number)
+    // Support local developer mock session (10-digit number) only in non-production
     const isRawPhone = /^\d{10}$/.test(token);
-    if (isRawPhone) {
+    if (isRawPhone && process.env.NODE_ENV !== "production") {
       return token;
     }
 

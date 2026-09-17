@@ -26,9 +26,9 @@ function parseJwt(token: string) {
 function verifySession(token: string | undefined): { phone: string } | null {
   if (!token) return null;
 
-  // Support local developer mock session (10-digit number)
+  // Support local developer mock session (10-digit number) only in non-production
   const isRawPhone = /^\d{10}$/.test(token);
-  if (isRawPhone) {
+  if (isRawPhone && process.env.NODE_ENV !== "production") {
     return { phone: token };
   }
 

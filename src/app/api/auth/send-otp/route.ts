@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       message: `OTP sent successfully to +91 ${phone}`,
-      demoOtp: generatedOtp,
+      ...(process.env.NODE_ENV === "development" ? { demoOtp: generatedOtp } : {}),
     });
   } catch (error: any) {
     console.error("Send OTP Error:", error);

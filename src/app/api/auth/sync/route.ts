@@ -78,15 +78,16 @@ export async function POST(request: Request) {
         }
       }
     } else {
-      // 2. System OTP Fallback for testing / dev
-      if (!rawPhone) {
+      // 2. System OTP Fallback strictly for local development
+      if (process.env.NODE_ENV === "development" && rawPhone) {
+        phone = rawPhone.replace(/^\+91/, "").replace(/\D/g, "").slice(-10);
+        verifiedSessionToken = phone;
+      } else {
         return NextResponse.json(
-          { success: false, error: "Phone number or ID Token is required." },
+          { success: false, error: "Firebase ID Token is required for authentication." },
           { status: 400 }
         );
       }
-      phone = rawPhone.replace(/^\+91/, "").replace(/\D/g, "").slice(-10);
-      verifiedSessionToken = phone;
     }
 
     if (!phone || phone.length !== 10) {

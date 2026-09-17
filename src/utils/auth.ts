@@ -35,10 +35,10 @@ export async function verifyAdminRequest(request?: Request): Promise<DecodedAdmi
       return null;
     }
 
-    // Support local developer mock mode (10-digit number)
+    // Support local developer mock mode (10-digit number) only in non-production
     const isRawPhone = /^\d{10}$/.test(token);
 
-    if (isRawPhone) {
+    if (isRawPhone && process.env.NODE_ENV !== "production") {
       if (isAdminPhone(token)) {
         return {
           uid: "mock-admin-uid",

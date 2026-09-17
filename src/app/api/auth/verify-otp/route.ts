@@ -23,8 +23,8 @@ export async function POST(request: Request) {
     const phone = rawPhone.replace(/\D/g, "");
     const cleanOtp = otp.toString().trim();
 
-    // 1. Check if OTP is valid (Default test OTP 123456 or stored OTP)
-    let isValidOtp = cleanOtp === "123456";
+    // 1. Check if OTP is valid (Default test OTP 123456 in dev only)
+    let isValidOtp = process.env.NODE_ENV === "development" && cleanOtp === "123456";
 
     if (!isValidOtp) {
       const records = await db
