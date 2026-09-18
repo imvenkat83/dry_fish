@@ -267,43 +267,23 @@ export default function CartPage() {
     }
   };
 
-  const loadRazorpayScript = () => {
-    return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
-
-  const processRazorpayPayment = async () => {
+  const processPhonePePayment = async () => {
     setIsProcessingPayment(true);
     setPaymentStep("processing");
-
-    // 1. Load Razorpay script
-    const scriptLoaded = await loadRazorpayScript();
-    if (!scriptLoaded) {
-      alert("Failed to load Razorpay payment gateway. Please check your internet connection.");
-      setPaymentStep("details");
-      setIsProcessingPayment(false);
-      return;
-    }
 
     try {
       const shippingAddr = showNewAddressForm
         ? `Name: ${address.fullName}, Street: ${address.street}, City: ${address.city}, State: ${address.state}, Pincode: ${address.pincode}, Contact: ${address.phone}`
         : savedAddresses[selectedAddressIndex || 0];
 
-      // 2. Request order initialization from our backend
-      const res = await fetch("/api/checkout/razorpay", {
+      const res = await fetch("/api/checkout/phonepe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items,
           shippingAddress: shippingAddr,
           couponCode: appliedCoupon?.code || null,
-        })
+        }),
       });
 
       const data = await res.json();
@@ -314,83 +294,12 @@ export default function CartPage() {
         return;
       }
 
-      if (data.direct) {
-        clearCart();
-        setIsCheckoutModalOpen(false);
-        setIsProcessingPayment(false);
-        router.push("/profile/orders");
-        return;
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
       }
-
-      // 3. Configure Razorpay Options
-      const options = {
-        key: data.keyId,
-        amount: data.amount,
-        currency: data.currency,
-        name: "Dry Fish Basket",
-        description: "Seafood Purchase",
-        order_id: data.razorpayOrderId,
-        theme: {
-          color: "#C5A059", // Match brand accent color
-        },
-        handler: async function (response: any) {
-          // Re-enter processing state during signature verification
-          setPaymentStep("processing");
-          setIsProcessingPayment(true);
-          try {
-            const verifyRes = await fetch("/api/checkout/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                razorpayOrderId: response.razorpay_order_id,
-                razorpayPaymentId: response.razorpay_payment_id,
-                razorpaySignature: response.razorpay_signature,
-              }),
-            });
-            const verifyData = await verifyRes.json();
-            if (verifyData.success) {
-              if (showNewAddressForm) {
-                try {
-                  await fetch("/api/profile/address", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ address: shippingAddr }),
-                  });
-                } catch (addrErr) {
-                  console.error("Failed to auto-save new address to profile:", addrErr);
-                }
-              }
-              clearCart();
-              router.push("/profile/orders");
-            } else {
-              alert("Payment verification failed: " + verifyData.error);
-              setPaymentStep("details");
-              setIsProcessingPayment(false);
-            }
-          } catch (e) {
-            console.error("Signature verification failed:", e);
-            alert("Something went wrong verifying the payment. Please contact support.");
-            setPaymentStep("details");
-            setIsProcessingPayment(false);
-          }
-        },
-        modal: {
-          ondismiss: function () {
-            setPaymentStep("details");
-            setIsProcessingPayment(false);
-          }
-        },
-        prefill: {
-          contact: address.phone || "",
-        }
-      };
-
-      // 4. Launch Razorpay popup
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
     } catch (error) {
       console.error("Error starting checkout:", error);
-      alert("Something went wrong. Please try again.");
+      alert("Something went wrong initializing PhonePe payment.");
       setPaymentStep("details");
       setIsProcessingPayment(false);
     }
@@ -1002,10 +911,10 @@ export default function CartPage() {
                       Cancel
                     </button>
                     <button
-                      onClick={processRazorpayPayment}
+                      onClick={processPhonePePayment}
                       className="flex-[2] py-4 bg-brand text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-hover shadow-lg transition-all active:scale-95"
                     >
-                      Pay Now
+                      Pay via PhonePe
                     </button>
                   </div>
                 </div>

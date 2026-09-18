@@ -46,8 +46,9 @@ type Order = {
   couponCode: string | null;
   discountAmount: number | null;
   paymentStatus: string | null;
-  razorpayOrderId: string | null;
-  razorpayPaymentId: string | null;
+  phonepeOrderId: string | null;
+  phonepePaymentId: string | null;
+  paymentGateway: string | null;
   courierServiceName: string | null;
   courierId: string | null;
   trackingNumber: string | null;

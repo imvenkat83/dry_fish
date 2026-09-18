@@ -29,8 +29,9 @@ interface Order {
   discountAmount: number | null;
   items: OrderItem[];
   paymentStatus: string;
-  razorpayOrderId: string | null;
-  razorpayPaymentId: string | null;
+  phonepeOrderId: string | null;
+  phonepePaymentId: string | null;
+  paymentGateway?: string | null;
   courierServiceName?: string | null;
   courierId?: string | null;
   trackingNumber?: string | null;
@@ -87,7 +88,7 @@ export default function AdminOrders() {
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedOrderForPayment, setSelectedOrderForPayment] = useState<Order | null>(null);
-  const [paymentForm, setPaymentForm] = useState({ razorpayPaymentId: "" });
+  const [paymentForm, setPaymentForm] = useState({ phonepePaymentId: "" });
   const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
 
   // Cancellation Modal States
@@ -479,16 +480,16 @@ export default function AdminOrders() {
                           </div>
                           
                           <div className="flex items-center justify-between gap-4">
-                            <span className="text-[10px] font-bold text-black/40 uppercase whitespace-nowrap">Razorpay Order ID</span>
-                            <span className="text-[10px] font-mono font-bold text-black/70 truncate max-w-[150px]" title={order.razorpayOrderId || "N/A"}>
-                              {order.razorpayOrderId || "N/A"}
+                            <span className="text-[10px] font-bold text-black/40 uppercase whitespace-nowrap">PhonePe Order ID</span>
+                            <span className="text-[10px] font-mono font-bold text-black/70 truncate max-w-[150px]" title={order.phonepeOrderId || "N/A"}>
+                              {order.phonepeOrderId || "N/A"}
                             </span>
                           </div>
 
                           <div className="flex items-center justify-between gap-4">
                             <span className="text-[10px] font-bold text-black/40 uppercase whitespace-nowrap">Payment ID</span>
-                            <span className="text-[10px] font-mono font-bold text-black/70 truncate max-w-[150px]" title={order.razorpayPaymentId || "N/A"}>
-                              {order.razorpayPaymentId || "N/A"}
+                            <span className="text-[10px] font-mono font-bold text-black/70 truncate max-w-[150px]" title={order.phonepePaymentId || "N/A"}>
+                              {order.phonepePaymentId || "N/A"}
                             </span>
                           </div>
 
@@ -505,7 +506,7 @@ export default function AdminOrders() {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setSelectedOrderForPayment(order);
-                                  setPaymentForm({ razorpayPaymentId: "" });
+                                  setPaymentForm({ phonepePaymentId: "" });
                                   setShowPaymentModal(true);
                                 }}
                                 className="w-full bg-[#C5A059] hover:bg-[#C5A059]/90 text-white font-black text-[9px] uppercase tracking-widest rounded-xl py-2 px-4 transition-all flex items-center justify-center space-x-1.5 cursor-pointer shadow-sm"
@@ -517,7 +518,7 @@ export default function AdminOrders() {
                               <div className="group relative flex items-center justify-center gap-1.5 text-[9px] font-medium text-black/50 hover:text-black/80 cursor-help mt-1 transition-colors">
                                 <span>⚠️ Verification Required</span>
                                 <div className="absolute bottom-full mb-2 hidden group-hover:block w-48 bg-brand text-white text-[9px] font-bold leading-normal p-3 rounded-xl shadow-xl z-20 border border-white/10 text-center">
-                                  Check your Razorpay dashboard under Order ID <span className="font-mono text-black-accent">{order.razorpayOrderId}</span> to verify the payment status before updating here.
+                                  Check your PhonePe dashboard under Order ID <span className="font-mono text-black-accent">{order.phonepeOrderId}</span> to verify the payment status before updating here.
                                 </div>
                               </div>
                             </div>
@@ -925,8 +926,8 @@ export default function AdminOrders() {
             {/* Form */}
             <form onSubmit={async (e) => {
               e.preventDefault();
-              if (!paymentForm.razorpayPaymentId) {
-                showToast("Please enter the Razorpay Payment ID");
+              if (!paymentForm.phonepePaymentId) {
+                showToast("Please enter the PhonePe Payment ID");
                 return;
               }
               setIsSubmittingPayment(true);
@@ -936,7 +937,7 @@ export default function AdminOrders() {
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     paymentStatus: "paid",
-                    razorpayPaymentId: paymentForm.razorpayPaymentId,
+                    phonepePaymentId: paymentForm.phonepePaymentId,
                   })
                 });
                 const data = await res.json();
@@ -956,24 +957,24 @@ export default function AdminOrders() {
             }} className="p-8 space-y-6">
               <div className="space-y-4">
                 <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl">
-                  <p className="text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">Razorpay Order Reference</p>
-                  <p className="text-xs font-mono font-bold text-amber-900">{selectedOrderForPayment.razorpayOrderId || "No order ID generated"}</p>
+                  <p className="text-[10px] font-bold text-amber-800 uppercase tracking-wider mb-1">PhonePe Order Reference</p>
+                  <p className="text-xs font-mono font-bold text-amber-900">{selectedOrderForPayment.phonepeOrderId || "No order ID generated"}</p>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-black text-black/40 uppercase tracking-widest mb-2">
-                    Razorpay Payment ID <span className="text-red-500">*</span>
+                    PhonePe Payment ID <span className="text-red-500">*</span>
                   </label>
                   <input 
                     type="text" 
                     required
-                    value={paymentForm.razorpayPaymentId}
-                    onChange={(e) => setPaymentForm({ razorpayPaymentId: e.target.value })}
-                    placeholder="e.g. pay_N1A2B3C4D5E6F7"
+                    value={paymentForm.phonepePaymentId}
+                    onChange={(e) => setPaymentForm({ phonepePaymentId: e.target.value })}
+                    placeholder="e.g. T26091812345678"
                     className="w-full bg-white border border-brand/10 rounded-2xl py-3.5 px-4 text-xs font-bold text-black focus:outline-none focus:ring-4 focus:ring-[#C5A059]/5 transition-all shadow-sm"
                   />
                   <p className="text-[9px] text-black/40 font-medium mt-2 leading-relaxed">
-                    Verify the payment status on your Razorpay dashboard for order <span className="font-mono font-bold">{selectedOrderForPayment.razorpayOrderId}</span>, copy the Payment ID, and paste it here.
+                    Verify the payment status on your PhonePe dashboard for order <span className="font-mono font-bold">{selectedOrderForPayment.phonepeOrderId}</span>, copy the Payment ID, and paste it here.
                   </p>
                 </div>
               </div>

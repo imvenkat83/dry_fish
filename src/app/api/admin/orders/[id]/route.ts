@@ -18,7 +18,7 @@ export async function PATCH(
   }
 
   try {
-    const { status, paymentStatus, razorpayPaymentId, cancellationReason } = await req.json();
+    const { status, paymentStatus, phonepePaymentId, cancellationReason } = await req.json();
     const orderId = parseInt(id);
 
     if (!status && !paymentStatus) {
@@ -60,8 +60,8 @@ export async function PATCH(
       updateData.paymentStatus = paymentStatus;
     }
 
-    if (razorpayPaymentId !== undefined) {
-      updateData.razorpayPaymentId = razorpayPaymentId;
+    if (phonepePaymentId !== undefined) {
+      updateData.phonepePaymentId = phonepePaymentId;
     }
 
     await db.update(orders)

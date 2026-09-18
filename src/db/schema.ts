@@ -107,9 +107,9 @@ export const orders = sqliteTable("orders", {
   shippingAddress: text("shipping_address"),
   couponCode: text("coupon_code"),
   discountAmount: real("discount_amount"),
-  razorpayOrderId: text("razorpay_order_id"),
-  razorpayPaymentId: text("razorpay_payment_id"),
-  razorpaySignature: text("razorpay_signature"),
+  phonepeOrderId: text("phonepe_order_id"),
+  phonepePaymentId: text("phonepe_payment_id"),
+  paymentGateway: text("payment_gateway").default("phonepe"),
   paymentStatus: text("payment_status").default("pending"), // pending, paid
   courierServiceName: text("courier_service_name"),
   courierId: text("courier_id"),
