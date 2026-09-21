@@ -2,7 +2,7 @@ import { verifyAdminRequest } from "@/utils/auth";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, orders, orderItems } from "@/db/schema";
-import { sql, eq, and, gte, lt } from "drizzle-orm";
+import { sql, eq, and, gte, lt, ne } from "drizzle-orm";
 
 async function isAuthenticated(request?: Request) {
   return !!(await verifyAdminRequest(request));
@@ -23,14 +23,20 @@ export async function GET(request: Request) {
       const startIso = start.toISOString();
       const endIso = end.toISOString();
 
+      const validOrderCondition = and(
+        ne(orders.status, "payment_pending"),
+        ne(orders.status, "payment_failed"),
+        ne(orders.paymentStatus, "failed")
+      );
+
       const [userCount] = await db.select({ value: sql`count(*)` }).from(users).where(and(gte(users.createdAt, startIso), lt(users.createdAt, endIso)));
-      const [orderCount] = await db.select({ value: sql`count(*)` }).from(orders).where(and(gte(orders.createdAt, startIso), lt(orders.createdAt, endIso)));
-      const [revenue] = await db.select({ value: sql`sum(${orders.totalAmount})` }).from(orders).where(and(gte(orders.createdAt, startIso), lt(orders.createdAt, endIso)));
+      const [orderCount] = await db.select({ value: sql`count(*)` }).from(orders).where(and(gte(orders.createdAt, startIso), lt(orders.createdAt, endIso), validOrderCondition));
+      const [revenue] = await db.select({ value: sql`sum(${orders.totalAmount})` }).from(orders).where(and(gte(orders.createdAt, startIso), lt(orders.createdAt, endIso), validOrderCondition));
       
       const [itemsSold] = await db.select({ value: sql`sum(${orderItems.quantity})` })
         .from(orderItems)
         .leftJoin(orders, eq(orderItems.orderId, orders.id))
-        .where(and(gte(orders.createdAt, startIso), lt(orders.createdAt, endIso)));
+        .where(and(gte(orders.createdAt, startIso), lt(orders.createdAt, endIso), validOrderCondition));
 
       return {
         users: Number(userCount?.value || 0),

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { orders, cartItems } from "@/db/schema";
+import { orders, orderItems, cartItems } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getPhonePeClient } from "@/utils/phonepe";
 
@@ -73,19 +73,13 @@ export async function GET(req: Request) {
       console.log(`[PhonePe Callback] Payment verified successfully for order #${order.id}. Redirecting to profile orders.`);
       return NextResponse.redirect(`${baseUrl}/profile/orders?payment=success&orderId=${order.id}`);
     } else {
-      // Mark payment failed in DB if not already paid
+      // Payment failed or cancelled: DO NOT place/create order in DB -> Delete pending order record
       if (order.paymentStatus !== "paid") {
-        await db
-          .update(orders)
-          .set({
-            status: "payment_failed",
-            paymentStatus: "failed",
-            phonepePaymentId: txnId,
-          })
-          .where(eq(orders.id, order.id));
+        await db.delete(orderItems).where(eq(orderItems.orderId, order.id));
+        await db.delete(orders).where(eq(orders.id, order.id));
+        console.log(`[PhonePe Callback] Payment failed/cancelled for order #${order.id} (merchantOrderId: ${merchantOrderId}). Deleted order from DB.`);
       }
 
-      console.log(`[PhonePe Callback] Payment failed/cancelled for order #${order.id}. Redirecting to cart.`);
       return NextResponse.redirect(`${baseUrl}/cart?error=payment_failed`);
     }
   } catch (error: any) {

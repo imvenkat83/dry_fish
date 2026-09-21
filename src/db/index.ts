@@ -28,6 +28,9 @@ client.execute("ALTER TABLE users ADD COLUMN email TEXT;").catch(() => {});
 client.execute("ALTER TABLE products ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1;").catch(() => {});
 client.execute("ALTER TABLE homepage_categories ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1;").catch(() => {});
 client.execute("ALTER TABLE navigation_menu ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1;").catch(() => {});
+client.execute("ALTER TABLE orders ADD COLUMN phonepe_order_id TEXT;").catch(() => {});
+client.execute("ALTER TABLE orders ADD COLUMN phonepe_payment_id TEXT;").catch(() => {});
+client.execute("ALTER TABLE orders ADD COLUMN payment_gateway TEXT DEFAULT 'phonepe';").catch(() => {});
 client.execute(`
   CREATE TABLE IF NOT EXISTS reels (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

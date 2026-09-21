@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { orders, cartItems } from "@/db/schema";
+import { orders, orderItems, cartItems } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getPhonePeClient, getPhonePeConfig } from "@/utils/phonepe";
 
@@ -90,17 +90,12 @@ export async function POST(req: Request) {
 
       console.log(`[PhonePe Webhook] Order #${order.id} payment confirmed successfully.`);
     } else {
-      // Mark order as payment failed
-      await db
-        .update(orders)
-        .set({
-          status: "payment_failed",
-          paymentStatus: "failed",
-          phonepePaymentId: txnId,
-        })
-        .where(eq(orders.id, order.id));
-
-      console.log(`[PhonePe Webhook] Order #${order.id} payment failed with state: ${state}`);
+      // Payment failed or cancelled: Delete order record from DB
+      if (order.paymentStatus !== "paid") {
+        await db.delete(orderItems).where(eq(orderItems.orderId, order.id));
+        await db.delete(orders).where(eq(orders.id, order.id));
+        console.log(`[PhonePe Webhook] Order #${order.id} payment failed with state: ${state}. Deleted order from DB.`);
+      }
     }
 
     return NextResponse.json({ success: true, message: "Webhook processed" });

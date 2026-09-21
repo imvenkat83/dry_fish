@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { ShoppingBag, Loader2, Package, CheckCircle2, Clock, Ruler, XCircle, AlertTriangle, Image as ImageIcon, MapPin, Check, X } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useCartStore } from "@/store/useCartStore";
 
 interface OrderItem {
   id: number;
@@ -108,16 +110,31 @@ const MILESTONES = [
   "Delivered"
 ];
 
-export default function MyOrdersPage() {
+function MyOrdersContent() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [successBanner, setSuccessBanner] = useState<string | null>(null);
   const [confirmingCancelId, setConfirmingCancelId] = useState<number | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+    const orderId = searchParams.get("orderId");
+    if (paymentStatus === "success") {
+      useCartStore.getState().clearCart();
+      setSuccessBanner(
+        orderId
+          ? `Payment successful! Order #${orderId} has been placed successfully via PhonePe.`
+          : "Payment successful! Your order has been placed successfully via PhonePe."
+      );
+    }
+  }, [searchParams]);
 
   const fetchOrders = async () => {
     try {
@@ -171,6 +188,24 @@ export default function MyOrdersPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24">
+      {successBanner && (
+        <div className="mb-8 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between text-emerald-800 animate-in fade-in duration-300">
+          <div className="flex items-center space-x-3">
+            <CheckCircle2 className="w-6 h-6 flex-shrink-0 text-emerald-600" />
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider">Order Confirmed</h4>
+              <p className="text-xs font-medium mt-0.5">{successBanner}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setSuccessBanner(null)}
+            className="p-1 hover:bg-emerald-100 rounded-lg transition-colors text-emerald-600"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-10">
         <div>
           <h1 className="text-4xl font-playfair font-bold text-black mb-2">My Orders</h1>
@@ -628,5 +663,20 @@ export default function MyOrdersPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MyOrdersPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[60vh] flex flex-col items-center justify-center">
+          <Loader2 className="w-8 h-8 text-[#C5A059] animate-spin mb-4" />
+          <p className="text-[10px] font-black text-black/40 uppercase tracking-[0.2em]">Loading...</p>
+        </div>
+      }
+    >
+      <MyOrdersContent />
+    </Suspense>
   );
 }

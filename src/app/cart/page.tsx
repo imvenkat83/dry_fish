@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/store/useCartStore";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Loader2, CreditCard, ShieldCheck, CheckCircle2, Scissors, Sparkles, MapPin, AlertTriangle, ChevronDown, X, Ticket } from "lucide-react";
-import { useRouter } from "next/navigation";
-//test commit : Add rayzorpay env variables in hosting env
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function CartPage() {
+function CartContent() {
   const { items, updateQuantity, removeItem, getTotalPrice, getTotalItems, clearCart, setQuantity, updateItemVariant } = useCartStore();
   const [isHydrated, setIsHydrated] = useState(false);
   const [productDetailsMap, setProductDetailsMap] = useState<Record<number, { variations: any[] }>>({});
@@ -19,6 +18,7 @@ export default function CartPage() {
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState<number | null>(null);
   const [fetchingAddress, setFetchingAddress] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [address, setAddress] = useState({
     fullName: "",
     street: "",
@@ -29,6 +29,23 @@ export default function CartPage() {
   });
   const [orderId, setOrderId] = useState<number | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Read URL params for return callback payment errors
+  useEffect(() => {
+    const err = searchParams.get("error");
+    if (err === "payment_failed") {
+      setCheckoutError("Payment was cancelled or failed on PhonePe. Please try again.");
+    } else if (err === "status_verification_failed") {
+      setCheckoutError("Could not verify payment status with PhonePe. If money was debited, please check your orders page.");
+    } else if (err === "missing_order_id" || err === "order_not_found") {
+      setCheckoutError("Order reference error. Please check your cart or order history.");
+    } else if (err === "internal_server_error") {
+      setCheckoutError("An error occurred during payment processing. Please try again.");
+    } else if (err) {
+      setCheckoutError(`Checkout notice: ${err}`);
+    }
+  }, [searchParams]);
 
   // Coupon States
   const [couponInput, setCouponInput] = useState("");
@@ -307,6 +324,24 @@ export default function CartPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-24">
+      {checkoutError && (
+        <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-between text-red-700 animate-in fade-in duration-300">
+          <div className="flex items-center space-x-3">
+            <AlertTriangle className="w-5 h-5 flex-shrink-0 text-red-500" />
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider">Payment Status Notice</h4>
+              <p className="text-xs font-medium mt-0.5">{checkoutError}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setCheckoutError(null)}
+            className="p-1 hover:bg-red-100 rounded-lg transition-colors text-red-500"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center space-x-4 mb-10">
         <h1 className="text-4xl font-playfair font-bold text-black">Shopping Cart</h1>
         <span className="bg-brand/5 text-black/60 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">
@@ -865,17 +900,36 @@ export default function CartPage() {
 
             {paymentStep === "details" && (
               <div className="animate-in slide-in-from-right-5 duration-300">
-                <div className="flex items-center space-x-4 mb-8">
+                <div className="flex items-center space-x-4 mb-6">
                   <div className="p-3 bg-brand/5 rounded-2xl text-black">
                     <CreditCard size={24} />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-black">Secure Checkout</h3>
-                    <p className="text-[10px] text-black/40 font-black uppercase tracking-widest">Only Online Prepaid Payments Accepted</p>
+                    <h3 className="text-xl font-bold text-black">Secure Payment Gateway</h3>
+                    <p className="text-[10px] text-black/40 font-black uppercase tracking-widest">Select Payment Gateway</p>
                   </div>
                 </div>
 
                 <div className="space-y-6">
+                  {/* PhonePe PG Card Selection */}
+                  <div className="border border-brand/20 bg-white p-4 rounded-2xl shadow-sm flex items-center justify-between cursor-pointer ring-2 ring-brand/30">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-[#5f259f]/10 text-[#5f259f] rounded-xl flex items-center justify-center font-bold text-lg">
+                        <CreditCard size={20} />
+                      </div>
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-bold text-black">PhonePe Gateway</span>
+                          <span className="text-[9px] bg-green-100 text-green-700 font-extrabold px-2 py-0.5 rounded-full uppercase">Primary</span>
+                        </div>
+                        <p className="text-[10px] text-black/50 font-medium mt-0.5">UPI, Credit/Debit Cards, NetBanking & Wallets</p>
+                      </div>
+                    </div>
+                    <div className="w-5 h-5 rounded-full border-2 border-[#5f259f] flex items-center justify-center bg-[#5f259f]">
+                      <div className="w-2 h-2 rounded-full bg-white" />
+                    </div>
+                  </div>
+
                   <div className="bg-brand/5 p-6 rounded-3xl border border-brand/5 space-y-4">
                     <div className="flex justify-between items-center text-xs font-bold text-black/60">
                       <span>Subtotal</span>
@@ -899,22 +953,31 @@ export default function CartPage() {
 
                     <div className="flex items-center space-x-2 text-[10px] font-bold text-green-600 bg-green-50 px-3 py-2 rounded-xl border border-green-100">
                       <ShieldCheck size={14} />
-                      <span>End-to-End Encrypted Gateway</span>
+                      <span>256-Bit Bank Level Encryption</span>
                     </div>
                   </div>
 
                   <div className="flex gap-4">
                     <button
+                      disabled={isProcessingPayment}
                       onClick={() => setIsCheckoutModalOpen(false)}
-                      className="flex-1 py-4 border-2 border-brand/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-black/40 hover:bg-brand/5 transition-all"
+                      className="flex-1 py-4 border-2 border-brand/5 rounded-xl text-[10px] font-black uppercase tracking-widest text-black/40 hover:bg-brand/5 transition-all disabled:opacity-50"
                     >
                       Cancel
                     </button>
                     <button
+                      disabled={isProcessingPayment}
                       onClick={processPhonePePayment}
-                      className="flex-[2] py-4 bg-brand text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-hover shadow-lg transition-all active:scale-95"
+                      className="flex-[2] py-4 bg-[#5f259f] hover:bg-[#4a1c7d] text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                     >
-                      Pay via PhonePe
+                      {isProcessingPayment ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin text-white" />
+                          <span>Redirecting...</span>
+                        </>
+                      ) : (
+                        <span>Pay via PhonePe</span>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -1092,5 +1155,19 @@ export default function CartPage() {
         );
       })()}
     </div>
+  );
+}
+
+export default function CartPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-[#C5A059] animate-spin" />
+        </div>
+      }
+    >
+      <CartContent />
+    </Suspense>
   );
 }

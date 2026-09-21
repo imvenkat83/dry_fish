@@ -39,7 +39,7 @@ export async function GET() {
     })
     .from(orders)
     .leftJoin(coupons, eq(orders.couponCode, coupons.code))
-    .where(and(eq(orders.userId, user.id), ne(orders.status, "payment_pending")))
+    .where(and(eq(orders.userId, user.id), ne(orders.status, "payment_pending"), ne(orders.status, "payment_failed"), ne(orders.paymentStatus, "failed")))
     .orderBy(desc(orders.createdAt));
 
     // For each order, fetch items
