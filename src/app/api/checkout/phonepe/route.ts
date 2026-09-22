@@ -139,7 +139,7 @@ export async function POST(req: Request) {
     }
 
     // Construct return callback URL
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://www.vkdryfishbasket.com";
     const redirectUrl = `${baseUrl}/api/checkout/phonepe/callback?merchantOrderId=${merchantOrderId}`;
 
     // PhonePe PG accepts amount in Paise (1 INR = 100 Paise)
