@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { products, productVariations } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function GET(
@@ -18,7 +18,7 @@ export async function GET(
     const productRows = await db
       .select()
       .from(products)
-      .where(eq(products.id, productId))
+      .where(and(eq(products.id, productId), eq(products.isActive, true)))
       .limit(1);
 
     if (!productRows.length) {

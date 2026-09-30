@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { products, productVariations } from "@/db/schema";
-import { like, or, inArray } from "drizzle-orm";
+import { like, or, inArray, eq, and } from "drizzle-orm";
 
 export async function GET(request: Request) {
   try {
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     const q = searchParams.get("q");
 
     if (!q || q.trim() === "") {
-      const allProducts = await db.select().from(products).limit(100);
+      const allProducts = await db.select().from(products).where(eq(products.isActive, true)).limit(100);
       return NextResponse.json({ success: true, data: allProducts });
     }
 
@@ -38,17 +38,20 @@ export async function GET(request: Request) {
     });
     const expandedTokens = Array.from(expandedTokensSet);
 
-    // Fetch candidate products matching any of the expanded tokens
+    // Fetch candidate active products matching any of the expanded tokens
     const results = await db.select().from(products).where(
-      or(
-        ...expandedTokens.flatMap((t) => [
-          like(products.name, `%${t}%`),
-          like(products.description, `%${t}%`),
-          like(products.category, `%${t}%`),
-          like(products.gender, `%${t}%`),
-          like(products.tags, `%${t}%`),
-          like(products.colors, `%${t}%`)
-        ])
+      and(
+        or(
+          ...expandedTokens.flatMap((t) => [
+            like(products.name, `%${t}%`),
+            like(products.description, `%${t}%`),
+            like(products.category, `%${t}%`),
+            like(products.gender, `%${t}%`),
+            like(products.tags, `%${t}%`),
+            like(products.colors, `%${t}%`)
+          ])
+        ),
+        eq(products.isActive, true)
       )
     ).limit(100);
 

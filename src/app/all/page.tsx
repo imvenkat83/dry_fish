@@ -1,14 +1,15 @@
 import { db } from "@/db";
 import { products, productVariations } from "@/db/schema";
-import { inArray } from "drizzle-orm";
+import { inArray, eq } from "drizzle-orm";
 import CategoryFilterSection from "@/components/CategoryFilterSection";
 
 export const dynamic = "force-dynamic";
 
 export default async function AllProductsPage() {
-  // 1. Fetch all products
+  // 1. Fetch all active products
   const displayProducts = await db.select()
-    .from(products);
+    .from(products)
+    .where(eq(products.isActive, true));
 
   // 2. Query variations for all products
   const allProductIds = displayProducts.map((p) => p.id);
