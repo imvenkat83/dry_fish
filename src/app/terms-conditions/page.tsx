@@ -412,7 +412,7 @@ export default function TermsConditions() {
               </li>
               <li className="flex items-start gap-2.5">
                 <MapPin size={16} className="text-[#8c6239] shrink-0 mt-0.5" />
-                <span>Address: H.No 806, Sahabhavana Township, Bandlaguda Nagole, Hyderabad - 500068</span>
+                <span>Address: vk dryfish basket unit, Door number: 107 _A, Ramalayam temple, Nimmakuru(old), Krishna District, Andhra Pradesh</span>
               </li>
             </ul>
           </div>

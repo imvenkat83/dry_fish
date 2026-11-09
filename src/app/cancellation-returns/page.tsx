@@ -40,7 +40,7 @@ export default function CancellationReturns() {
                 <strong>You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.
               </li>
               <li>
-                <strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to Dry Fish Basket, H.No 806, Sahabhavana Township, Bandlaguda Nagole, Hyderabad - 500068.
+                <strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to Dry Fish Basket (vk dryfish basket unit), Door number: 107 _A, Ramalayam temple, Nimmakuru(old), Krishna District, Andhra Pradesh.
               </li>
               <li>
                 <strong>Service</strong> refers to the Website.
@@ -107,7 +107,7 @@ export default function CancellationReturns() {
             </h2>
             <p>You are responsible for the cost and risk of returning the Goods to Us. You should send the Goods at the following address:</p>
             <div className="bg-[#FAF6ED] p-4 rounded-xl border border-[#8c6239]/15 font-semibold text-[#3b2314]">
-              H.No 806, Sahabhavana Township, Bandlaguda Nagole, Hyderabad - 500068
+              vk dryfish basket unit, Door number: 107 _A, Ramalayam temple, Nimmakuru(old), Krishna District, Andhra Pradesh
             </div>
             <p>We cannot be held responsible for Goods damaged or lost in return shipment. Therefore, We recommend an insured and trackable mail service. We are unable to issue a refund without actual receipt of the Goods or proof of received return delivery.</p>
           </div>
@@ -138,7 +138,7 @@ export default function CancellationReturns() {
               </li>
               <li className="flex items-start gap-2.5">
                 <MapPin size={16} className="text-[#8c6239] shrink-0 mt-0.5" />
-                <span>Address: H.No 806, Sahabhavana Township, Bandlaguda Nagole, Hyderabad - 500068</span>
+                <span>Address: vk dryfish basket unit, Door number: 107 _A, Ramalayam temple, Nimmakuru(old), Krishna District, Andhra Pradesh</span>
               </li>
             </ul>
           </div>

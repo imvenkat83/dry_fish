@@ -69,9 +69,10 @@ export default function Footer() {
                   <MapPin size={15} />
                 </div>
                 <div className="leading-relaxed">
-                  <p className="font-medium">H.No 806, Sahabhavana Township,</p>
-                  <p>Bandlaguda Nagole,</p>
-                  <p className="text-[#fcd34d] font-semibold">Hyderabad - 500068</p>
+                  <p className="font-medium">vk dryfish basket unit,</p>
+                  <p>Door number: 107 _A, Ramalayam temple,</p>
+                  <p>Nimmakuru(old),</p>
+                  <p className="text-[#fcd34d] font-semibold">Krishna District, Andhra Pradesh</p>
                 </div>
               </li>
 
