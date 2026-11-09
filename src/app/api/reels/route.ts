@@ -28,7 +28,7 @@ export async function GET() {
         p.images AS productImages,
         p.category AS productCategory
       FROM reels r
-      LEFT JOIN products p ON r.product_id = p.id
+      LEFT JOIN products p ON r.product_id = p.id AND (p.is_active = 1 OR p.is_active IS NULL)
       WHERE r.is_active = 1
       ORDER BY r.display_order ASC, r.id DESC
     `);
@@ -43,7 +43,7 @@ export async function GET() {
         badgeText: row.badgeText || "NEW",
         viewsCount: row.viewsCount || "2.5M",
         displayOrder: row.displayOrder || 0,
-        product: row.productId ? {
+        product: (row.productId && row.productName) ? {
           id: row.productId,
           name: row.productName,
           description: row.productDescription,
