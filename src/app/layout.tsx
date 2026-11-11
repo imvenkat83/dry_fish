@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import MetaPixel from "@/components/MetaPixel";
 import "./globals.css";
 
 import Script from "next/script";
@@ -45,7 +46,13 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${inter.variable} ${playfair.variable} antialiased`}
     >
-      <body className="min-h-screen bg-brand-light font-inter text-brand-dark flex flex-col">
+      <head>
+        <MetaPixel />
+      </head>
+      <body
+        suppressHydrationWarning
+        className="min-h-screen bg-brand-light font-inter text-brand-dark flex flex-col"
+      >
         <Script
           id="vk-landing-init"
           strategy="beforeInteractive"
