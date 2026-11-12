@@ -4,10 +4,12 @@ import Navbar from "@/components/Navbar";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import MetaPixel from "@/components/MetaPixel";
+import MetaPixelTracker from "@/components/MetaPixel";
 import "./globals.css";
 
 import Script from "next/script";
+
+const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || "1502456308396887";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -47,12 +49,42 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable} antialiased`}
     >
       <head>
-        <MetaPixel />
+        <Script
+          id="meta-pixel-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin')) {
+                !function(f,b,e,v,n,t,s)
+                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)}(window, document,'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', '${FB_PIXEL_ID}');
+                fbq('track', 'PageView');
+              }
+            `,
+          }}
+        />
+        <noscript>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src={`https://www.facebook.com/tr?id=${FB_PIXEL_ID}&ev=PageView&noscript=1`}
+            alt=""
+          />
+        </noscript>
       </head>
       <body
         suppressHydrationWarning
         className="min-h-screen bg-brand-light font-inter text-brand-dark flex flex-col"
       >
+        <MetaPixelTracker />
         <Script
           id="vk-landing-init"
           strategy="beforeInteractive"
